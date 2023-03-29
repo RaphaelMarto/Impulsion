@@ -1,0 +1,23 @@
+<ion-header [translucent]="true" mode="ios" *ngIf="isIOS">
+    <ion-toolbar>
+        <ion-img src="../../../../assets/icon/test.png" slot="start"></ion-img>
+        <ion-title>
+            {{name}}
+        </ion-title>
+        <ion-button slot="end">
+            <ion-icon area-hidden="true" slot="icon-only" name="person-circle-outline"></ion-icon>
+        </ion-button>
+    </ion-toolbar>
+</ion-header>
+
+<ion-header mode="md" *ngIf="!isIOS">
+    <ion-toolbar>
+        <ion-img src="../../../../assets/icon/test.png" slot="start"></ion-img>
+        <ion-title>
+            {{name}}
+        </ion-title>
+        <ion-button slot="end">
+            <ion-icon area-hidden="true" slot="icon-only" name="person-circle-outline"></ion-icon>
+        </ion-button>
+    </ion-toolbar>
+</ion-header>

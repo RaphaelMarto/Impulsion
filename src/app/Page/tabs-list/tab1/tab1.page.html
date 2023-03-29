@@ -1,0 +1,40 @@
+<app-header name="Home"></app-header>
+
+<ion-content
+  [fullscreen]="true"
+  [scrollEvents]="true"
+  #content
+  id="content"
+  (ionScroll)="onContentScroll($event)"
+  (ionScrollEnd)="onContentScrollEnd($event)"
+  disableScroll
+>
+  <ion-row [id]="'page-' + PageNumber" *ngFor="let image of images let PageNumber = index">
+    <ion-img src="{{image}}"></ion-img>
+    <ion-toolbar>
+      <ion-buttons class="reaction-toolbar">
+        <ion-button (click)="getLiked(PageNumber)">
+          <ion-icon
+            slot="icon-only"
+            [name]="like[PageNumber] ? 'heart' : 'heart-outline'"
+          ></ion-icon
+          ><br />
+          <p slot="icon-only">{{numLike[PageNumber]}}</p>
+        </ion-button>
+        <ion-button>
+          <ion-icon slot="icon-only" name="chatbubble-ellipses"></ion-icon>
+          <p slot="icon-only">{{0}}</p>
+        </ion-button>
+        <ion-button>
+          <ion-icon slot="icon-only" name="share-social"></ion-icon>
+          <p slot="icon-only">{{0}}</p>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-row>
+  <ion-infinite-scroll (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingText="Loading..."
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
