@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "impulsion",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "impulsion",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "null",
+    "password": null,
+    "database": "null",
+    "host": "null",
+    "dialect": "null"
+  }
+}

@@ -6,5 +6,17 @@
       <ion-title size="large">Music</ion-title>
     </ion-toolbar>
   </ion-header>
-
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-button (click)="chooseFile()"><ion-icon name="add-outline"></ion-icon></ion-button>
+    <!-- <ion-fab-button (click)="fileInput.click()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+    <input
+      #fileInput
+      type="file"
+      accept="audio/*"
+      style="display: none"
+      (change)="onFileSelected($event)"
+    /> -->
+  </ion-fab>
 </ion-content>
