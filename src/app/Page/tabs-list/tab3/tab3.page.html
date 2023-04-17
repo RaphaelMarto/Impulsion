@@ -6,17 +6,15 @@
       <ion-title size="large">Music</ion-title>
     </ion-toolbar>
   </ion-header>
+  <p *ngIf="name !== ''">{{name}}</p>
+  <p *ngIf="name !== ''">Durée de la musique: {{minutes}} minutes {{secondes}} secondes.</p>
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-button (click)="chooseFile()"><ion-icon name="add-outline"></ion-icon></ion-button>
-    <!-- <ion-fab-button (click)="fileInput.click()">
+    <ion-fab-button *ngIf="name === ''" (click)="fileInput.click()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-    <input
-      #fileInput
-      type="file"
-      accept="audio/*"
-      style="display: none"
-      (change)="onFileSelected($event)"
-    /> -->
+    <input #fileInput type="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)"/>
+    <ion-fab-button *ngIf="name !== ''" (click)="uploadFiles()">
+      <ion-icon name="checkmark-outline"></ion-icon>
+    </ion-fab-button>
   </ion-fab>
 </ion-content>

@@ -1,13 +1,13 @@
 {
   "development": {
-    "username": "root",
+    "username": "dev",
     "password": null,
     "database": "impulsion",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
-    "username": "root",
+    "username": "dev",
     "password": null,
     "database": "impulsion",
     "host": "localhost",

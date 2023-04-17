@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
 
     const Music = sequelize.define("Music", {
         File: {
-            type: DataTypes.STRING,
+            type: DataTypes.BLOB('long'),
             allowNull: false
         },
         SongName: {

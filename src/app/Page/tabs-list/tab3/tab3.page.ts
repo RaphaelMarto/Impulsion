@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { FileChooser } from '@ionic-native/file-chooser/ngx';
-import { File } from '@ionic-native/file/ngx';
+import { Tab3Service } from './service/tab3.service';
 
 @Component({
   selector: 'app-tab3',
@@ -10,85 +9,29 @@ import { File } from '@ionic-native/file/ngx';
 })
 export class Tab3Page {
   public isIOS: boolean;
+  public name: string = '';
+  public minutes:number = 0;
+  public secondes:number = 0;
+  public file:any;
 
-  constructor(
-    private platform: Platform,
-    private fileChooser: FileChooser,
-    private file: File
-  ) {
+  constructor(private platform: Platform, private tab3Service: Tab3Service) {
     this.isIOS = this.platform.is('ios');
   }
 
-  // async selectAudioFiles() {
-  //   const selectedFiles = await FileSelector.fileSelector({
-  //     multipleSelection: true,
-  //     exts: ['mp3', 'wav', 'ogg'],
-  //   });
-  //   // do something with the selected files
-  // }
-
-  // async openFileFolder() {
-  //   const path = 'My Audio Files';
-  //   const directory = Directory.External;
-  //   const uri = await Filesystem.getUri({
-  //     directory,
-  //     path,
-  //   });
-  //   try {
-  //     await Filesystem.mkdir({
-  //       directory,
-  //       path,
-  //       recursive: false,
-  //     });
-  //   } catch (e) {
-  //     console.error('Directory exists', e);
-  //   }
-  //   await this.selectAudioFiles();
-  // }
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    console.log(file.name);
-    console.log(file.type);
-    console.log(file.size);
-    // you can also upload the selected file to a server or play it in your app
-  }
+    this.file = event.target.files[0];
+    this.name = this.file.name.substring(0, this.file.name.lastIndexOf('.'));
 
-  // async selectAudioFile() {
-  //   const options: FileSelectorOptions = {
-  //     multiple: false,
-  //     mimeType: ['audio/mpeg', 'audio/wav'],
-  //   };
+    const audio = new Audio();
+    audio.src = URL.createObjectURL(this.file);
 
-  //   const result = await FileSelector.fileSelector(options);
-
-  //   if (result.files.length > 0) {
-  //     const fileUri = result.files[0].uri;
-  //     const fileContent = await Filesystem.readFile({
-  //       path: fileUri,
-  //       directory: Directory.Cache,
-  //       encoding: Encoding.UTF8,
-  //     });
-
-  //     console.log('Selected audio file content:', fileContent);
-  //   } else {
-  //     console.log('No file selected.');
-  //   }
-  // }
-
-  async chooseFile() {
-    try {
-      const uri = await this.fileChooser.open();
-      const fileEntry = await this.file.resolveLocalFilesystemUrl(uri);
-      const file = await this.getFile(fileEntry);
-      console.log(file);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async getFile(fileEntry:any) {
-    return new Promise((resolve, reject) => {
-      fileEntry.file(resolve, reject);
+    audio.addEventListener('loadedmetadata', () => {
+      this.minutes = Math.trunc(audio.duration/60);
+      this.secondes = Math.trunc(audio.duration%60);
     });
+  }
+
+  uploadFiles(){
+    this.tab3Service.uploadAudio(this.file);
   }
 }

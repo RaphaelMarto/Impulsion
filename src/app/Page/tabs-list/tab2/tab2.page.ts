@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserInterface } from '../../../interface/user.interface';
 import { Platform } from '@ionic/angular';
+import { config } from '../../../config/configuration';
 
 @Component({
   selector: 'app-tab2',
@@ -22,7 +23,7 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit() {
     this.http
-      .get<UserInterface[]>('http://localhost:3000/users')
+      .get<UserInterface[]>(config.API_URL+'/users')
       .subscribe((res) => {
         this.test = res[0]['Username'];
       });

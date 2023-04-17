@@ -17,6 +17,7 @@
           <ion-icon
             slot="icon-only"
             [name]="like[PageNumber] ? 'heart' : 'heart-outline'"
+            [class]="like[PageNumber] ? 'heart' : ''"
           ></ion-icon
           ><br />
           <p slot="icon-only">{{numLike[PageNumber]}}</p>

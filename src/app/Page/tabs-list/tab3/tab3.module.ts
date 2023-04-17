@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { Tab3Page } from './tab3.page';
 
 import { Tab3PageRoutingModule } from './tab3-routing.module';
-import { FileChooser } from '@ionic-native/file-chooser/ngx';
-import { File } from '@ionic-native/file/ngx';
+import { HttpClientModule } from '@angular/common/http';
+import { Tab3Service } from './service/tab3.service';
 
 @NgModule({
   imports: [
@@ -16,8 +16,9 @@ import { File } from '@ionic-native/file/ngx';
     FormsModule,
     Tab3PageRoutingModule,
     HeaderModule,
+    HttpClientModule,
   ],
   declarations: [Tab3Page],
-  providers: [FileChooser,File],
+  providers: [Tab3Service],
 })
 export class Tab3PageModule {}
