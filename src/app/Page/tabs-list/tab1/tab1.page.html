@@ -10,7 +10,8 @@
   disableScroll
 >
   <ion-row [id]="'page-' + PageNumber" *ngFor="let image of images let PageNumber = index">
-    <ion-img src="{{image}}"></ion-img>
+    <!-- <ion-img src="{{image}}"></ion-img> -->
+    <canvas #visual [attr.id]="'canva-' + PageNumber"></canvas>
     <ion-toolbar>
       <ion-buttons class="reaction-toolbar">
         <ion-button (click)="getLiked(PageNumber)">
@@ -38,4 +39,5 @@
       loadingText="Loading..."
     ></ion-infinite-scroll-content>
   </ion-infinite-scroll>
+  <button #hiddenButton (click)="onHiddenButtonClick()" style="display:none"></button>
 </ion-content>
