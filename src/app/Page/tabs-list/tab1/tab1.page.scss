@@ -1,22 +1,13 @@
-ion-img {
-    object-fit: cover;
-    display: inline;
-}
-
-ion-toolbar {
+.reaction-container {
     position: absolute;
-    top: 70%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    bottom: 10%;
+    right: 3%;
     z-index: 1;
-    --background: transparent;
 }
 
 .reaction-toolbar {
-    flex-wrap: wrap;
+    display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: end;
 
     ion-button {
         width: 80px;
@@ -33,12 +24,13 @@ ion-toolbar {
     }
 }
 
-ion-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+button {
+    background-color: transparent;
+    padding: 3px 3px 0px 3px;
+}
+
+p {
+    margin-top: 3px;
 }
 
 @media (max-width: 767px) {
@@ -94,4 +86,10 @@ ion-row{
 
 .heart{
     color: rgb(254, 37, 27);
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
 }

@@ -1,5 +1,3 @@
-<app-header name="Home"></app-header>
-
 <ion-content
   [fullscreen]="true"
   [scrollEvents]="true"
@@ -12,27 +10,26 @@
   <ion-row [id]="'page-' + PageNumber" *ngFor="let image of images let PageNumber = index">
     <!-- <ion-img src="{{image}}"></ion-img> -->
     <canvas #visual [attr.id]="'canva-' + PageNumber"></canvas>
-    <ion-toolbar>
+    <div class="reaction-container">
       <ion-buttons class="reaction-toolbar">
-        <ion-button (click)="getLiked(PageNumber)">
+        <button (click)="getLiked(PageNumber)">
           <ion-icon
             slot="icon-only"
             [name]="like[PageNumber] ? 'heart' : 'heart-outline'"
             [class]="like[PageNumber] ? 'heart' : ''"
-          ></ion-icon
-          ><br />
+          ></ion-icon>
           <p slot="icon-only">{{numLike[PageNumber]}}</p>
-        </ion-button>
-        <ion-button>
+        </button>
+        <button>
           <ion-icon slot="icon-only" name="chatbubble-ellipses"></ion-icon>
           <p slot="icon-only">{{0}}</p>
-        </ion-button>
-        <ion-button>
+        </button>
+        <button>
           <ion-icon slot="icon-only" name="share-social"></ion-icon>
           <p slot="icon-only">{{0}}</p>
-        </ion-button>
+        </button>
       </ion-buttons>
-    </ion-toolbar>
+    </div>
   </ion-row>
   <ion-infinite-scroll (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content

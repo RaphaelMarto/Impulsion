@@ -1,0 +1,24 @@
+<ion-content>
+  <h1 class="title"> {{login ? 'Déconnectez-vous !' :' Connectez-vous !'}}</h1>
+  <div class="container">
+    <div>
+      <div *ngIf="!login">
+        <button class="google-button" (click)="signInWithGoogle()">
+          <div class="button__icon-wrapper">
+            <img
+              class="button__icon"
+              src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+              alt="Google logo"
+            />
+          </div>
+          <span class="button__text">Sign in with Google</span>
+        </button>
+      </div>
+      <div *ngIf="login">
+        <button class="google-button" (click)="logout()">
+          <span class="button__text">Log out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

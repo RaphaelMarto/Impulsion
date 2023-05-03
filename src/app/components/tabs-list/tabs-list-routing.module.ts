@@ -20,7 +20,7 @@ const routes: Routes = [
         loadChildren: () => import('../../Page/tabs-list/tab3/tab3.module').then(m => m.Tab3PageModule)
       },
       {
-        path: 'notif',
+        path: 'profil',
         loadChildren: () => import('../../Page/tabs-list/tab4/tab4.module').then(m => m.Tab4PageModule)
       },
       {
