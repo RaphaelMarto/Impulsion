@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './Authentication/auth.module';
 import { LoginModule } from './Page/login/login.module';
+import { TabsProfilComponentModule } from './components/tabs-profil-component/tabs-profil-component.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,6 +18,7 @@ import { LoginModule } from './Page/login/login.module';
     AppRoutingModule,
     AuthModule,
     LoginModule,
+    TabsProfilComponentModule,
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

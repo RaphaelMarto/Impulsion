@@ -143,7 +143,7 @@ export class Tab1Page implements OnInit, AfterViewInit {
 
       const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
-          console.log(entry.isIntersecting);
+         // console.log(entry.isIntersecting);
           if (entry.isIntersecting) {
             // Start playing the audio when the row comes into view
             startPlaying();
@@ -237,9 +237,9 @@ export class Tab1Page implements OnInit, AfterViewInit {
     loadUnload: boolean
   ) {
     if (playPause) {
-      console.log(this.context.state, this.source);
+    //  console.log(this.context.state, this.source);
       if (loadUnload) {
-        console.log('launch');
+ //       console.log('launch');
         const audio = await this.loadAudio(music);
         const analyser = this.context.createAnalyser();
         analyser.fftSize = 2048;
@@ -253,7 +253,7 @@ export class Tab1Page implements OnInit, AfterViewInit {
         this.source.connect(analyser);
         analyser.connect(gainNode);
         gainNode.connect(this.context.destination);
-        console.log(this.source, this.source.context.state);
+  //      console.log(this.source, this.source.context.state);
         this.source.start(0);
 
         const bufferLength = analyser.frequencyBinCount;
@@ -315,7 +315,7 @@ export class Tab1Page implements OnInit, AfterViewInit {
 
         draw();
       } else if (this.source) {
-        console.log('context', this.context.state, this.source.context.state);
+      //  console.log('context', this.context.state, this.source.context.state);
         this.source.stop();
       }
     } else {

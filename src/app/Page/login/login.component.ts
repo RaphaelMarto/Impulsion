@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
         //const token = credential!.idToken; googletoken
 
         const token = (await result.user.getIdTokenResult()).token;
-        const connecter = this.authService.login(token);
+        const connecter = await this.authService.login(token);
         if (connecter) {
           this.router.navigate(['/tabs/home']);
         }

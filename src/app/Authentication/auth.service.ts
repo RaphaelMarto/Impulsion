@@ -9,13 +9,16 @@ import { Observable, map } from 'rxjs';
 export class AuthService {
   constructor(private http: HttpClient) {}
 
-  login(token: string): boolean {
+  async login(token: string): Promise<boolean> {
     const options = { withCredentials: true };
-    this.http.post(config.API_URL + '/auth/login', { token }, options).subscribe(
-      (response) => console.log('Token sent successfully'),
-      (error) => console.error('Error sending token:', error)
-    );
+  try {
+    const response:any = await this.http.post(config.API_URL + '/auth/login', { token }, options).toPromise();
+    console.log(response.res);
+    return response.res;
+  } catch (error) {
+    console.error('Error sending token:', error);
     return false;
+  }
   }
 
   logout(): void {

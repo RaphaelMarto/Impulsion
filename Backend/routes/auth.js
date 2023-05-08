@@ -12,6 +12,7 @@ router.post("/login", async (req, res) => {
   try {
     // Verify token and get user ID
     const decodedToken = await admin.auth().verifyIdToken(idToken);
+    console.log(decodedToken.uid)
     const uid = decodedToken.uid;
     const user = await admin.auth().getUser(uid);
     // Check if user exists in database
@@ -23,9 +24,15 @@ router.post("/login", async (req, res) => {
     if (!userDoc.exists) {
       // User doesn't exist, create new user document
       await admin.firestore().collection("Utilisateur").doc(uid).set({
-        email: user.providerData[0].email,
-        name: user.displayName,
-        photoUrl: user.photoURL,
+        Email: user.providerData[0].email,
+        Nickname: user.displayName,
+        PhotoUrl: user.photoURL,
+        Country: null,
+        City: null,
+        Role: 1,
+        PolicyCheck: true,
+        IsActive: true,
+        Phone: null,
       });
     }
 
@@ -41,7 +48,7 @@ router.post("/login", async (req, res) => {
         expires: new Date(Date.now() + expiresIn ),
         httpOnly:true,
       });
-      res.send({res:"cookie sent!"});
+      res.send({res:true});
   } catch (error) {
     console.log("Error:", error);
     res.sendStatus(500);
