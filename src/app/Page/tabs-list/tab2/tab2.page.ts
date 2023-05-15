@@ -22,10 +22,5 @@ export class Tab2Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.http
-      .get<UserInterface[]>(config.API_URL+'/users')
-      .subscribe((res) => {
-        this.test = res[0]['Username'];
-      });
   }
 }
