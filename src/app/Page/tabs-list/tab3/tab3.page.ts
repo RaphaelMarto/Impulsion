@@ -1,37 +1,195 @@
-import { Component } from '@angular/core';
-import { Platform } from '@ionic/angular';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { LoadingController, Platform, ToastController } from '@ionic/angular';
 import { Tab3Service } from './service/tab3.service';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import WaveSurfer from 'wavesurfer.js';
+import * as WaveSurferTimeline from 'wavesurfer.js/src/plugin/timeline';
+import * as WaveSurferRegion from 'wavesurfer.js/src/plugin/regions';
+import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
 })
-export class Tab3Page {
+export class Tab3Page implements OnInit {
   public isIOS: boolean;
   public name: string = '';
-  public minutes:number = 0;
-  public secondes:number = 0;
-  public file:any;
+  public minutes: number = 0;
+  public secondes: number = 0;
+  public file: any;
+  public genre: any[] = [];
+  musicForm!: FormGroup<any>;
+  audioFile: any;
+  audioDuration: any;
+  wave: any;
+  duration: number = 0;
+  dragging: boolean = false;
+  condition: boolean = false;
+  sending:boolean = false;
 
-  constructor(private platform: Platform, private tab3Service: Tab3Service) {
+  @ViewChild('waveform', { static: false }) waveformcontainer!: ElementRef;
+
+  constructor(
+    private platform: Platform,
+    private tab3Service: Tab3Service,
+    public loadingController: LoadingController,
+    public toastController: ToastController,
+    private formBuilder: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {
     this.isIOS = this.platform.is('ios');
   }
 
-  onFileSelected(event: any) {
-    this.file = event.target.files[0];
+  ngOnInit(): void {
+    this.tab3Service.getGenre().subscribe((data) => {
+      this.genre = data;
+    });
+  }
+
+  async presentLoading(): Promise<HTMLIonLoadingElement> {
+    const loading = await this.loadingController.create({
+      message: 'Uploading file...',
+    });
+    await loading.present();
+    return loading;
+  }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'File uploaded successfully.',
+      duration: 2000,
+      position: 'top',
+    });
+    toast.present();
+  }
+
+  onFileSelected(event: any): void {
+    this.file = event.target.files[0] as File;
     this.name = this.file.name.substring(0, this.file.name.lastIndexOf('.'));
+    this.condition = true;
 
     const audio = new Audio();
     audio.src = URL.createObjectURL(this.file);
 
     audio.addEventListener('loadedmetadata', () => {
-      this.minutes = Math.trunc(audio.duration/60);
-      this.secondes = Math.trunc(audio.duration%60);
+      this.duration = audio.duration;
     });
+
+    this.musicForm = this.formBuilder.group({
+      name: [this.name, Validators.required],
+      genre: new FormControl('', Validators.required),
+      desc: ['', Validators.required],
+    });
+    this.cdr.detectChanges();
+    this.audioPlayerCreate();
   }
 
-  uploadFiles(){
-    this.tab3Service.uploadAudio(this.file);
+  exportSelected() {
+    const region: any = Object.values(this.wave.regions.list)[0];
+    if (region) {
+      const start = region.start;
+      const end = region.end;
+      const newFile = new File([this.file.slice((start * 44100) / 2, (end * 44100) / 2)], this.file.name, {
+        type: this.file.type,
+        lastModified: this.file.lastModified,
+      });
+      this.file = newFile;
+    } else {
+      console.log('No region selected.');
+    }
+  }
+
+  audioPlayerCreate() {
+    console.log('here');
+    this.audioFile = URL.createObjectURL(this.file);
+    this.wave = WaveSurfer.create({
+      container: this.waveformcontainer.nativeElement,
+      waveColor: 'red',
+      progressColor: 'orange',
+      cursorWidth: 1,
+      cursorColor: 'black',
+      backend: 'MediaElement',
+      plugins: [
+        // WaveSurferTimeline.default.create({
+        //   container: '#timeline',
+        //   height: 20,
+        //   notchPercentHeight: 90,
+        //   unlabeledNotchColor: '#c0c0c0',
+        //   primaryColor: 'white',
+        //   secondaryColor: 'gray',
+        //   primaryFontColor: 'white',
+        //   secondaryFontColor: 'white',
+        //   zoomDebounce: 10,
+        //   zoomThreshold: 10000,
+        //   duration: this.duration,
+        //   timeInterval: function (step: number) {
+        //     let duration = moment.duration(step, 'seconds');
+        //     if (duration.asHours() >= 1) {
+        //       return duration.asSeconds();
+        //     }
+        //     return duration.asSeconds();
+        //   },
+        // }),
+        WaveSurferRegion.default.create({
+          regions: [],
+        }),
+        Minimap.default.create({}),
+      ],
+    });
+
+    this.wave.load(this.audioFile);
+    this.wave.on('ready', () => {
+      // Create a region that spans the entire audio file
+      const region = this.wave.addRegion({
+        start: 0,
+        end: 10,
+        color: 'rgba(140, 191, 217, 0.4)',
+        minLength: 10,
+        maxLength: 20,
+      });
+    });
+    this.cdr.detectChanges();
+  }
+
+  async uploadFiles(): Promise<void> {
+    this.sending = true;
+    if (this.musicForm.valid) {
+      const loading = await this.presentLoading();
+      const res = await this.tab3Service.uploadAudio(this.file, this.musicForm.value);
+      if (res) {
+        loading.dismiss();
+      }
+      this.name = '';
+      this.presentToast();
+      this.condition = false;
+      this.sending = false;
+    }
+  }
+
+  play(): void {
+    this.wave.play();
+  }
+
+  pause(): void {
+    this.wave.pause();
+  }
+
+  zoomIn() {
+    this.wave.zoom(this.wave.params.minPxPerSec * 1.5);
+  }
+
+  zoomOut() {
+    this.wave.zoom(this.wave.params.minPxPerSec * 0.5);
   }
 }

@@ -40,6 +40,7 @@ const serviceAccount = require("./security/impulsion-6bca6-firebase-adminsdk-w7g
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(serviceAccount),
   databaseURL: "https://impulsion-6bca6.firebaseio.com",
+  storageBucket: 'impulsion-6bca6.appspot.com',
 });
 
 
