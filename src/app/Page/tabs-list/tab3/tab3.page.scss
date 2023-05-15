@@ -77,11 +77,19 @@ form input {
     justify-content: center;
 }
 
-ion-button {
+.ion-button-justify {
     justify-self: center;
 }
 
 .error{
     margin-bottom: 10%;
     color:rgba(255, 0, 0, 0.5);
+}
+
+.right-button {
+    right: 2%;
+    top: 3%;
+    position: absolute;
+    --background: transparent;
+    padding: 3px 3px 0px 3px;
 }

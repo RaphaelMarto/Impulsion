@@ -46,7 +46,7 @@ export class Tab3Page implements OnInit {
     public loadingController: LoadingController,
     public toastController: ToastController,
     private formBuilder: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.isIOS = this.platform.is('ios');
   }
@@ -191,5 +191,9 @@ export class Tab3Page implements OnInit {
 
   zoomOut() {
     this.wave.zoom(this.wave.params.minPxPerSec * 0.5);
+  }
+
+  cancel() {
+    this.condition = false;
   }
 }

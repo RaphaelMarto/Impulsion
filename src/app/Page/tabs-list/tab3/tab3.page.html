@@ -6,6 +6,9 @@
   </ion-header>
   <div class="music-container">
     <form *ngIf="condition" [formGroup]="musicForm" id="music-form" (submit)="uploadFiles()">
+      <ion-button class="right-button" (click)="cancel()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
       <div class="form-group">
         <label>Nom</label>
         <input type="text" class="form-control" formControlName="name" />
@@ -33,7 +36,7 @@
       <div class="form-group">
         <div id="waveform" #waveform></div>
         <div id="timeline"></div>
-        <div class="div-button">
+        <div class="div-button ion-button-justify">
           <ion-button (click)="play()">Play</ion-button>
           <ion-button (click)="pause()">Pause</ion-button>
           <ion-button (click)="zoomIn()">Zoom +</ion-button>
