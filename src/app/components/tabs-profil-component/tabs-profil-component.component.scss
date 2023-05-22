@@ -1,0 +1,20 @@
+.centerItem {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+}
+
+.centerItem ion-col:last-child {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.Text-center{
+    font-size:medium;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
   <div class="profile-container">
-    <img class="profile-picture" [src]="user.avatar" alt="Profile Picture" />
+    <img class="profile-picture" [src]="user.avatar" alt="Profile Picture" *ngIf="login" />
     <form *ngIf="login && edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
         <input hidden formControlName="avatar">
@@ -38,7 +38,7 @@
   <div class="button-container" *ngIf="!login">
     <ion-button (click)="connexion()">Connexion</ion-button>
   </div>
-  <div>
-    <!-- <app-tabs-profil-component></app-tabs-profil-component> -->
+   <div *ngIf="login && !edit">
+    <app-tabs-profil-component></app-tabs-profil-component>
   </div>
 </ion-content>

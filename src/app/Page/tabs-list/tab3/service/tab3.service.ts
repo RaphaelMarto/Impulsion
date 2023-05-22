@@ -9,6 +9,7 @@ export class Tab3Service {
   constructor(private http: HttpClient) {}
 
   async uploadAudio(audioFile: any, formValue: musicInterface): Promise<boolean> {
+    const options = { withCredentials: true };
     const formData = new FormData();
     formData.append('file', audioFile);
     formData.append('genre', formValue.genre);
@@ -17,7 +18,7 @@ export class Tab3Service {
     formData.append('desc', formValue.desc);
     console.log(audioFile.size);
     return new Promise((resolve, reject) => {
-      this.http.post(config.API_URL + '/music/upload', formData, {}).subscribe({
+      this.http.post(config.API_URL + '/music/upload', formData, options).subscribe({
         next: () => resolve(true),
         error: (e) => {
           console.error(e);

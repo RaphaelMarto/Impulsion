@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './../../../Authentication/auth.service';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TabsListComponent } from 'src/app/components/tabs-list/tabs-list.component';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
 
 @Component({

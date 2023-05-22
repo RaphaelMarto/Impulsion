@@ -1,13 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, Platform, ToastController } from '@ionic/angular';
 import { Tab3Service } from './service/tab3.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -16,6 +7,8 @@ import * as WaveSurferTimeline from 'wavesurfer.js/src/plugin/timeline';
 import * as WaveSurferRegion from 'wavesurfer.js/src/plugin/regions';
 import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
 import * as moment from 'moment';
+import { AuthService } from 'src/app/Authentication/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab3',
@@ -36,7 +29,8 @@ export class Tab3Page implements OnInit {
   duration: number = 0;
   dragging: boolean = false;
   condition: boolean = false;
-  sending:boolean = false;
+  sending: boolean = false;
+  login: boolean = false;
 
   @ViewChild('waveform', { static: false }) waveformcontainer!: ElementRef;
 
@@ -47,14 +41,25 @@ export class Tab3Page implements OnInit {
     public toastController: ToastController,
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.isIOS = this.platform.is('ios');
   }
 
   ngOnInit(): void {
-    this.tab3Service.getGenre().subscribe((data) => {
-      this.genre = data;
+    this.authService.checkCookie().subscribe(async (response) => {
+      if (response) {
+        this.tab3Service.getGenre().subscribe((data) => {
+          this.genre = data;
+        });
+        this.login = response;
+      }
     });
+  }
+
+  connexion(): void {
+    this.router.navigate(['/login']);
   }
 
   async presentLoading(): Promise<HTMLIonLoadingElement> {
@@ -111,7 +116,6 @@ export class Tab3Page implements OnInit {
   }
 
   audioPlayerCreate() {
-    console.log('here');
     this.audioFile = URL.createObjectURL(this.file);
     this.wave = WaveSurfer.create({
       container: this.waveformcontainer.nativeElement,
@@ -153,9 +157,9 @@ export class Tab3Page implements OnInit {
       // Create a region that spans the entire audio file
       const region = this.wave.addRegion({
         start: 0,
-        end: 10,
+        end: 20,
         color: 'rgba(140, 191, 217, 0.4)',
-        minLength: 10,
+        minLength: 20,
         maxLength: 20,
       });
     });

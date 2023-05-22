@@ -16,7 +16,7 @@ import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-compon
     Tab4RoutingModule,
     HeaderModule,
     ReactiveFormsModule,
-    // TabsProfilComponentModule,
+    TabsProfilComponentModule,
   ],
   declarations: [Tab4Page],
 })

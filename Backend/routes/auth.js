@@ -3,10 +3,6 @@ var router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
 
-router.get("",authenticate, (req, res) => {
-  res.send('Secure route oklm');
-}); 
-
 router.post("/login", async (req, res) => {
   const idToken = req.body.token;
   try {
