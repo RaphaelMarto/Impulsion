@@ -123,4 +123,35 @@ router.get("/user/all", authenticate, async (req, res) => {
     });
 });
 
+router.delete("/user/music/:musicId", authenticate, async (req, res) => {
+  const musicId = req.params.musicId;
+
+  try {
+    const musicRef = await admin.firestore().collection("Music").doc(req.uid).get();
+
+    // Check if the music entry exists
+    if (!musicRef.exists) {
+      res.status(404).send("Music entry not found.");
+      return;
+    }
+    const dataMusic = musicRef.data();
+
+    await admin
+      .firestore()
+      .collection("Music")
+      .doc(req.uid)
+      .update({
+        URL: admin.firestore.FieldValue.arrayRemove(dataMusic["URL"][musicId]),
+        desc: admin.firestore.FieldValue.arrayRemove(dataMusic["desc"][musicId]),
+        genre: admin.firestore.FieldValue.arrayRemove(dataMusic["genre"][musicId]),
+        name: admin.firestore.FieldValue.arrayRemove(dataMusic["name"][musicId]),
+      });
+
+    res.status(200).send();
+  } catch (error) {
+    console.log("Error deleting music entry:", error);
+    res.status(500).send("Error deleting music entry.");
+  }
+});
+
 module.exports = router;
