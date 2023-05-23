@@ -17,4 +17,10 @@ export class TabsProfilService {
       })
     );
   }
+
+  deleteMusic(musicId: number) {
+    console.log(musicId)
+    const options = { withCredentials: true };
+    return this.http.delete(config.API_URL + '/music/user/music/' + musicId, options);
+  }
 }

@@ -19,31 +19,22 @@ export class TabsProfilComponentComponent implements OnInit {
   loadInitialData(): void {
     this.tabsProfilService.getAllMusicUser().subscribe((data: any) => {
       this.items = data;
-      console.log(this.items)
     });
     this.cdr.detectChanges();
   }
 
-  deleteItem(item: any): void {
+  deleteMusic(item: any): void {
     const index = this.items.indexOf(item);
     if (index > -1) {
       this.items.splice(index, 1);
     }
+    this.tabsProfilService.deleteMusic(index).subscribe();
   }
 
-  loadMoreData(event: any): void {
-    // const newItems = this.elementService.getMoreElements();
-
-    this.items = this.items.concat(/*newItems*/ { numero: '5', nom: 'rfr' });
-
-    event.target.complete();
-  }
-
-  loadMoreData2(event: any): void {
-    // const newItems = this.elementService.getMoreElements();
-
-    this.items = this.items.concat(/*newItems*/ { numero: '5', nom: 'rfr' });
-
-    event.target.complete();
+  deleteFriends(item: any): void {
+    const index = this.items.indexOf(item);
+    if (index > -1) {
+      this.items.splice(index, 1);
+    }
   }
 }

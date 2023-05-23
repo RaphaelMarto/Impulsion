@@ -6,7 +6,6 @@ import WaveSurfer from 'wavesurfer.js';
 import * as WaveSurferTimeline from 'wavesurfer.js/src/plugin/timeline';
 import * as WaveSurferRegion from 'wavesurfer.js/src/plugin/regions';
 import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
-import * as moment from 'moment';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { Router } from '@angular/router';
 
@@ -48,12 +47,13 @@ export class Tab3Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe(async (response) => {
-      if (response) {
+    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
+    this.authService.isLoggedIn$.subscribe((logedIn) => {
+      if (logedIn) {
         this.tab3Service.getGenre().subscribe((data) => {
           this.genre = data;
         });
-        this.login = response;
+        this.login = logedIn;
       }
     });
   }

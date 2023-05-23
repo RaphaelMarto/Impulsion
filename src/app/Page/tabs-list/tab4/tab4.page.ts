@@ -41,37 +41,36 @@ export class Tab4Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe(async (response) => {
-      if (response) {
+    this.authService.checkCookie().subscribe((response)=>this.authService.setLoggedInStatus(response))
+    this.authService.isLoggedIn$.subscribe(async (logedIn) => {
+      if (logedIn) {
+        this.login = logedIn;
         await this.getInfoUser();
-        this.login = response;
       }
     });
   }
 
   async getInfoUser(): Promise<void> {
-    this.http
-      .get(config.API_URL + '/user', this.options)
-      .subscribe((s: any) => {
-        this.userCopy = s;
-        this.user.nickname = s.Nickname;
-        this.user.avatar = s.PhotoUrl;
-        this.user.email = s.Email;
-        this.user.phone = s.Phone;
-        this.user.country = s.Country;
-        this.user.city = s.City;
-        this.profileForm = this.formBuilder.group({
-          nickname: [s.Nickname, Validators.required],
-          email: [s.Email, [Validators.required, Validators.email]],
-          phone: [s.Phone],
-          country: [s.Country],
-          city: [s.City],
-          avatar: [s.PhotoUrl],
-        });
+    this.http.get(config.API_URL + '/user', this.options).subscribe((s: any) => {
+      this.userCopy = s;
+      this.user.nickname = s.Nickname;
+      this.user.avatar = s.PhotoUrl;
+      this.user.email = s.Email;
+      this.user.phone = s.Phone;
+      this.user.country = s.Country;
+      this.user.city = s.City;
+      this.profileForm = this.formBuilder.group({
+        nickname: [s.Nickname, Validators.required],
+        email: [s.Email, [Validators.required, Validators.email]],
+        phone: [s.Phone],
+        country: [s.Country],
+        city: [s.City],
+        avatar: [s.PhotoUrl],
       });
+    });
   }
 
-  emitEvent(show:boolean) {
+  emitEvent(show: boolean) {
     this.dataSharingService.setData(show);
   }
 
@@ -82,13 +81,19 @@ export class Tab4Page implements OnInit {
   Edit(): void {
     this.userCopy = { ...this.user };
     this.edit = true;
-     this.emitEvent(false);
+    this.emitEvent(false);
   }
 
   cancelEdit(): void {
     this.profileForm.setValue(this.userCopy);
     this.edit = false;
-     this.emitEvent(true);
+    this.emitEvent(true);
+  }
+
+  setDefaultImage() {
+    var image = document.getElementById('myImage') as HTMLImageElement;
+    image!.src = '../../../../assets/icon/user.png';
+    image!.onerror = null;
   }
 
   onSubmit(): void {
@@ -100,9 +105,7 @@ export class Tab4Page implements OnInit {
       this.user.country = this.profileForm.controls['country'].value;
       this.user.city = this.profileForm.controls['city'].value;
       this.emitEvent(true);
-      this.http
-        .put(config.API_URL + '/user', this.user, this.options)
-        .subscribe();
+      this.http.put(config.API_URL + '/user', this.user, this.options).subscribe();
       this.edit = false;
     }
   }

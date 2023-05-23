@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
   <div class="profile-container">
-    <img class="profile-picture" [src]="user.avatar" alt="Profile Picture" *ngIf="login" />
+    <img id="myImage" class="profile-picture" [src]="user.avatar" (onerror)="setDefaultImage()" alt="Profile Picture" *ngIf="login" />
     <form *ngIf="login && edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
         <input hidden formControlName="avatar">

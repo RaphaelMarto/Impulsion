@@ -17,7 +17,8 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.provider.addScope('email');
     this.provider.addScope('profile');
-    this.checkCookie();
+    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
+    this.checkLogIn();
   }
 
   signInWithGoogle() {
@@ -25,14 +26,13 @@ export class LoginComponent implements OnInit {
     signInWithPopup(auth, this.provider)
       .then(async (result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = await GoogleAuthProvider.credentialFromResult(
-          result
-        );
+        const credential = await GoogleAuthProvider.credentialFromResult(result);
         //const token = credential!.idToken; googletoken
 
         const token = (await result.user.getIdTokenResult()).token;
         const connecter = await this.authService.login(token);
         if (connecter) {
+          this.authService.setLoggedInStatus(true);
           this.router.navigate(['/tabs/home']);
         }
       })
@@ -44,12 +44,13 @@ export class LoginComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.authService.setLoggedInStatus(false);
     this.router.navigate(['/tabs/home']);
   }
 
-  checkCookie() {
-    this.authService.checkCookie().subscribe(
-      (response) => {this.login= response}
-    );
-}
+  checkLogIn() {
+    this.authService.isLoggedIn$.subscribe((logedIn) => {
+      this.login = logedIn;
+    });
+  }
 }
