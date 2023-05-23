@@ -1,0 +1,16 @@
+<ion-content [fullscreen]="true">
+  <div class="profile-container">
+     <ion-button class="right-button" (click)="cancel()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+    <img id="myImage" class="profile-picture" [src]="user.avatar" (onerror)="setDefaultImage()" alt="Profile Picture" *ngIf="login" />
+    <ion-button class="follow-button" (click)="follow()">
+        <ion-icon name="heart-outline" slot="icon-only"></ion-icon>
+        <p>Follow</p>
+    </ion-button>
+    <div class="profile-info" *ngIf="login">
+      <h1>{{user.nickname}}</h1>
+      <p>Country: {{user.country}}</p>
+    </div>
+  </div>
+</ion-content>

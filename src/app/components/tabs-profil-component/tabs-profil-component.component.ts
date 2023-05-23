@@ -8,8 +8,8 @@ import { TabsProfilService } from './service/tabs-profil.service';
 })
 export class TabsProfilComponentComponent implements OnInit {
   activeTab: string = 'music';
-  items: any[] = [];
-
+  music: any[] = [];
+  follow: any[] = [];
   constructor(private tabsProfilService: TabsProfilService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -18,23 +18,28 @@ export class TabsProfilComponentComponent implements OnInit {
 
   loadInitialData(): void {
     this.tabsProfilService.getAllMusicUser().subscribe((data: any) => {
-      this.items = data;
+      this.music = data;
+    });
+
+    this.tabsProfilService.getAllFollow().subscribe((data: any) => {
+      this.follow = data;
     });
     this.cdr.detectChanges();
   }
 
   deleteMusic(item: any): void {
-    const index = this.items.indexOf(item);
+    const index = this.music.indexOf(item);
     if (index > -1) {
-      this.items.splice(index, 1);
+      this.music.splice(index, 1);
+      this.tabsProfilService.deleteMusic(index).subscribe();
     }
-    this.tabsProfilService.deleteMusic(index).subscribe();
   }
 
-  deleteFriends(item: any): void {
-    const index = this.items.indexOf(item);
+  deleteFollow(item: any): void {
+    const index = this.follow.indexOf(item);
     if (index > -1) {
-      this.items.splice(index, 1);
+      this.follow.splice(index, 1);
+      this.tabsProfilService.deleteFollow(item.uid).subscribe();
     }
   }
 }

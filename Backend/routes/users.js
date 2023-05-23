@@ -32,6 +32,34 @@ router.get("", authenticate, (req, res) => {
     });
 });
 
+router.get("/:UserId", (req, res) => {
+  const userId = req.params.UserId
+  admin
+    .firestore()
+    .collection("Utilisateur")
+    .doc(userId)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        // No document found for the given UID
+        res.status(404).send("Document not found");
+      } else {
+        // Retrieve the data from the document
+        const userData = doc.data();
+        const selectData = {
+          Nickname: userData.Nickname,
+          Country: userData.Country,
+          PhotoUrl: userData.PhotoUrl,
+        };
+        res.send(selectData);
+      }
+    })
+    .catch((error) => {
+      console.log("Error fetching user data:", error);
+      res.status(500).send("Error fetching user data");
+    });
+});
+
 router.put("", authenticate, (req, res) => {
   const updatedUserData = {
     Nickname: req.body.nickname,

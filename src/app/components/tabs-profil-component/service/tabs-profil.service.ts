@@ -18,9 +18,22 @@ export class TabsProfilService {
     );
   }
 
+  getAllFollow() {
+    const options = { withCredentials: true };
+    return this.http.get(config.API_URL + '/follow/all', options).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
+
   deleteMusic(musicId: number) {
-    console.log(musicId)
     const options = { withCredentials: true };
     return this.http.delete(config.API_URL + '/music/user/music/' + musicId, options);
+  }
+
+  deleteFollow(followedId:any) {
+    const options = { withCredentials: true };
+    return this.http.delete(config.API_URL + '/follow/' + followedId, options);
   }
 }
