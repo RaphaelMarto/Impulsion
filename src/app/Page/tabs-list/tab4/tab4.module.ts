@@ -1,4 +1,3 @@
-import { HeaderModule } from './../../../components/header/header.module';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -7,6 +6,8 @@ import { Tab4Page } from './tab4.page';
 
 import { Tab4RoutingModule } from './tab4-routing.module';
 import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-component/tabs-profil-component.module';
+import { AuthModule } from 'src/app/Authentication/auth.module';
+import { DataSharingServiceModule } from 'src/app/service/data-sharing.module';
 
 @NgModule({
   imports: [
@@ -14,9 +15,10 @@ import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-compon
     CommonModule,
     FormsModule,
     Tab4RoutingModule,
-    HeaderModule,
+    AuthModule,
     ReactiveFormsModule,
     TabsProfilComponentModule,
+    DataSharingServiceModule
   ],
   declarations: [Tab4Page],
 })

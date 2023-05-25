@@ -1,10 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { config } from 'src/app/config/configuration';
 import { Location } from '@angular/common';
-
 
 @Component({
   selector: 'app-profile-other-users',
@@ -18,8 +17,14 @@ export class ProfileOtherUsersComponent implements OnInit {
     country: '',
   };
   login: any;
+  liked: boolean = false;
   options = { withCredentials: true };
   idOther = this.route.snapshot.paramMap.get('id');
+  music: any;
+  followed: boolean = false;
+  itemLikes: { [name: string]: boolean } = {};
+  @ViewChild('audioPlayer', { static: false }) audioPlayerRef!: ElementRef<HTMLAudioElement>;
+
   constructor(
     private authService: AuthService,
     private http: HttpClient,
@@ -28,13 +33,11 @@ export class ProfileOtherUsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
-    this.authService.isLoggedIn$.subscribe(async (logedIn) => {
-      if (logedIn) {
-        this.login = logedIn;
-      }
+    this.authService.isLoggedIn.subscribe((logedIn) => {
+      this.login = logedIn;
+      this.getInfoUser();
+      this.getAllMusicUser();
     });
-    this.getInfoUser();
   }
 
   setDefaultImage(): void {
@@ -49,6 +52,9 @@ export class ProfileOtherUsersComponent implements OnInit {
       this.user.avatar = s.PhotoUrl;
       this.user.country = s.Country;
     });
+    this.http.get(config.API_URL + '/follow/' + this.idOther, this.options).subscribe((s: any) => {
+      this.followed = s.res;
+    });
   }
 
   cancel() {
@@ -56,6 +62,49 @@ export class ProfileOtherUsersComponent implements OnInit {
   }
 
   follow() {
+    this.followed = true;
     this.http.post(config.API_URL + '/follow/' + this.idOther, {}, this.options).subscribe();
+  }
+
+  unfollow() {
+    this.followed = false;
+    this.http.delete(config.API_URL + '/follow/' + this.idOther, this.options).subscribe();
+  }
+
+  getAllMusicUser() {
+    this.http.get(config.API_URL + '/music/' + this.idOther, this.options).subscribe((data: any) => {
+      this.music = data;
+      this.getlike();
+    });
+  }
+
+  deleteLike(name: string) {
+    this.itemLikes[name] = false;
+    this.http.delete(config.API_URL + '/like/del/' + name + '/' + this.idOther, this.options).subscribe();
+  }
+
+  like(name: string) {
+    this.itemLikes[name] = true;
+    this.http.put(config.API_URL + '/like/add/' + name + '/' + this.idOther, {}, this.options).subscribe();
+  }
+
+  getlike() {
+    let music: any;
+    for (music of this.music) {
+      this.http
+        .get(config.API_URL + '/like/liked/' + music.name + '/' + this.idOther, this.options)
+        .subscribe((res: any) => {
+          this.itemLikes[music.name] = res.res;
+        });
+    }
+  }
+
+  playAudio(url: string): void {
+    const audioPlayer: HTMLAudioElement = this.audioPlayerRef.nativeElement;
+    audioPlayer.pause();
+
+    audioPlayer.src = url;
+
+    audioPlayer.play();
   }
 }

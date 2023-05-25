@@ -41,16 +41,16 @@ export class Tab4Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe((response)=>this.authService.setLoggedInStatus(response))
-    this.authService.isLoggedIn$.subscribe(async (logedIn) => {
+    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
+    this.authService.isLoggedIn.subscribe((logedIn) => {
       if (logedIn) {
-        this.login = logedIn;
-        await this.getInfoUser();
+        this.getInfoUser();
       }
+      this.login = logedIn;
     });
   }
 
-  async getInfoUser(): Promise<void> {
+  getInfoUser(): void {
     this.http.get(config.API_URL + '/user', this.options).subscribe((s: any) => {
       this.userCopy = s;
       this.user.nickname = s.Nickname;
@@ -75,6 +75,7 @@ export class Tab4Page implements OnInit {
   }
 
   connexion(): void {
+    this.authService.setLoggedInStatus(true);
     this.router.navigate(['/login']);
   }
 
@@ -109,4 +110,9 @@ export class Tab4Page implements OnInit {
       this.edit = false;
     }
   }
+
+  Deconnexion(){
+    this.authService.setLoggedInStatus(false);
+    this.router.navigate(["/login"]);
+  };
 }

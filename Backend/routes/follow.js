@@ -81,6 +81,25 @@ router.get("/all", authenticate, async (req, res) => {
     });
 });
 
+router.get("/:followID", authenticate, async (req, res) => {
+  const followedId = req.params.followID;
+  admin
+    .firestore()
+    .collection("Follow")
+    .doc(req.uid)
+    .get()
+    .then((doc) => {
+      const follow = doc.data();
+      InfoSelectedFollow = follow.following;
+      if ( InfoSelectedFollow.indexOf(followedId) !== -1){
+        res.status(200).send({res:true})
+      }
+    })
+    .catch((error) => {
+      res.status(500).send("Error fetching user data");
+    });
+});
+
 router.delete("/:followedId", authenticate, async (req, res) => {
   const followedId = req.params.followedId;
 

@@ -47,14 +47,13 @@ export class Tab3Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
-    this.authService.isLoggedIn$.subscribe((logedIn) => {
+    this.authService.isLoggedIn.subscribe((logedIn) => {
       if (logedIn) {
         this.tab3Service.getGenre().subscribe((data) => {
           this.genre = data;
         });
-        this.login = logedIn;
       }
+      this.login = logedIn;
     });
   }
 

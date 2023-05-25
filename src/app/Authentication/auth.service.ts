@@ -3,14 +3,14 @@ import { config } from '../config/configuration';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('AuthService instance:', this);
+  }
 
   async login(token: string): Promise<boolean> {
     const options = { withCredentials: true };
@@ -42,5 +42,9 @@ export class AuthService {
 
   setLoggedInStatus(isLoggedIn: boolean) {
     this.isLoggedInSubject.next(isLoggedIn);
+  }
+
+  get isLoggedIn(): Observable<boolean> {
+    return this.isLoggedIn$;
   }
 }

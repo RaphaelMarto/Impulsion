@@ -43,8 +43,41 @@
 }
 
 .follow-button {
-    --background: transparent;
+    --background:rgb(41, 45, 47);
     padding: 3px 3px 0px 0px;
     margin-top: 3%;
     --box-shadow: none;
+}
+
+.unfollow-button {
+    --background: black;
+    padding: 3px 3px 0px 0px;
+    margin-top: 3%;
+    --box-shadow: none;
+}
+
+ion-list{
+    width: 100%;
+}
+
+.invisible{
+    --background: transparent;
+    --box-shadow: none;
+}
+
+.item-container {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.label-container {
+    flex: 1;
+}
+
+.centered-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
 }

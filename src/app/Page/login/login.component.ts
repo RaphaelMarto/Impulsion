@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { AuthService } from '../../Authentication/auth.service';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private location: Location) {}
 
   private provider = new GoogleAuthProvider();
   public login: boolean = false;
@@ -17,7 +18,6 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.provider.addScope('email');
     this.provider.addScope('profile');
-    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
     this.checkLogIn();
   }
 
@@ -48,8 +48,13 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['/tabs/home']);
   }
 
+  cancel() {
+    this.location.back();
+  }
+
   checkLogIn() {
-    this.authService.isLoggedIn$.subscribe((logedIn) => {
+    this.authService.isLoggedIn.subscribe((logedIn) => {
+      console.log('login', logedIn);
       this.login = logedIn;
     });
   }

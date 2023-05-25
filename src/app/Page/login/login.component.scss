@@ -49,3 +49,12 @@
     font-weight: bold;
     margin-left: 5%;
 }
+
+.right-button {
+    right: 2%;
+    top: 2%;
+    position: absolute;
+    --background: transparent;
+    padding: 3px 3px 0px 3px;
+    --box-shadow: none;
+}

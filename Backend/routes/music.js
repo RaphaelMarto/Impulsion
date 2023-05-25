@@ -55,6 +55,10 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
           desc: admin.firestore.FieldValue.arrayUnion(desc),
         });
     }
+    await admin.firestore().collection("Liked").doc(name).set({
+      idUserLike: [],
+      like: 0,
+    });
 
     fs.unlink(file.path, (err) => {
       if (err) {
@@ -123,6 +127,30 @@ router.get("/user/all", authenticate, async (req, res) => {
     });
 });
 
+router.get("/:userId", authenticate, async (req, res) => {
+  const userId = req.params.userId;
+
+  admin
+    .firestore()
+    .collection("Music")
+    .doc(userId)
+    .get()
+    .then((doc) => {
+      const musique = doc.data();
+      InfoSelectedMusique = musique.name;
+      const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
+        name: name,
+        url: musique.URL[index],
+        number: index + 1,
+      }));
+      res.send(musiqueObjects);
+    })
+    .catch((error) => {
+      console.log("Error fetching user data:", error);
+      res.status(500).send("Error fetching user data");
+    });
+});
+
 router.delete("/user/music/:musicId", authenticate, async (req, res) => {
   const musicId = req.params.musicId;
 
@@ -135,6 +163,8 @@ router.delete("/user/music/:musicId", authenticate, async (req, res) => {
       return;
     }
     const dataMusic = musicRef.data();
+
+    await admin.firestore().collection("Liked").doc(dataMusic["name"][musicId]).delete();
 
     await admin
       .firestore()

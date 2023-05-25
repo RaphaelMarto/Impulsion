@@ -1,32 +1,64 @@
 <ion-content [fullscreen]="true">
   <div class="profile-container">
-    <img id="myImage" class="profile-picture" [src]="user.avatar" (onerror)="setDefaultImage()" alt="Profile Picture" *ngIf="login" />
+    <ion-menu contentId="main-content" *ngIf="login && !edit">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Menu</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-button color="danger" (click)="Deconnexion()">Déconnexion</ion-button>
+      </ion-content>
+    </ion-menu>
+    <ion-header *ngIf="login && !edit">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <img
+      id="myImage"
+      class="profile-picture"
+      [src]="user.avatar"
+      (onerror)="setDefaultImage()"
+      alt="Profile Picture"
+      *ngIf="login"
+    />
+    <img
+      id="myImage"
+      class="profile-picture"
+      src="https://lh3.googleusercontent.com/a/AGNmyxbULLaSSq9aYWP1-JqEmoZ0bBc7-Gkw_SJJMQixsw=s96-c"
+      (onerror)="setDefaultImage()"
+      alt="Profile Picture"
+      *ngIf="login"
+    />
     <form *ngIf="login && edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
-        <input hidden formControlName="avatar">
+        <input hidden formControlName="avatar" />
         <label>Nickname</label>
-        <input type="text" class="form-control" formControlName="nickname">
+        <input type="text" class="form-control" formControlName="nickname" />
       </div>
       <div class="form-group">
         <label>Email</label>
-        <input type="email" class="form-control" formControlName="email">
+        <input type="email" class="form-control" formControlName="email" />
       </div>
       <div class="form-group">
         <label>Phone</label>
-        <input type="tel" class="form-control" formControlName="phone">
+        <input type="tel" class="form-control" formControlName="phone" />
       </div>
       <div class="form-group">
         <label>Country</label>
-        <input type="text" class="form-control" formControlName="country">
+        <input type="text" class="form-control" formControlName="country" />
       </div>
       <div class="form-group">
         <label>City</label>
-        <input type="text" class="form-control" formControlName="city">
+        <input type="text" class="form-control" formControlName="city" />
       </div>
       <ion-button type="submit" shape="round">Save Changes</ion-button>
       <ion-button shape="round" color="medium" class="btn btn-medium" (click)="cancelEdit()">Cancel</ion-button>
     </form>
-    <div class="profile-info" *ngIf="login && !edit">
+    <div class="profile-info" *ngIf="login && !edit" id="main-content">
       <h1>{{user.nickname}}</h1>
       <p>Email: {{user.email}}</p>
       <p>Phone: {{user.phone}}</p>
@@ -38,7 +70,7 @@
   <div class="button-container" *ngIf="!login">
     <ion-button (click)="connexion()">Connexion</ion-button>
   </div>
-   <div *ngIf="login && !edit">
+  <div *ngIf="login && !edit">
     <app-tabs-profil-component></app-tabs-profil-component>
   </div>
 </ion-content>

@@ -1,8 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { UserInterface } from '../../../interface/user.interface';
+import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { config } from '../../../config/configuration';
+
 
 @Component({
   selector: 'app-tab2',
@@ -13,14 +11,16 @@ export class Tab2Page implements OnInit {
   public isIOS: boolean;
   public test: string = 'test';
   public test2: string = 'hein?';
+  login:any
 
   constructor(
     private platform: Platform,
-    private http: HttpClient,
   ) {
     this.isIOS = this.platform.is('ios');
   }
 
   async ngOnInit() {
+   
   }
+
 }
