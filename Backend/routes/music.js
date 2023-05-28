@@ -137,13 +137,15 @@ router.get("/:userId", authenticate, async (req, res) => {
     .get()
     .then((doc) => {
       const musique = doc.data();
-      InfoSelectedMusique = musique.name;
-      const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
-        name: name,
-        url: musique.URL[index],
-        number: index + 1,
-      }));
-      res.send(musiqueObjects);
+      if (musique !== undefined) {
+        InfoSelectedMusique = musique.name;
+        const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
+          name: name,
+          url: musique.URL[index],
+          number: index + 1,
+        }));
+        res.send(musiqueObjects);
+      }
     })
     .catch((error) => {
       console.log("Error fetching user data:", error);

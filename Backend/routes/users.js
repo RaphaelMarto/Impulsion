@@ -4,7 +4,8 @@ const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
 
 router.get("", authenticate, (req, res) => {
-   admin.firestore()
+  admin
+    .firestore()
     .collection("Utilisateur")
     .doc(req.uid)
     .get()
@@ -32,8 +33,42 @@ router.get("", authenticate, (req, res) => {
     });
 });
 
+router.get("/all/:startLetter", async (req, res) => {
+  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
+  const endLetter = String.fromCharCode(startLetter.charCodeAt(0) + 1);
+
+  try {
+    const userRef = admin.firestore().collection("Utilisateur");
+    const snapshot = await userRef.where("Nickname", ">=", startLetter).where("Nickname", "<", endLetter).get();
+
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      res.status(200).send([]);
+      return;
+    }
+
+    const userDataList = [];
+    snapshot.forEach((doc) => {
+      const userData = doc.data();
+      const selectData = {
+        Nickname: userData.Nickname,
+        Country: userData.Country,
+        PhotoUrl: userData.PhotoUrl,
+        id: doc.id,
+      };
+      userDataList.push(selectData);
+    });
+
+    res.status(200).json(userDataList);
+  } catch (error) {
+    console.log("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
+  }
+});
+
+
 router.get("/:UserId", (req, res) => {
-  const userId = req.params.UserId
+  const userId = req.params.UserId;
   admin
     .firestore()
     .collection("Utilisateur")
@@ -69,12 +104,13 @@ router.put("", authenticate, (req, res) => {
     City: req.body.city,
     PhotoUrl: req.body.avatar,
   };
-  admin.firestore()
+  admin
+    .firestore()
     .collection("Utilisateur")
     .doc(req.uid)
     .update(updatedUserData)
     .then(() => {
-      res.status(200).send({result : "User data updated successfully"});
+      res.status(200).send({ result: "User data updated successfully" });
     })
     .catch((error) => {
       console.log(error);

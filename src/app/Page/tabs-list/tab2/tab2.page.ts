@@ -1,6 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
-
+import { config } from 'src/app/config/configuration';
 
 @Component({
   selector: 'app-tab2',
@@ -9,18 +11,26 @@ import { Platform } from '@ionic/angular';
 })
 export class Tab2Page implements OnInit {
   public isIOS: boolean;
-  public test: string = 'test';
-  public test2: string = 'hein?';
-  login:any
+  public data: any;
+  private options = { withCredentials: true };
 
-  constructor(
-    private platform: Platform,
-  ) {
+  constructor(private platform: Platform, private http: HttpClient, private router: Router) {
     this.isIOS = this.platform.is('ios');
   }
 
-  async ngOnInit() {
-   
+  async ngOnInit() {}
+
+  handleInput(event: any) {
+    const query = event.target.value.toLowerCase();
+    if (query !== '') {
+      this.http.get(config.API_URL + '/user/all/' + query, this.options).subscribe((res) => {
+        this.data = res;
+        console.log(this.data);
+      });
+    }
   }
 
+  getProfile(id: string) {
+    this.router.navigate(['/otherProfile', id]);
+  }
 }

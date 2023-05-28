@@ -20,6 +20,9 @@
       <p>Country: {{ user.country }}</p>
     </div>
     <ion-list>
+      <div>
+        <p class="centered-inline" *ngIf="music == null">Pas de musique, pour l'instant ! ♫</p>
+      </div>
       <ion-item *ngFor="let item of music" class="item-container">
         <ion-label class="label-container">
           <ion-row>

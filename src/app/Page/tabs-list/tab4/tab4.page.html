@@ -25,14 +25,6 @@
       alt="Profile Picture"
       *ngIf="login"
     />
-    <img
-      id="myImage"
-      class="profile-picture"
-      src="https://lh3.googleusercontent.com/a/AGNmyxbULLaSSq9aYWP1-JqEmoZ0bBc7-Gkw_SJJMQixsw=s96-c"
-      (onerror)="setDefaultImage()"
-      alt="Profile Picture"
-      *ngIf="login"
-    />
     <form *ngIf="login && edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
         <input hidden formControlName="avatar" />
