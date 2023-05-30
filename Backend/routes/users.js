@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
+const axios = require("axios");
+const config = "http://localhost:3000";
 
 router.get("", authenticate, (req, res) => {
   admin
@@ -53,7 +55,7 @@ router.get("/all/:startLetter", async (req, res) => {
       const selectData = {
         Nickname: userData.Nickname,
         Country: userData.Country,
-        PhotoUrl: userData.PhotoUrl,
+        PhotoUrl: config +'/user/proxy-image?url='+userData.PhotoUrl,
         id: doc.id,
       };
       userDataList.push(selectData);
@@ -63,6 +65,25 @@ router.get("/all/:startLetter", async (req, res) => {
   } catch (error) {
     console.log("Error fetching user data:", error);
     res.status(500).send("Error fetching user data");
+  }
+});
+
+router.get("/proxy-image", async (req, res) => {
+  try {
+    const imageUrl = req.query.url; // The URL of the image to proxy
+    const imageResponse = await axios.get(imageUrl, {
+      responseType: "arraybuffer", // Set the response type to arraybuffer to handle binary data
+    });
+
+    // Set the appropriate headers for the image response
+    res.set("Content-Type", imageResponse.headers["content-type"]);
+    res.set("Content-Length", imageResponse.headers["content-length"]);
+
+    // Send the image data as the response
+    res.send(imageResponse.data);
+  } catch (error) {
+    console.error("Error proxying image:", error);
+    res.sendStatus(500);
   }
 });
 

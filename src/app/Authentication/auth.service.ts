@@ -33,11 +33,7 @@ export class AuthService {
 
   checkCookie(): Observable<any> {
     const options = { withCredentials: true };
-    return this.http.get(config.API_URL + '/auth/check-cookie', options).pipe(
-      map((response) => {
-        return response;
-      })
-    );
+    return this.http.get<boolean>(config.API_URL + '/auth/check-cookie', options)
   }
 
   setLoggedInStatus(isLoggedIn: boolean) {

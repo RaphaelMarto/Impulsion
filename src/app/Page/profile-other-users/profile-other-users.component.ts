@@ -49,7 +49,7 @@ export class ProfileOtherUsersComponent implements OnInit {
   async getInfoUser(): Promise<void> {
     this.http.get(config.API_URL + '/user/' + this.idOther).subscribe((s: any) => {
       this.user.nickname = s.Nickname;
-      this.user.avatar = s.PhotoUrl;
+      this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
       this.user.country = s.Country;
     });
     this.http.get(config.API_URL + '/follow/' + this.idOther, this.options).subscribe((s: any) => {

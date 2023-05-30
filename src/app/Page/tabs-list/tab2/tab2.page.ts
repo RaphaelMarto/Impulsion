@@ -23,10 +23,12 @@ export class Tab2Page implements OnInit {
   handleInput(event: any) {
     const query = event.target.value.toLowerCase();
     if (query !== '') {
-      this.http.get(config.API_URL + '/user/all/' + query, this.options).subscribe((res) => {
+      this.http.get(config.API_URL + '/user/all/' + query, this.options).subscribe((res:any) => {
         this.data = res;
-        console.log(this.data);
+        this.data.PhotoUrl = config.API_URL+'user/proxy-image?url=' + res.PhotoUrl;
       });
+    } else{
+      this.data = []
     }
   }
 

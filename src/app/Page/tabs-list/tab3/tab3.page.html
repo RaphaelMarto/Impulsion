@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
     <div class="music-container">
-      <form *ngIf="condition && login" [formGroup]="musicForm" id="music-form" (submit)="uploadFiles()">
+      <form *ngIf="condition" [formGroup]="musicForm" id="music-form" (submit)="uploadFiles()">
         <ion-button class="right-button" (click)="cancel()">
           <ion-icon name="close-outline" slot="icon-only"></ion-icon>
         </ion-button>
@@ -53,11 +53,8 @@
         </ion-fab-button>
       </form>
     </div>
-    <div class="button-container" *ngIf="!login">
-      <ion-button (click)="connexion()">Connexion</ion-button>
-    </div>
     <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="up">
-      <ion-fab-button *ngIf="!condition && login" (click)="fileInput.click()">
+      <ion-fab-button *ngIf="!condition" (click)="fileInput.click()">
         <ion-icon name="add-outline"></ion-icon>
       </ion-fab-button>
       <input #fileInput type="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)" />

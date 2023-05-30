@@ -29,7 +29,6 @@ export class Tab3Page implements OnInit {
   dragging: boolean = false;
   condition: boolean = false;
   sending: boolean = false;
-  login: boolean = false;
 
   @ViewChild('waveform', { static: false }) waveformcontainer!: ElementRef;
 
@@ -47,18 +46,9 @@ export class Tab3Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.isLoggedIn.subscribe((logedIn) => {
-      if (logedIn) {
-        this.tab3Service.getGenre().subscribe((data) => {
-          this.genre = data;
-        });
-      }
-      this.login = logedIn;
+    this.tab3Service.getGenre().subscribe((data) => {
+      this.genre = data;
     });
-  }
-
-  connexion(): void {
-    this.router.navigate(['/login']);
   }
 
   async presentLoading(): Promise<HTMLIonLoadingElement> {

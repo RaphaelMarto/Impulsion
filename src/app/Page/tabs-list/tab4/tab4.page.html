@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
   <div class="profile-container">
-    <ion-menu contentId="main-content" *ngIf="login && !edit">
+    <ion-menu contentId="main-content" *ngIf="!edit">
       <ion-header>
         <ion-toolbar>
           <ion-title>Menu</ion-title>
@@ -10,7 +10,7 @@
         <ion-button color="danger" (click)="Deconnexion()">Déconnexion</ion-button>
       </ion-content>
     </ion-menu>
-    <ion-header *ngIf="login && !edit">
+    <ion-header *ngIf="!edit">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
@@ -23,9 +23,8 @@
       [src]="user.avatar"
       (onerror)="setDefaultImage()"
       alt="Profile Picture"
-      *ngIf="login"
     />
-    <form *ngIf="login && edit" [formGroup]="profileForm" (submit)="onSubmit()">
+    <form *ngIf="edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
         <input hidden formControlName="avatar" />
         <label>Nickname</label>
@@ -50,7 +49,7 @@
       <ion-button type="submit" shape="round">Save Changes</ion-button>
       <ion-button shape="round" color="medium" class="btn btn-medium" (click)="cancelEdit()">Cancel</ion-button>
     </form>
-    <div class="profile-info" *ngIf="login && !edit" id="main-content">
+    <div class="profile-info" *ngIf="!edit" id="main-content">
       <h1>{{user.nickname}}</h1>
       <p>Email: {{user.email}}</p>
       <p>Phone: {{user.phone}}</p>
@@ -59,10 +58,7 @@
       <ion-button shape="round" class="edit" (click)="Edit()">Edit Profile</ion-button>
     </div>
   </div>
-  <div class="button-container" *ngIf="!login">
-    <ion-button (click)="connexion()">Connexion</ion-button>
-  </div>
-  <div *ngIf="login && !edit">
+  <div *ngIf="!edit">
     <app-tabs-profil-component></app-tabs-profil-component>
   </div>
 </ion-content>

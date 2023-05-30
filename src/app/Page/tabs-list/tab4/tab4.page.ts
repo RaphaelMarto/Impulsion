@@ -14,7 +14,6 @@ import { DataSharingService } from 'src/app/service/data-sharing.service';
 })
 export class Tab4Page implements OnInit {
   public isIOS: boolean;
-  public login: boolean = false;
   user: any = {
     nickname: '',
     avatar: '',
@@ -41,20 +40,14 @@ export class Tab4Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkCookie().subscribe((response) => this.authService.setLoggedInStatus(response));
-    this.authService.isLoggedIn.subscribe((logedIn) => {
-      if (logedIn) {
-        this.getInfoUser();
-      }
-      this.login = logedIn;
-    });
+    this.getInfoUser();
   }
 
   getInfoUser(): void {
     this.http.get(config.API_URL + '/user', this.options).subscribe((s: any) => {
       this.userCopy = s;
       this.user.nickname = s.Nickname;
-      this.user.avatar = s.PhotoUrl;
+      this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
       this.user.email = s.Email;
       this.user.phone = s.Phone;
       this.user.country = s.Country;
@@ -65,18 +58,13 @@ export class Tab4Page implements OnInit {
         phone: [s.Phone],
         country: [s.Country],
         city: [s.City],
-        avatar: [s.PhotoUrl],
+        avatar: [config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl],
       });
     });
   }
 
   emitEvent(show: boolean) {
     this.dataSharingService.setData(show);
-  }
-
-  connexion(): void {
-    this.authService.setLoggedInStatus(true);
-    this.router.navigate(['/login']);
   }
 
   Edit(): void {
@@ -111,8 +99,7 @@ export class Tab4Page implements OnInit {
     }
   }
 
-  Deconnexion(){
-    this.authService.setLoggedInStatus(false);
-    this.router.navigate(["/login"]);
-  };
+  Deconnexion() {
+    this.router.navigate(['/login']);
+  }
 }

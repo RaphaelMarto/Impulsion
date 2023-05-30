@@ -10,6 +10,7 @@ import { AuthModule } from './Authentication/auth.module';
 import { LoginModule } from './Page/login/login.module';
 import { TabsProfilComponentModule } from './components/tabs-profil-component/tabs-profil-component.module';
 import { ProfileOtherModule } from './Page/profile-other-users/profile-other.module';
+import { AuthGuard } from './guards/AuthGuard';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,7 +23,7 @@ import { ProfileOtherModule } from './Page/profile-other-users/profile-other.mod
     TabsProfilComponentModule,
     ProfileOtherModule,
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, AuthGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
