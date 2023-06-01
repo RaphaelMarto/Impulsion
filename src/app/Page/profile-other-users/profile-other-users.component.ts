@@ -80,19 +80,19 @@ export class ProfileOtherUsersComponent implements OnInit {
 
   deleteLike(name: string) {
     this.itemLikes[name] = false;
-    this.http.delete(config.API_URL + '/like/del/' + name + '/' + this.idOther, this.options).subscribe();
+    this.http.delete(config.API_URL + '/like/del/' + name, this.options).subscribe();
   }
 
   like(name: string) {
     this.itemLikes[name] = true;
-    this.http.put(config.API_URL + '/like/add/' + name + '/' + this.idOther, {}, this.options).subscribe();
+    this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).subscribe();
   }
 
   getlike() {
     let music: any;
     for (music of this.music) {
       this.http
-        .get(config.API_URL + '/like/liked/' + music.name + '/' + this.idOther, this.options)
+        .get(config.API_URL + '/like/liked/' + music.name, this.options)
         .subscribe((res: any) => {
           this.itemLikes[music.name] = res.res;
         });

@@ -11,7 +11,6 @@ export class AuthGuard implements CanActivate {
     return this.authService.checkCookie().pipe(
       first(), // Take the first emitted value
       map((isLoggedIn) => {
-        console.log(isLoggedIn)
         if (isLoggedIn) {
           return true; // User is logged in, allow navigation
         } else {

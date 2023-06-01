@@ -3,9 +3,8 @@ const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
 var router = express.Router();
 
-router.put("/add/:nameMusic/:userId", authenticate, async (req, res) => {
+router.put("/add/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
-  const userId = req.params.userId;
   try {
     let numlike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
 
@@ -14,7 +13,7 @@ router.put("/add/:nameMusic/:userId", authenticate, async (req, res) => {
       .collection("Liked")
       .doc(name)
       .update({
-        idUserLike: admin.firestore.FieldValue.arrayUnion(userId),
+        idUserLike: admin.firestore.FieldValue.arrayUnion(req.uid),
         like: ++numlike,
       });
     res.status(200).send();
@@ -24,14 +23,13 @@ router.put("/add/:nameMusic/:userId", authenticate, async (req, res) => {
   }
 });
 
-router.delete("/del/:nameMusic/:userId", authenticate, async (req, res) => {
+router.delete("/del/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
-  const userId = req.params.userId;
 
   try {
     const likeInfo = (await admin.firestore().collection("Liked").doc(name).get()).data();
     let numlike = likeInfo.like;
-    const idUser = likeInfo.idUserLike.indexOf(userId);
+    const idUser = likeInfo.idUserLike.indexOf(req.uid);
 
     admin
       .firestore()
@@ -47,14 +45,16 @@ router.delete("/del/:nameMusic/:userId", authenticate, async (req, res) => {
   }
 });
 
-router.get("/liked/:nameMusic/:userId", authenticate, async (req, res) => {
+router.get("/liked/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
-  const userId = req.params.userId;
   try {
     let userLiking = (await admin.firestore().collection("Liked").doc(name).get()).data().idUserLike;
+    let nbLike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
 
-    if (userLiking.indexOf(userId) !== -1) {
-      res.status(200).send({res : true});
+    if (userLiking.indexOf(req.uid) !== -1) {
+      res.status(200).send({res : true, like:nbLike});
+    } else{
+      res.status(200).send({ res: false, like: nbLike });
     }
   } catch (error) {
     console.log("Error fetching user data:", error);

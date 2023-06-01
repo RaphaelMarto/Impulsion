@@ -5,7 +5,9 @@ const admin = require("firebase-admin");
 const fs = require("fs");
 const nanoid = require("nanoid");
 var router = express.Router();
+const axios = require("axios");
 const { MusicService } = require("../service/music.service");
+const { empty } = require("rxjs");
 
 const musicService = new MusicService();
 
@@ -106,6 +108,25 @@ router.get("/genre", async (req, res) => {
   });
 });
 
+router.get("/proxy-audio", async (req, res) => {
+  try {
+    const url = req.query.url; // The URL of the audio file to proxy
+    const audioResponse = await axios.get(url, {
+      responseType: "arraybuffer", // Set the response type to arraybuffer to handle binary data
+    });
+
+    // Set the appropriate headers for the audio response
+    res.set("Content-Type", audioResponse.headers["content-type"]);
+    res.set("Content-Length", audioResponse.headers["content-length"]);
+
+    // Send the audio data as the response
+    res.send(audioResponse.data);
+  } catch (error) {
+    console.error("Error proxying audio:", error);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/user/all", authenticate, async (req, res) => {
   admin
     .firestore()
@@ -125,6 +146,132 @@ router.get("/user/all", authenticate, async (req, res) => {
       console.log("Error fetching user data:", error);
       res.status(500).send("Error fetching user data");
     });
+});
+
+// Function to generate an array of random indices
+function getRandomIndices(totalDocuments, count) {
+  const indices = [];
+  while (indices.length < count) {
+    const randomIndex = Math.floor(Math.random() * totalDocuments);
+    if (!indices.includes(randomIndex)) {
+      indices.push(randomIndex);
+    }
+  }
+  return indices;
+}
+
+async function verify(querySnapshot, list, indices) {
+  let getMore = "";
+  let emptyId = [];
+  let newIndice = [];
+  querySnapshot.map(async (querySnapshot, index) => {
+    const doc = querySnapshot.docs[0];
+    const data = doc.data().URL;
+    if (data == []) {
+      emptyId.push(doc.id);
+      getMore++;
+    }
+
+    if (list !== [] && list.includes(doc.id)) {
+      if (data.length > 1) {
+        const target = doc.id;
+        let count = 0;
+
+        for (let i = 0; i < list.length; i++) {
+          if (list[i] === target) {
+            count++;
+          }
+        }
+
+        if (data.length <= count) {
+          indices.splice(index, 1);
+          emptyId.push(doc.id);
+          getMore++;
+        }
+      } else {
+        indices.splice(index, 1);
+        emptyId.push(doc.id);
+        getMore++;
+      }
+    } else {
+      newIndice.push(indices[index]);
+    }
+  });
+  return [getMore, emptyId, newIndice];
+}
+
+// Function to fetch the random documents based on the generated indices
+async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocuments) {
+  const promises = indices.map((index) => {
+    return collectionRef.limit(1).offset(index).get();
+  });
+  let querySnapshots = await Promise.all(promises);
+
+  let more = await verify(querySnapshots, list, indices);
+
+  let getMore = more == undefined ? 0 : more[0];
+  let emptyId = more == undefined ? [] : more[1];
+
+  if (more !== undefined) {
+    indices = more[2];
+  }
+
+  if (getMore !== 0) {
+    let newIndice = getRandomIndices(totalDocuments, getMore);
+    indices.concat(newIndice);
+    if (indices.length == 10) {
+      const promises = indices.map((index) => {
+        return collectionRef.limit(1).offset(index).get();
+      });
+      querySnapshots = await Promise.all(promises);
+    }
+  }
+
+  const musicDocuments = querySnapshots.map((querySnapshot) => {
+    const doc = querySnapshot.docs[0];
+    if (!emptyId.includes(doc.id)) {
+      if (list !== [] && list.includes(doc.id)) {
+        if (data.length > 1) {
+          const target = doc.id;
+          let count = 0;
+
+          for (let i = 0; i < list.length; i++) {
+            if (list[i] === target) {
+              count++;
+            }
+          }
+        }
+        return {
+          url: doc.data().URL[count],
+          titre: doc.data().name[count],
+          id: doc.id,
+        };
+      }
+      return {
+        url: doc.data().URL[0],
+        titre: doc.data().name[0],
+        id: doc.id,
+      };
+    }
+  });
+  return musicDocuments;
+}
+
+router.get("/all/music", async (req, res) => {
+  try {
+    const strList = req.query.list;
+    const list = strList.split(",");
+    const musicCollectionRef = admin.firestore().collection("Music");
+    const totalDocuments = await musicCollectionRef.get().then((snapshot) => snapshot.size);
+    const numberToGet = totalDocuments >= 10 ? 10 : totalDocuments;
+    const randomIndices = getRandomIndices(totalDocuments, numberToGet, []);
+    const docsData = await getRandomDocsSnapshot(musicCollectionRef, randomIndices, list, totalDocuments);
+
+    res.status(200).json(docsData);
+  } catch (error) {
+    console.error("Error retrieving random music documents:", error);
+    res.status(500).send("Internal Server Error Music");
+  }
 });
 
 router.get("/:userId", authenticate, async (req, res) => {
