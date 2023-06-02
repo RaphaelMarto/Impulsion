@@ -293,8 +293,8 @@ export class Tab1Page implements OnInit {
       this.http
         .get(config.API_URL + '/like/liked/' + titre, this.options)
         .subscribe((res: any) => {
-          this.itemLikes[titre] = res.res;
-          this.numLike[titre] = res.like;
+          this.itemLikes[res.name] = res.res;
+          this.numLike[res.name] = res.like;
           console.log(this.itemLikes);
         });
     }

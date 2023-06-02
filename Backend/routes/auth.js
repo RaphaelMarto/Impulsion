@@ -8,15 +8,11 @@ router.post("/login", async (req, res) => {
   try {
     // Verify token and get user ID
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    console.log(decodedToken.uid)
+    console.log(decodedToken.uid);
     const uid = decodedToken.uid;
     const user = await admin.auth().getUser(uid);
     // Check if user exists in database
-    const userDoc = await admin
-      .firestore()
-      .collection("Utilisateur")
-      .doc(uid)
-      .get();
+    const userDoc = await admin.firestore().collection("Utilisateur").doc(uid).get();
     if (!userDoc.exists) {
       // User doesn't exist, create new user document
       await admin.firestore().collection("Utilisateur").doc(uid).set({
@@ -34,17 +30,24 @@ router.post("/login", async (req, res) => {
 
     // Create session cookie
     const expiresIn = 60 * 60 * 24 * 14 * 1000; // 2 weeks in milliseconds
-    const sessionCookie = await admin
-      .auth()
-      .createSessionCookie(idToken, { expiresIn });
+    const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
     // Set session cookie in response
-    res.cookie("user_session", sessionCookie, {
-        maxAge: expiresIn,
-        expires: new Date(Date.now() + expiresIn ),
-        httpOnly:true,
-      });
-      res.send({res:true});
+    // res.cookie("user_session", sessionCookie, {
+    //   maxAge: expiresIn,
+    //   expires: new Date(Date.now() + expiresIn),
+    //   httpOnly: true,
+    //   secure: true, // Set the secure flag to true for HTTPS connections
+    // });
+    res.setHeader(
+      "Set-Cookie",
+      "user_session=" +
+        sessionCookie +
+        "; expires=" +
+        new Date(Date.now() + expiresIn) +
+        "; Secure; httpOnly; SameSite=None; Path=/"
+    );
+    res.send({ res: true });
   } catch (error) {
     console.log("Error:", error);
     res.sendStatus(500);
@@ -52,11 +55,16 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", function (req, res) {
-  res.clearCookie("user_session").send({res:"cookie cleared"});
+  // res.clearCookie("user_session").send({ res: "cookie cleared" });
+  res.setHeader(
+    "Set-Cookie",
+    "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
+  );
+   res.send();
 });
 
-router.get("/check-cookie", (req,res) => {
- if (req.cookies.user_session) {
+router.get("/check-cookie", (req, res) => {
+  if (req.cookies.user_session) {
     res.send(true);
   } else {
     res.send(false);

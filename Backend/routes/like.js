@@ -52,9 +52,9 @@ router.get("/liked/:nameMusic", authenticate, async (req, res) => {
     let nbLike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
 
     if (userLiking.indexOf(req.uid) !== -1) {
-      res.status(200).send({res : true, like:nbLike});
+      res.status(200).send({ res: true, like: nbLike, name: name });
     } else{
-      res.status(200).send({ res: false, like: nbLike });
+      res.status(200).send({ res: false, like: nbLike, name: name });
     }
   } catch (error) {
     console.log("Error fetching user data:", error);

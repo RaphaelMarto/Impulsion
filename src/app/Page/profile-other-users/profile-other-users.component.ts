@@ -94,7 +94,7 @@ export class ProfileOtherUsersComponent implements OnInit {
       this.http
         .get(config.API_URL + '/like/liked/' + music.name, this.options)
         .subscribe((res: any) => {
-          this.itemLikes[music.name] = res.res;
+          this.itemLikes[res.name] = res.res;
         });
     }
   }
