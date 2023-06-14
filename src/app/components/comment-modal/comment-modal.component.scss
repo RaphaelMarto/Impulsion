@@ -1,0 +1,36 @@
+.input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+.input{
+  background-color: gray;
+  border-radius: 40px;
+  padding-left: 16px !important;
+  margin-bottom: 2%;
+  caret-color: red;
+  margin-top: 3%;
+}
+// .custom-list {
+//   --ion-item-text-padding: 0;
+// }
+
+// .custom-item {
+//   --padding-start: 0;
+//   --padding-end: 0;
+// }
+
+// .comment-container {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+// }
+
+// .comment-text {
+//   flex: 1;
+//   word-wrap: break-word;
+// }
+

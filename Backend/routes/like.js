@@ -62,4 +62,16 @@ router.get("/liked/:nameMusic", authenticate, async (req, res) => {
   }
 });
 
+router.get("/liked/anon/:nameMusic", async (req, res) => {
+  const name = req.params.nameMusic;
+  try {
+    let nbLike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
+
+    res.status(200).send({like: nbLike, name: name });
+  } catch (error) {
+    console.log("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
+  }
+});
+
 module.exports = router;

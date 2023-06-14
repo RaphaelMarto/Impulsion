@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { IonContent } from '@ionic/angular';
+import { IonContent, ModalController } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
+import { CommentModalComponent } from '../../../components/comment-modal/comment-modal.component';
+import { AuthService } from 'src/app/Authentication/auth.service';
 
 @Component({
   selector: 'app-tab1',
@@ -11,6 +13,7 @@ import { config } from 'src/app/config/configuration';
 export class Tab1Page implements OnInit {
   public liked: boolean[] = [];
   public numLike: number[] = [];
+  public numCom: number[] = [];
   public images: string[] = [''];
   public page: number = 0;
   public scrollPositions: number[] = [];
@@ -21,11 +24,12 @@ export class Tab1Page implements OnInit {
   public audioMap = new Map();
   public observers: IntersectionObserver[] = [];
   public audioElements: any;
-  private pausedAt: number = 0;
+  public pausedAt: number = 0;
   private source: any;
   public usersId: any = [];
   public nickname: any = [];
   public titre: any = [];
+  public login: boolean = false;
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
 
@@ -34,13 +38,16 @@ export class Tab1Page implements OnInit {
   @ViewChild('swiper') swiperRef!: ElementRef;
   private context: AudioContext;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private modalController: ModalController, private authService: AuthService) {
     this.context = new AudioContext();
   }
 
   async ngOnInit() {
-    await this.getMusic();
-    this.init();
+    this.authService.isLoggedIn.subscribe(async (logedIn) => {
+      this.login = logedIn;
+      await this.getMusic();
+      this.init();
+    });
   }
 
   setUpObservers() {
@@ -261,6 +268,7 @@ export class Tab1Page implements OnInit {
       });
       this.fetchNicknames();
       this.getlike();
+      this.getComment();
     });
   }
 
@@ -289,14 +297,37 @@ export class Tab1Page implements OnInit {
   }
 
   getlike() {
-    for (let titre of this.titre) {
-      this.http
-        .get(config.API_URL + '/like/liked/' + titre, this.options)
-        .subscribe((res: any) => {
+    if (this.login) {
+      for (let titre of this.titre) {
+        this.http.get(config.API_URL + '/like/liked/' + titre, this.options).subscribe((res: any) => {
           this.itemLikes[res.name] = res.res;
           this.numLike[res.name] = res.like;
-          console.log(this.itemLikes);
         });
+      }
+    } else {
+      for (let titre of this.titre) {
+        this.http.get(config.API_URL + '/like/liked/anon/' + titre).subscribe((res: any) => {
+          this.numLike[res.name] = res.like;
+        });
+      }
+    }
+  }
+
+  async openCommentModal(titre:string) {
+    const modal = await this.modalController.create({
+      component: CommentModalComponent,
+      componentProps: {
+        titre:titre,
+      },
+    });
+    await modal.present();
+  }
+
+  getComment() {
+    for (let titre of this.titre) {
+      this.http.get(config.API_URL + '/comment/comment/anon/' + titre).subscribe((res: any) => {
+        this.numCom[res.name] = res.nbCom;
+      });
     }
   }
 }

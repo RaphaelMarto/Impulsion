@@ -62,6 +62,12 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
       like: 0,
     });
 
+    await admin.firestore().collection("Comment").doc(name).set({
+      idUserCom: [],
+      nbCom: 0,
+      Comment:[],
+    });
+
     fs.unlink(file.path, (err) => {
       if (err) {
         console.error(err);
@@ -314,6 +320,7 @@ router.delete("/user/music/:musicId", authenticate, async (req, res) => {
     const dataMusic = musicRef.data();
 
     await admin.firestore().collection("Liked").doc(dataMusic["name"][musicId]).delete();
+    await admin.firestore().collection("Comment").doc(dataMusic["name"][musicId]).delete();
 
     await admin
       .firestore()

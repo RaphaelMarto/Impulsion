@@ -7,9 +7,10 @@ import { Tab1Page } from './tab1.page';
 
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
+import { CommentModalModule } from 'src/app/components/comment-modal/comment-modal.module';
 
 @NgModule({
-  imports: [IonicModule, CommonModule, FormsModule, Tab1PageRoutingModule, HeaderModule],
+  imports: [IonicModule, CommonModule, FormsModule, Tab1PageRoutingModule, HeaderModule, CommentModalModule],
   declarations: [Tab1Page],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

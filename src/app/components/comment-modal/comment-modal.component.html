@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let comment of comments let comNumber = index">
+      <div class="comment-container">
+        <p>{{ UserComenting[comNumber] }}: {{ comment }}</p>
+    </div>
+    <ion-button slot="end" color="dark" (click)="deleteCom(comNumber)">Del</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div class="input-container">
+    <ion-item>
+      <ion-input type="text" placeholder="Commentaire" class="input" clear-input="true" color="dark" [disabled]="!login" (keyup.enter)="addComment($event)"></ion-input>
+    </ion-item>
+  </div>
+</ion-content>

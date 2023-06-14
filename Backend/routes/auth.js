@@ -8,7 +8,7 @@ router.post("/login", async (req, res) => {
   try {
     // Verify token and get user ID
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    console.log(decodedToken.uid);
+  
     const uid = decodedToken.uid;
     const user = await admin.auth().getUser(uid);
     // Check if user exists in database
@@ -33,20 +33,19 @@ router.post("/login", async (req, res) => {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
     // Set session cookie in response
-    // res.cookie("user_session", sessionCookie, {
-    //   maxAge: expiresIn,
-    //   expires: new Date(Date.now() + expiresIn),
-    //   httpOnly: true,
-    //   secure: true, // Set the secure flag to true for HTTPS connections
-    // });
-    res.setHeader(
-      "Set-Cookie",
-      "user_session=" +
-        sessionCookie +
-        "; expires=" +
-        new Date(Date.now() + expiresIn) +
-        "; Secure; httpOnly; SameSite=None; Path=/"
-    );
+    res.cookie("user_session", sessionCookie, {
+      maxAge: expiresIn,
+      expires: new Date(Date.now() + expiresIn),
+      httpOnly: true,
+    });
+    // res.setHeader(
+    //   "Set-Cookie",
+    //   "user_session=" +
+    //     sessionCookie +
+    //     "; expires=" +
+    //     new Date(Date.now() + expiresIn) +
+    //     "; Secure; httpOnly; SameSite=None; Path=/"
+    // );
     res.send({ res: true });
   } catch (error) {
     console.log("Error:", error);

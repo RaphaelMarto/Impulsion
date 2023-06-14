@@ -8,7 +8,7 @@
       </div>
       <div class="reaction-container">
         <ion-buttons class="reaction-toolbar">
-          <button (click)="itemLikes[titre[PageNumber]] ? deleteLike(titre[PageNumber]) : like(titre[PageNumber])">
+          <button (click)="itemLikes[titre[PageNumber]] ? deleteLike(titre[PageNumber]) : like(titre[PageNumber])" [disabled]="!login">
             <ion-icon
               slot="icon-only"
               [name]="itemLikes[titre[PageNumber]] ? 'heart' : 'heart-outline'"
@@ -16,9 +16,9 @@
             ></ion-icon>
             <p slot="icon-only">{{numLike[titre[PageNumber]]}}</p>
           </button>
-          <button>
-            <ion-icon slot="icon-only" name="chatbubble-ellipses"></ion-icon>
-            <p slot="icon-only">{{0}}</p>
+          <button (click)="openCommentModal(titre[PageNumber])">
+            <ion-icon slot="icon-only" name="chatbubble-ellipses" ></ion-icon>
+            <p slot="icon-only">{{numCom[titre[PageNumber]]}}</p>
           </button>
           <button>
             <ion-icon slot="icon-only" name="share-social"></ion-icon>

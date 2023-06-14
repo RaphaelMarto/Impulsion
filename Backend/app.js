@@ -11,6 +11,7 @@ let musicRouter = require("./routes/music");
 let authRouter = require("./routes/auth");
 let followRouter = require("./routes/follow");
 let likeRouter = require("./routes/like");
+let commentRouter = require("./routes/Comment");
 
 const firebaseAdmin = require("firebase-admin");
 
@@ -46,6 +47,7 @@ app.use("/music", musicRouter);
 app.use("/auth", authRouter);
 app.use("/follow", followRouter);
 app.use("/like", likeRouter);
+app.use("/comment", commentRouter);
 
 const serviceAccount = require("./security/impulsion-6bca6-firebase-adminsdk-w7go6-f24f59f4a0.json");
 
