@@ -20,5 +20,12 @@
   ],
   "storage": {
     "rules": "storage.rules"
-  }
+  },
+  "hosting": [
+    {
+      "target": "app",
+      "source": ".",
+      "frameworksBackend": {}
+    }
+  ]
 }

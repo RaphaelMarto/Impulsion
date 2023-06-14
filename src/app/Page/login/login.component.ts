@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithCredential, signInWithPopup, signInWithRedirect } from 'firebase/auth';
 import { AuthService } from '../../Authentication/auth.service';
+import { GoogleAuth } from  '@codetrix-studio/capacitor-google-auth'
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { isPlatform } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +12,11 @@ import { Location } from '@angular/common';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  constructor(private authService: AuthService, private router: Router, private location: Location) {}
+  constructor(private authService: AuthService, private router: Router, private location: Location) {
+    if (!isPlatform('capacitor')) {
+      GoogleAuth.initialize();
+    }
+  }
 
   private provider = new GoogleAuthProvider();
   public login: boolean = false;
@@ -21,28 +27,23 @@ export class LoginComponent implements OnInit {
     this.checkLogIn();
   }
 
-  signInWithGoogle() {
+  async signInWithGoogle() {
     const auth = getAuth();
-    signInWithPopup(auth, this.provider)
-      .then(async (result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = await GoogleAuthProvider.credentialFromResult(result);
-        //const token = credential!.idToken; googletoken
+    const googleUser = await GoogleAuth.signIn();
 
-        const token = (await result.user.getIdTokenResult()).token;
-        const connecter = await this.authService.login(token);
-        if (connecter) {
-          this.authService.setLoggedInStatus(true);
-          this.router.navigate(['/tabs/home']);
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
+    const credential = GoogleAuthProvider.credential(googleUser.authentication.idToken);
+    const result = await signInWithCredential(auth, credential);
+
+    const token = (await result.user.getIdTokenResult()).token;
+    const connecter = await this.authService.login(token);
+    if (connecter) {
+      this.authService.setLoggedInStatus(true);
+      this.router.navigate(['/tabs/home']);
+    }
   }
 
-  logout() {
+  async logout() {
+    await GoogleAuth.signOut();
     this.authService.logout();
     this.authService.setLoggedInStatus(false);
     this.router.navigate(['/tabs/home']);

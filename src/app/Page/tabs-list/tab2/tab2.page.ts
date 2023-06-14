@@ -25,7 +25,7 @@ export class Tab2Page implements OnInit {
     if (query !== '') {
       this.http.get(config.API_URL + '/user/all/' + query, this.options).subscribe((res:any) => {
         this.data = res;
-        this.data.PhotoUrl = config.API_URL+'user/proxy-image?url=' + res.PhotoUrl;
+        // this.data.PhotoUrl = config.API_URL+'user/proxy-image?url=' + res.PhotoUrl;
       });
     } else{
       this.data = []

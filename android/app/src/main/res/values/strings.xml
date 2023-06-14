@@ -4,4 +4,5 @@
     <string name="title_activity_main">tfe</string>
     <string name="package_name">ionic.tfe</string>
     <string name="custom_url_scheme">ionic.tfe</string>
+    <string name="server_client_id">957888261459-r47m6tbbk0sbq00lh1o1t54m7djjiuu4.apps.googleusercontent.com</string>
 </resources>

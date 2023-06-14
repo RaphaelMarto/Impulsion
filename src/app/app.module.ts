@@ -11,6 +11,11 @@ import { LoginModule } from './Page/login/login.module';
 import { TabsProfilComponentModule } from './components/tabs-profil-component/tabs-profil-component.module';
 import { ProfileOtherModule } from './Page/profile-other-users/profile-other.module';
 import { AuthGuard } from './guards/AuthGuard';
+import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
+import { provideAuth,getAuth } from '@angular/fire/auth';
+import { provideFirestore,getFirestore } from '@angular/fire/firestore';
+import { provideStorage,getStorage } from '@angular/fire/storage';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,6 +27,10 @@ import { AuthGuard } from './guards/AuthGuard';
     LoginModule,
     TabsProfilComponentModule,
     ProfileOtherModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
+    provideStorage(() => getStorage()),
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, AuthGuard],
   bootstrap: [AppComponent],

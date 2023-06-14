@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "impulsion-6bca6"
+  },
+  "targets": {
+    "impulsion-6bca6": {
+      "hosting": {
+        "app": [
+          "impulsion-6bca6"
+        ]
+      }
+    }
   }
 }

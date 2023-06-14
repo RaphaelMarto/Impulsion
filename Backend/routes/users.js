@@ -3,7 +3,7 @@ var router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
 const axios = require("axios");
-const config = "http://localhost:3000";
+const config = "https://impulsion-api.site";
 
 router.get("", authenticate, (req, res) => {
   admin

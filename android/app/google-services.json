@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "957888261459",
+    "project_id": "impulsion-6bca6",
+    "storage_bucket": "impulsion-6bca6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957888261459:android:83dd0364b37ae49bb385a6",
+        "android_client_info": {
+          "package_name": "ionic.tfe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "957888261459-g1dl58o68djuhp4q6l3trakbqlg6cpm9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ionic.tfe",
+            "certificate_hash": "0d7b4d90bed7156288f367c276a9d092bbdd7a23"
+          }
+        },
+        {
+          "client_id": "957888261459-r47m6tbbk0sbq00lh1o1t54m7djjiuu4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGft8P-M8lyBTMQW6wmGdeskQC6EBD73Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957888261459-9vj06lkihof31h2p7kou2os21odn2o3u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
