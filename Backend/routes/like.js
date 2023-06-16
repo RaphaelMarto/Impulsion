@@ -6,15 +6,13 @@ var router = express.Router();
 router.put("/add/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
   try {
-    let numlike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
-
     admin
       .firestore()
       .collection("Liked")
       .doc(name)
       .update({
         idUserLike: admin.firestore.FieldValue.arrayUnion(req.uid),
-        like: ++numlike,
+        like: admin.firestore.FieldValue.increment(1),
       });
     res.status(200).send();
   } catch (error) {
@@ -28,7 +26,6 @@ router.delete("/del/:nameMusic", authenticate, async (req, res) => {
 
   try {
     const likeInfo = (await admin.firestore().collection("Liked").doc(name).get()).data();
-    let numlike = likeInfo.like;
     const idUser = likeInfo.idUserLike.indexOf(req.uid);
 
     admin
@@ -37,7 +34,7 @@ router.delete("/del/:nameMusic", authenticate, async (req, res) => {
       .doc(name)
       .update({
         idUserLike: admin.firestore.FieldValue.arrayRemove(likeInfo.idUserLike[idUser]),
-        like: --numlike,
+        like: admin.firestore.FieldValue.increment(-1),
       });
   } catch (error) {
     console.log("Error fetching user data:", error);

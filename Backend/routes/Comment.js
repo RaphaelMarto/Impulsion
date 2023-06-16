@@ -7,16 +7,21 @@ router.put("/add/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
   const comment = req.body.comment;
   try {
-    let numCom = (await admin.firestore().collection("Comment").doc(name).get()).data().nbCom;
+    let docRef = await admin.firestore().collection("Comment").doc(name).get();
+    let commentArray = docRef.get("Comment");
+    let userArray = docRef.get("idUserCom");
+
+    commentArray.push(comment);
+    userArray.push(req.uid);
 
     admin
       .firestore()
       .collection("Comment")
       .doc(name)
       .update({
-        idUserCom: admin.firestore.FieldValue.arrayUnion(req.uid),
-        Comment: admin.firestore.FieldValue.arrayUnion(comment),
-        nbCom: ++numCom,
+        idUserCom: userArray,
+        Comment: commentArray,
+        nbCom: admin.firestore.FieldValue.increment(1),
       });
     res.status(200).send();
   } catch (error) {
@@ -30,17 +35,21 @@ router.delete("/del/:nameMusic/:comNum", authenticate, async (req, res) => {
   const indexPos = req.params.comNum;
 
   try {
-    const comInfo = (await admin.firestore().collection("Comment").doc(name).get()).data();
-    let numCom = comInfo.nbCom;
+    let docRef = await admin.firestore().collection("Comment").doc(name).get();
+    let commentArray = docRef.get("Comment");
+    let userArray = docRef.get("idUserCom");
+
+    commentArray.splice(indexPos, 1);
+    userArray.splice(indexPos, 1);
 
     admin
       .firestore()
       .collection("Comment")
       .doc(name)
       .update({
-        idUserCom: admin.firestore.FieldValue.arrayRemove(comInfo.idUserCom[indexPos]),
-        Comment: admin.firestore.FieldValue.arrayRemove(comInfo.Comment[indexPos]),
-        nbCom: --numCom,
+        idUserCom: userArray,
+        Comment: commentArray,
+        nbCom: admin.firestore.FieldValue.increment(-1),
       });
   } catch (error) {
     console.log("Error fetching user data:", error);

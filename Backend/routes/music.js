@@ -34,6 +34,14 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
     });
 
     const musicDoc = await admin.firestore().collection("Music").doc(req.uid).get();
+    let nameArray = musicDoc.get("name");
+    let genreArray = musicDoc.get("genre");
+    let descArray = musicDoc.get("desc");
+
+    nameArray.push(name);
+    genreArray.push(genre);
+    descArray.push(desc);
+
     if (!musicDoc.exists) {
       await admin
         .firestore()
@@ -52,9 +60,9 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
         .doc(req.uid)
         .update({
           URL: admin.firestore.FieldValue.arrayUnion(downloadUrl[0]),
-          name: admin.firestore.FieldValue.arrayUnion(name),
-          genre: admin.firestore.FieldValue.arrayUnion(genre),
-          desc: admin.firestore.FieldValue.arrayUnion(desc),
+          name: nameArray,
+          genre: genreArray,
+          desc: descArray,
         });
     }
     await admin.firestore().collection("Liked").doc(name).set({
@@ -322,15 +330,23 @@ router.delete("/user/music/:musicId", authenticate, async (req, res) => {
     await admin.firestore().collection("Liked").doc(dataMusic["name"][musicId]).delete();
     await admin.firestore().collection("Comment").doc(dataMusic["name"][musicId]).delete();
 
+    let nameArray = musicRef.get("name");
+    let genreArray = musicRef.get("genre");
+    let descArray = musicRef.get("desc");
+
+    nameArray.splice(musicId, 1);
+    genreArray.splice(musicId, 1);
+    descArray.splice(musicId, 1);
+
     await admin
       .firestore()
       .collection("Music")
       .doc(req.uid)
       .update({
         URL: admin.firestore.FieldValue.arrayRemove(dataMusic["URL"][musicId]),
-        desc: admin.firestore.FieldValue.arrayRemove(dataMusic["desc"][musicId]),
-        genre: admin.firestore.FieldValue.arrayRemove(dataMusic["genre"][musicId]),
-        name: admin.firestore.FieldValue.arrayRemove(dataMusic["name"][musicId]),
+        desc:  descArray,
+        genre:  genreArray,
+        name: nameArray,
       });
 
     res.status(200).send();
