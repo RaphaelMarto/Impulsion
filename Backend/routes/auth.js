@@ -54,11 +54,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", function (req, res) {
-  // res.clearCookie("user_session").send({ res: "cookie cleared" });
-  res.setHeader(
-    "Set-Cookie",
-    "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
-  );
+  res.clearCookie("user_session").send({ res: "cookie cleared" });
+  // res.setHeader(
+  //   "Set-Cookie",
+  //   "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
+  // );
    res.send();
 });
 
@@ -69,5 +69,31 @@ router.get("/check-cookie", (req, res) => {
     res.send(false);
   }
 });
+
+router.get("/get-name", authenticate, (req, res) => {
+  admin
+    .firestore()
+    .collection("Utilisateur")
+    .doc(req.uid)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        // No document found for the given UID
+        res.status(404).send("Document not found");
+      } else {
+        // Retrieve the data from the document
+        const userData = doc.data();
+        const selectData = {
+          Nickname: userData.Nickname
+        };
+        res.send(selectData);
+      }
+    })
+    .catch((error) => {
+      console.log("Error fetching user data:", error);
+      res.status(500).send("Error fetching user data");
+    });
+});
+
 
 module.exports = router;

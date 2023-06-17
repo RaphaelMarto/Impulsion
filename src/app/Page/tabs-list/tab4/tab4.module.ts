@@ -6,7 +6,6 @@ import { Tab4Page } from './tab4.page';
 
 import { Tab4RoutingModule } from './tab4-routing.module';
 import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-component/tabs-profil-component.module';
-import { DataSharingServiceModule } from 'src/app/service/data-sharing.module';
 
 @NgModule({
   imports: [
@@ -16,7 +15,6 @@ import { DataSharingServiceModule } from 'src/app/service/data-sharing.module';
     Tab4RoutingModule,
     ReactiveFormsModule,
     TabsProfilComponentModule,
-    DataSharingServiceModule
   ],
   declarations: [Tab4Page],
 })

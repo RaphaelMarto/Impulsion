@@ -51,11 +51,13 @@ app.use("/comment", commentRouter);
 
 const serviceAccount = require("./security/impulsion-6bca6-firebase-adminsdk-w7go6-f24f59f4a0.json");
 
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(serviceAccount),
-  databaseURL: "https://impulsion-6bca6.firebaseio.com",
-  storageBucket: "impulsion-6bca6.appspot.com",
-});
+if(!firebaseAdmin.apps.length){
+  firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount),
+    databaseURL: "https://impulsion-6bca6.firebaseio.com",
+    storageBucket: "impulsion-6bca6.appspot.com",
+  });
+}
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

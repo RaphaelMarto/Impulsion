@@ -12,10 +12,11 @@ import { DataSharingService } from 'src/app/service/data-sharing.service';
   styleUrls: ['tabs-list.Component.scss'],
 })
 export class TabsListComponent implements OnInit{
-  selectedTab: string = 'home';
+  selectedTab: any = 'home';
   showTabBar: boolean = true;
 
   @ViewChild('tabs', { static: false }) tabs!: IonTabs;
+  lastActiveTabIndex!: any;
 
   constructor(private dataSharingService: DataSharingService) {}
 
@@ -27,5 +28,18 @@ export class TabsListComponent implements OnInit{
 
   onTabSelected() {
     this.selectedTab = this.tabs.getSelected()!;
+
+    if (this.lastActiveTabIndex !== undefined && this.lastActiveTabIndex !== this.selectedTab && this.lastActiveTabIndex == "profil") {
+      this.emitEvent(true)
+    }
+
+    this.lastActiveTabIndex = this.selectedTab;
+    if(this.selectedTab == "profil"){
+      this.emitEvent(false)
+    }
+  }
+
+  emitEvent(show: boolean) {
+    this.dataSharingService.setDataTab(show);
   }
 }

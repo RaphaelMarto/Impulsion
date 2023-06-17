@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataSharingService {
-  private data = new Subject<boolean>();
+  private data = new BehaviorSubject<boolean>(true);
+  private dataTab = new BehaviorSubject<boolean>(true);
 
   getData() {
     return this.data.asObservable();
@@ -13,5 +14,13 @@ export class DataSharingService {
 
   setData(data: boolean) {
     this.data.next(data);
+  }
+
+  getDataTab() {
+    return this.dataTab.asObservable();
+  }
+
+  setDataTab(data: boolean) {
+    this.dataTab.next(data);
   }
 }

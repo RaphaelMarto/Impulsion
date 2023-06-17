@@ -12,7 +12,6 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "firebase": "^9.20.0",
     "firebase-admin": "^11.7.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
@@ -22,6 +21,7 @@
     "nanoid": "^3.3.5",
     "nodemon": "^2.0.22",
     "rxjs": "^7.8.1",
-    "sequelize": "^6.30.0"
+    "sequelize": "^6.30.0",
+    "ws": "^8.13.0"
   }
 }

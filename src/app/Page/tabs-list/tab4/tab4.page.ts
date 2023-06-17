@@ -1,5 +1,4 @@
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from './../../../Authentication/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
@@ -30,7 +29,6 @@ export class Tab4Page implements OnInit {
 
   constructor(
     private platform: Platform,
-    private authService: AuthService,
     private http: HttpClient,
     private router: Router,
     private formBuilder: FormBuilder,
@@ -64,6 +62,7 @@ export class Tab4Page implements OnInit {
   }
 
   emitEvent(show: boolean) {
+    console.log(show)
     this.dataSharingService.setData(show);
   }
 

@@ -11,7 +11,7 @@
       <div class="comment-container">
         <p>{{ UserComenting[comNumber] }}: {{ comment }}</p>
     </div>
-    <ion-button slot="end" color="dark" (click)="deleteCom(comNumber)">Del</ion-button>
+    <ion-button slot="end" color="dark" (click)="deleteCom(comNumber)" [class]="UserComenting[comNumber] == name ? '' : 'vanish'">Del</ion-button>
     </ion-item>
   </ion-list>
 
