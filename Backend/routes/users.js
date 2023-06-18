@@ -92,8 +92,6 @@ router.get("/condition",authenticate, async (req,res)=> {
 })
 
 router.put("/condition",authenticate, async (req,res)=> {
-  const user = await admin.auth().getUser(req.uid);
-  console.log(user)
   admin
     .firestore()
     .collection("Utilisateur")

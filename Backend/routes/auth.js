@@ -33,19 +33,19 @@ router.post("/login", async (req, res) => {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
     // Set session cookie in response
-    res.cookie("user_session", sessionCookie, {
-      maxAge: expiresIn,
-      expires: new Date(Date.now() + expiresIn),
-      httpOnly: true,
-    });
-    // res.setHeader(
-    //   "Set-Cookie",
-    //   "user_session=" +
-    //     sessionCookie +
-    //     "; expires=" +
-    //     new Date(Date.now() + expiresIn) +
-    //     "; Secure; httpOnly; SameSite=None; Path=/"
-    // );
+    // res.cookie("user_session", sessionCookie, {
+    //   maxAge: expiresIn,
+    //   expires: new Date(Date.now() + expiresIn),
+    //   httpOnly: true,
+    // });
+    res.setHeader(
+      "Set-Cookie",
+      "user_session=" +
+        sessionCookie +
+        "; expires=" +
+        new Date(Date.now() + expiresIn) +
+        "; Secure; httpOnly; SameSite=None; Path=/"
+    );
     res.send({ res: true });
   } catch (error) {
     console.log("Error:", error);
@@ -54,11 +54,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", function (req, res) {
-  res.clearCookie("user_session").send({ res: "cookie cleared" });
-  // res.setHeader(
-  //   "Set-Cookie",
-  //   "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
-  // );
+  // res.clearCookie("user_session").send({ res: "cookie cleared" });
+  res.setHeader(
+    "Set-Cookie",
+    "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
+  );
    res.send();
 });
 
