@@ -80,7 +80,7 @@ export class ProfileOtherUsersComponent implements OnInit {
 
   deleteLike(name: string) {
     this.itemLikes[name] = false;
-    this.http.delete(config.API_URL + '/like/del/' + name, this.options).subscribe();
+    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).subscribe();
   }
 
   like(name: string) {

@@ -21,12 +21,12 @@ router.put("/add/:nameMusic", authenticate, async (req, res) => {
   }
 });
 
-router.delete("/del/:nameMusic", authenticate, async (req, res) => {
+router.put("/del/:nameMusic", authenticate, async (req, res) => {
   const name = req.params.nameMusic;
 
   try {
     const likeInfo = (await admin.firestore().collection("Liked").doc(name).get()).data();
-    const idUser = likeInfo.idUserLike.indexOf(req.uid);
+    const idUser = await likeInfo.idUserLike.indexOf(req.uid);
 
     admin
       .firestore()

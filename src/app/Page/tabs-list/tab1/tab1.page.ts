@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 })
 export class Tab1Page implements OnInit {
   public liked: boolean[] = [];
-  public numLike: number[] = [];
+  public numLike: any;
   public numCom: number[] = [];
   public images: string[] = [''];
   public page: number = 0;
@@ -301,11 +301,13 @@ export class Tab1Page implements OnInit {
 
   deleteLike(name: string) {
     this.itemLikes[name] = false;
-    this.http.delete(config.API_URL + '/like/del/' + name, this.options).subscribe();
+    this.numLike[name]--
+    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).subscribe();
   }
 
   like(name: string) {
     this.itemLikes[name] = true;
+    this.numLike[name]++
     this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).subscribe();
   }
 
