@@ -68,6 +68,41 @@ router.get("/all/:startLetter", async (req, res) => {
   }
 });
 
+router.get("/condition",authenticate, async (req,res)=> {
+  admin
+    .firestore()
+    .collection("Utilisateur")
+    .doc(req.uid)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        // No document found for the given UID
+        res.status(404).send("Document not found");
+      } else {
+        // Retrieve the data from the document
+        const userData = doc.data();
+
+        res.send(userData.PolicyCheck);
+      }
+    })
+    .catch((error) => {
+      console.log("Error fetching user data:", error);
+      res.status(500).send("Error fetching user data");
+    });
+})
+
+router.put("/condition",authenticate, async (req,res)=> {
+  const user = await admin.auth().getUser(req.uid);
+  console.log(user)
+  admin
+    .firestore()
+    .collection("Utilisateur")
+    .doc(req.uid)
+    .update({
+      PolicyCheck: true,
+    });
+})
+
 router.get("/proxy-image", async (req, res) => {
   try {
     const imageUrl = req.query.url; // The URL of the image to proxy
@@ -137,6 +172,20 @@ router.put("", authenticate, (req, res) => {
       console.log(error);
       res.status(500).send("An error occurred while updating the user data");
     });
+});
+
+router.delete("", authenticate, async (req, res) => {
+  const musicRef = await admin.firestore().collection("Music").doc(req.uid).get();
+  const dataNameMusic = musicRef.data().name;
+
+  for(let name of dataNameMusic){
+    await admin.firestore().collection("Liked").doc(name).delete();
+    await admin.firestore().collection("Comment").doc(name).delete();
+  }
+
+  await admin.firestore().collection("Follow").doc(req.uid).delete();
+  await admin.firestore().collection("Music").doc(req.uid).delete();
+  await admin.firestore().collection("Utilisateur").doc(req.uid).delete();
 });
 
 module.exports = router;

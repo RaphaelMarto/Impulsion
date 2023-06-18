@@ -17,7 +17,7 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
   try {
     // Extract data from request:
     const file = req.file;
-    const name = req.body.name;
+    const name = req.body.name.trim();
     const genre = req.body.genre;
     const desc = req.body.desc;
     // Upload file to Firebase Storage:

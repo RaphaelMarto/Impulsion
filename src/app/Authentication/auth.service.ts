@@ -46,4 +46,9 @@ export class AuthService {
     const options = { withCredentials: true };
     return this.http.get(config.API_URL + '/auth/get-name', options);
   }
+
+  checkCondition(){
+    const options = { withCredentials: true };
+    return this.http.get(config.API_URL + '/user/condition', options);
+  }
 }

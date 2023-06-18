@@ -19,10 +19,10 @@ router.post("/login", async (req, res) => {
         Email: user.providerData[0].email,
         Nickname: user.displayName,
         PhotoUrl: user.photoURL,
-        Country: null,
+        Country:null,
         City: null,
         Role: 1,
-        PolicyCheck: true,
+        PolicyCheck: false,
         IsActive: true,
         Phone: null,
       });

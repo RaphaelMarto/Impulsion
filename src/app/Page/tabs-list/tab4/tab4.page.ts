@@ -101,4 +101,8 @@ export class Tab4Page implements OnInit {
   Deconnexion() {
     this.router.navigate(['/login']);
   }
+
+  Delete(){
+    this.http.delete(config.API_URL + '/user', this.options).subscribe()
+  }
 }

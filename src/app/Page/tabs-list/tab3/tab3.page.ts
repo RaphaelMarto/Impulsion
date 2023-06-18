@@ -6,8 +6,6 @@ import WaveSurfer from 'wavesurfer.js';
 import * as WaveSurferTimeline from 'wavesurfer.js/src/plugin/timeline';
 import * as WaveSurferRegion from 'wavesurfer.js/src/plugin/regions';
 import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
-import { AuthService } from 'src/app/Authentication/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab3',
@@ -39,8 +37,6 @@ export class Tab3Page implements OnInit {
     public toastController: ToastController,
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService,
-    private router: Router
   ) {
     this.isIOS = this.platform.is('ios');
   }
@@ -81,7 +77,7 @@ export class Tab3Page implements OnInit {
     });
 
     this.musicForm = this.formBuilder.group({
-      name: [this.name, Validators.required],
+      name: [this.name, [Validators.required, Validators.maxLength(20)]],
       genre: new FormControl('', Validators.required),
       desc: ['', Validators.required],
     });
@@ -89,8 +85,9 @@ export class Tab3Page implements OnInit {
     this.audioPlayerCreate();
   }
 
-  exportSelected() {
+  async exportSelected() {
     const region: any = Object.values(this.wave.regions.list)[0];
+    console.log(this.file)
     if (region) {
       const start = region.start;
       const end = region.end;
@@ -98,9 +95,11 @@ export class Tab3Page implements OnInit {
         type: this.file.type,
         lastModified: this.file.lastModified,
       });
-      this.file = newFile;
+      console.log(newFile)
+      return newFile;
     } else {
       console.log('No region selected.');
+      return null;
     }
   }
 
@@ -157,9 +156,11 @@ export class Tab3Page implements OnInit {
 
   async uploadFiles(): Promise<void> {
     this.sending = true;
+    console.log(this.musicForm.valid)
     if (this.musicForm.valid) {
       const loading = await this.presentLoading();
-      const res = await this.tab3Service.uploadAudio(this.file, this.musicForm.value);
+      const newFile = await this.exportSelected();
+      const res = await this.tab3Service.uploadAudio(newFile, this.musicForm.value);
       if (res) {
         loading.dismiss();
       }

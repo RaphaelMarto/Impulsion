@@ -4,6 +4,7 @@ import { IonContent, ModalController } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
 import { CommentModalComponent } from '../../../components/comment-modal/comment-modal.component';
 import { AuthService } from 'src/app/Authentication/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab1',
@@ -38,13 +39,25 @@ export class Tab1Page implements OnInit {
   @ViewChild('swiper') swiperRef!: ElementRef;
   private context: AudioContext;
 
-  constructor(private http: HttpClient, private modalController: ModalController, private authService: AuthService) {
+  constructor(
+    private http: HttpClient,
+    private modalController: ModalController,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.context = new AudioContext();
   }
 
   async ngOnInit() {
     this.authService.isLoggedIn.subscribe(async (logedIn) => {
       this.login = logedIn;
+      if (this.login) {
+        this.authService.checkCondition().subscribe(async (condition) => {
+          if (!condition) {
+            this.router.navigate(['/condition']);
+          }
+        });
+      }
       await this.getMusic();
       this.init();
     });
@@ -313,11 +326,11 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  async openCommentModal(titre:string) {
+  async openCommentModal(titre: string) {
     const modal = await this.modalController.create({
       component: CommentModalComponent,
       componentProps: {
-        titre:titre,
+        titre: titre,
       },
     });
     await modal.present();

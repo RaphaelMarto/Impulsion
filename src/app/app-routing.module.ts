@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './Page/login/login.component';
 import { ProfileOtherUsersComponent } from './Page/profile-other-users/profile-other-users.component';
+import { ConditionUtilisationComponent } from './Page/condition-utilisation/condition-utilisation.component';
 
 const routes: Routes = [
   {
@@ -9,6 +10,10 @@ const routes: Routes = [
     pathMatch: 'full',
     component: LoginComponent,
     // redirectTo: 'login',
+  },
+  {
+    path:'condition',
+    component:ConditionUtilisationComponent,
   },
   {
     path: '',

@@ -17,6 +17,7 @@ import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { provideStorage,getStorage } from '@angular/fire/storage';
 import { DataSharingServiceModule } from './service/data-sharing.module';
+import { conditionUtilisationModule } from './Page/condition-utilisation/condition-utilisation.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,6 +29,7 @@ import { DataSharingServiceModule } from './service/data-sharing.module';
     LoginModule,
     TabsProfilComponentModule,
     ProfileOtherModule,
+    conditionUtilisationModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
