@@ -7,7 +7,6 @@ const nanoid = require("nanoid");
 var router = express.Router();
 const axios = require("axios");
 const { MusicService } = require("../service/music.service");
-const { empty } = require("rxjs");
 
 const musicService = new MusicService();
 

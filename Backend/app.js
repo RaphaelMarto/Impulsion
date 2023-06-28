@@ -57,6 +57,7 @@ if(!firebaseAdmin.apps.length){
     databaseURL: "https://impulsion-6bca6.firebaseio.com",
     storageBucket: "impulsion-6bca6.appspot.com",
   });
+  firebaseAdmin.firestore().settings({ ignoreUndefinedProperties:true});
 }
 
 // catch 404 and forward to error handler

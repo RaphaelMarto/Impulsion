@@ -66,6 +66,7 @@ export class Tab3Page implements OnInit {
 
   onFileSelected(event: any): void {
     this.file = event.target.files[0] as File;
+    event.target.value = '';
     this.name = this.file.name.substring(0, this.file.name.lastIndexOf('.'));
     this.condition = true;
 
@@ -96,6 +97,7 @@ export class Tab3Page implements OnInit {
         lastModified: this.file.lastModified,
       });
       console.log(newFile)
+      this.file = '';
       return newFile;
     } else {
       console.log('No region selected.');
