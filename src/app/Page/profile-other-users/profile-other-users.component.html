@@ -7,15 +7,17 @@
       id="myImage"
       class="profile-picture"
       [src]="user.avatar"
-      (onerror)="setDefaultImage()"
       alt="Profile Picture"
-      *ngIf="login"
     />
-    <ion-button [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? unfollow() : follow()">
+    <ion-button *ngIf="login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? unfollow() : follow()">
       <ion-icon [name]="followed ? 'heart' : 'heart-outline'" slot="icon-only"></ion-icon>
       <p>{{ followed ? "Unfollow" : "Follow" }}</p>
     </ion-button>
-    <div class="profile-info" *ngIf="login">
+    <ion-button *ngIf="!login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="connexion()">
+      <ion-icon [name]="followed ? 'heart' : 'heart-outline'" slot="icon-only"></ion-icon>
+      <p>{{ followed ? "Unfollow" : "Follow" }}</p>
+    </ion-button>
+    <div class="profile-info">
       <h1>{{ user.nickname }}</h1>
       <p>Country: {{ user.country }}</p>
     </div>
@@ -36,9 +38,12 @@
               <p class="Text-center">{{ item.name }}</p>
             </ion-col>
             <ion-col size="2">
-              <ion-button [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="itemLikes[item.name] ? deleteLike(item.name) : like(item.name)"
+              <ion-button *ngIf="login" [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="itemLikes[item.name] ? deleteLike(item.name) : like(item.name)"
                 ><ion-icon [name]="itemLikes[item.name] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
               </ion-button>
+              <ion-button *ngIf="!login" [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="connexion()"
+              ><ion-icon [name]="itemLikes[item.name] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
+            </ion-button>
             </ion-col>
           </ion-row>
         </ion-label>

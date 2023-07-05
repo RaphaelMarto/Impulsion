@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { config } from 'src/app/config/configuration';
 import { Location } from '@angular/common';
@@ -29,6 +29,7 @@ export class ProfileOtherUsersComponent implements OnInit {
     private authService: AuthService,
     private http: HttpClient,
     private route: ActivatedRoute,
+    private router: Router,
     private location: Location
   ) {}
 
@@ -40,21 +41,17 @@ export class ProfileOtherUsersComponent implements OnInit {
     });
   }
 
-  setDefaultImage(): void {
-    var image = document.getElementById('myImage') as HTMLImageElement;
-    image!.src = '../../../../assets/icon/user.png';
-    image!.onerror = null;
-  }
-
   async getInfoUser(): Promise<void> {
     this.http.get(config.API_URL + '/user/' + this.idOther).subscribe((s: any) => {
       this.user.nickname = s.Nickname;
       this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
       this.user.country = s.Country;
     });
-    this.http.get(config.API_URL + '/follow/' + this.idOther, this.options).subscribe((s: any) => {
-      this.followed = s.res;
-    });
+    if(this.login){
+      this.http.get(config.API_URL + '/follow/' + this.idOther, this.options).subscribe((s: any) => {
+        this.followed = s.res;
+      });
+    }
   }
 
   cancel() {
@@ -72,9 +69,11 @@ export class ProfileOtherUsersComponent implements OnInit {
   }
 
   getAllMusicUser() {
-    this.http.get(config.API_URL + '/music/' + this.idOther, this.options).subscribe((data: any) => {
+    this.http.get(config.API_URL + '/music/' + this.idOther).subscribe((data: any) => {
       this.music = data;
-      this.getlike();
+      if(this.login){
+        this.getlike();
+      }
     });
   }
 
@@ -106,5 +105,9 @@ export class ProfileOtherUsersComponent implements OnInit {
     audioPlayer.src = url;
 
     audioPlayer.play();
+  }
+
+  connexion(){
+    this.router.navigate(['/login'])
   }
 }

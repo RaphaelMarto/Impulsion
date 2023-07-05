@@ -1,3 +1,3 @@
 export const config = {
-  API_URL: 'https://impulsion-api.site', //http://localhost:3000
+  API_URL: 'http://localhost:3000', //https://impulsion-api.site
 };

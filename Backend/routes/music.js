@@ -121,6 +121,81 @@ router.get("/genre", async (req, res) => {
   });
 });
 
+router.get("/all/:startLetter", async (req, res) => {
+  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
+  const genres = [
+    "Pop",
+    "Rock",
+    "Hip-hop/Rap",
+    "Electronic",
+    "R&B/Soul",
+    "Country",
+    "Reggae",
+    "Latin",
+    "Jazz",
+    "Classical",
+    "Blues",
+    "Funk",
+    "Metal",
+    "Gospel",
+    "Punk",
+    "Alternative",
+    "World",
+    "Folk",
+    "Indie",
+    "Experimental",
+  ];
+
+  try {
+    const userRef = admin.firestore().collection("Music");
+    const snapshot = await userRef.get();
+
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      res.status(200).send([]);
+      return;
+    }
+
+    const musicDataList = [];
+    for (const doc of snapshot.docs) {
+      const musicData = doc.data();
+      let nameUser = "";
+
+      try {
+        const nameUserDoc = await admin.firestore().collection("Utilisateur").doc(doc.id).get();
+        const userData = nameUserDoc.data();
+        nameUser = userData.Nickname;
+
+        const matchingPositions = musicData.name
+          .map((name, index) => (name.startsWith(startLetter) ? index : -1))
+          .filter((index) => index !== -1);
+
+        if (matchingPositions.length > 0) {
+          for (let i = 0; i < matchingPositions.length; i++) {
+            const selectData = {
+              Url: musicData.URL[matchingPositions[i]],
+              Genre: genres[musicData.genre[matchingPositions[i]] - 1],
+              Name: musicData.name[matchingPositions[i]],
+              Nickname: nameUser,
+              id: doc.id,
+            };
+            musicDataList.push(selectData);
+          }
+        }
+      } catch (error) {
+        console.log("Error fetching user data:", error);
+        res.status(500).send("Error fetching user data");
+      }
+    }
+    
+    console.log(musicDataList);
+    res.status(200).json(musicDataList);
+  } catch (error) {
+    console.log("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
+  }
+});
+
 router.get("/proxy-audio", async (req, res) => {
   try {
     const url = req.query.url; // The URL of the audio file to proxy
@@ -287,7 +362,7 @@ router.get("/all/music", async (req, res) => {
   }
 });
 
-router.get("/:userId", authenticate, async (req, res) => {
+router.get("/:userId", async (req, res) => {
   const userId = req.params.userId;
 
   admin
