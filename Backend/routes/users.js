@@ -22,6 +22,7 @@ router.get("", authenticate, (req, res) => {
           Nickname: userData.Nickname,
           Email: userData.Email,
           Phone: userData.Phone,
+          Instrument: userData.Instrument,
           Country: userData.Country,
           City: userData.City,
           PhotoUrl: userData.PhotoUrl,
@@ -33,6 +34,44 @@ router.get("", authenticate, (req, res) => {
       console.log("Error fetching user data:", error);
       res.status(500).send("Error fetching user data");
     });
+});
+
+router.put("/instrument",authenticate, async (req, res) => {
+  try {
+    const instrument = req.body.instrument;
+
+    const musicDoc = await admin.firestore().collection("Utilisateur").doc(req.uid).get();
+    let instruArray = musicDoc.get("Instrument");
+
+    instruArray.push(instrument);
+    admin.firestore().collection("Utilisateur").doc(req.uid).update({
+      Instrument: instruArray,
+    });
+
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error adding instrument." + error);
+  }
+});
+
+router.delete("/instrument/:indexInstru",authenticate, async (req, res) => {
+  try {
+    const instrument = req.params.indexInstru;
+
+    const musicDoc = await admin.firestore().collection("Utilisateur").doc(req.uid).get();
+    let instruArray = musicDoc.get("Instrument");
+
+    instruArray.splice(instrument, 1);
+    admin.firestore().collection("Utilisateur").doc(req.uid).update({
+      Instrument: instruArray,
+    });
+
+    res.status(200).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error deleting instrument." + error);
+  }
 });
 
 router.get("/all/:startLetter", async (req, res) => {

@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true">
  <ion-searchbar animated="true" #searchBar  color="light" [debounce]="500" (ionInput)="handleInput($event)"></ion-searchbar>
- <ion-button [color]="buttonFocus == 'artiste' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('artiste')">Artiste</ion-button>
- <ion-button [color]="buttonFocus == 'musique' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('musique')">Musique</ion-button>
+ <ion-button [color]="buttonFocus == 'artiste' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('artiste')">Artist</ion-button>
+ <ion-button [color]="buttonFocus == 'musique' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('musique')">Music</ion-button>
  <ion-button [color]="buttonFocus == 'instrument' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('instrument')">Instrument</ion-button>
  <div *ngIf="buttonFocus == 'artiste'">
   <ion-card *ngFor="let user of data" (click)="getProfile(user.id)" >
@@ -36,7 +36,7 @@
     <img alt="photo de profile" [src]="user.PhotoUrl" />
     <ion-card-header>
       <ion-card-title>{{user.Nickname}}</ion-card-title>
-      <ion-card-subtitle>{{user.Country}}</ion-card-subtitle>
+      <ion-card-subtitle>{{user.Instrument}}</ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>

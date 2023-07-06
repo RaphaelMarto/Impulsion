@@ -67,7 +67,7 @@ export class Tab3Page implements OnInit {
   onFileSelected(event: any): void {
     this.file = event.target.files[0] as File;
     event.target.value = '';
-    this.name = this.file.name.substring(0, this.file.name.lastIndexOf('.'));
+    this.name = this.file.name.substring(0, this.file.name.lastIndexOf('.') > 20 ? 20 : this.file.name.lastIndexOf('.'));
     this.condition = true;
 
     const audio = new Audio();

@@ -83,3 +83,37 @@ form input {
 .space{
     margin-top: 15px;
 }
+
+.form-group{
+    width: 100%;
+}
+
+.add-instrument{
+    --background: transparent;
+    // padding: 3px 3px 0px 3px;
+    --box-shadow: none;
+    padding-left:50%;
+}
+
+.del-instrument{
+    --background: transparent;
+    // padding: 3px 3px 0px 3px;
+    --box-shadow: none;
+}
+
+.instrument{
+    margin-bottom: 0px !important;
+}
+
+.select{
+    width: 35vh;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.centered-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }  
+  

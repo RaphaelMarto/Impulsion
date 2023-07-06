@@ -19,6 +19,7 @@ router.post("/login", async (req, res) => {
         Email: user.providerData[0].email,
         Nickname: user.displayName,
         PhotoUrl: user.photoURL,
+        Instrument: [],
         Country:null,
         City: null,
         Role: 1,

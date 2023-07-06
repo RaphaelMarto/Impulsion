@@ -54,7 +54,9 @@ export class Tab2Page implements OnInit {
   }
 
   InputInstrument(query: any) {
-    console.log('instru');
+    this.http.get(config.API_URL + '/music/instrument/all/' + query, this.options).subscribe((res:any) => {
+      this.data = res;
+    });
   }
 
   getProfile(id: string) {

@@ -9,6 +9,7 @@ const axios = require("axios");
 const { MusicService } = require("../service/music.service");
 
 const musicService = new MusicService();
+const config = "https://impulsion-api.site";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -84,115 +85,6 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
   } catch (error) {
     console.error(error);
     res.status(500).send("Error uploading file." + error);
-  }
-});
-
-router.get("/genre", async (req, res) => {
-  const genres = [
-    "Pop",
-    "Rock",
-    "Hip-hop/Rap",
-    "Electronic",
-    "R&B/Soul",
-    "Country",
-    "Reggae",
-    "Latin",
-    "Jazz",
-    "Classical",
-    "Blues",
-    "Funk",
-    "Metal",
-    "Gospel",
-    "Punk",
-    "Alternative",
-    "World",
-    "Folk",
-    "Indie",
-    "Experimental",
-  ];
-
-  const genreObjects = genres.map((genre, index) => ({
-    name: genre,
-    number: index + 1,
-  }));
-
-  res.send({
-    genre: genreObjects,
-  });
-});
-
-router.get("/all/:startLetter", async (req, res) => {
-  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
-  const genres = [
-    "Pop",
-    "Rock",
-    "Hip-hop/Rap",
-    "Electronic",
-    "R&B/Soul",
-    "Country",
-    "Reggae",
-    "Latin",
-    "Jazz",
-    "Classical",
-    "Blues",
-    "Funk",
-    "Metal",
-    "Gospel",
-    "Punk",
-    "Alternative",
-    "World",
-    "Folk",
-    "Indie",
-    "Experimental",
-  ];
-
-  try {
-    const userRef = admin.firestore().collection("Music");
-    const snapshot = await userRef.get();
-
-    if (snapshot.empty) {
-      console.log("No matching documents.");
-      res.status(200).send([]);
-      return;
-    }
-
-    const musicDataList = [];
-    for (const doc of snapshot.docs) {
-      const musicData = doc.data();
-      let nameUser = "";
-
-      try {
-        const nameUserDoc = await admin.firestore().collection("Utilisateur").doc(doc.id).get();
-        const userData = nameUserDoc.data();
-        nameUser = userData.Nickname;
-
-        const matchingPositions = musicData.name
-          .map((name, index) => (name.startsWith(startLetter) ? index : -1))
-          .filter((index) => index !== -1);
-
-        if (matchingPositions.length > 0) {
-          for (let i = 0; i < matchingPositions.length; i++) {
-            const selectData = {
-              Url: musicData.URL[matchingPositions[i]],
-              Genre: genres[musicData.genre[matchingPositions[i]] - 1],
-              Name: musicData.name[matchingPositions[i]],
-              Nickname: nameUser,
-              id: doc.id,
-            };
-            musicDataList.push(selectData);
-          }
-        }
-      } catch (error) {
-        console.log("Error fetching user data:", error);
-        res.status(500).send("Error fetching user data");
-      }
-    }
-    
-    console.log(musicDataList);
-    res.status(200).json(musicDataList);
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
   }
 });
 
@@ -347,6 +239,7 @@ async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocument
 
 router.get("/all/music", async (req, res) => {
   try {
+    console.log("hzez");
     const strList = req.query.list;
     const list = strList.split(",");
     const musicCollectionRef = admin.firestore().collection("Music");
@@ -359,6 +252,152 @@ router.get("/all/music", async (req, res) => {
   } catch (error) {
     console.error("Error retrieving random music documents:", error);
     res.status(500).send("Internal Server Error Music");
+  }
+});
+
+router.get("/genre", async (req, res) => {
+  const genres = [
+    "Pop",
+    "Rock",
+    "Hip-hop/Rap",
+    "Electronic",
+    "R&B/Soul",
+    "Country",
+    "Reggae",
+    "Latin",
+    "Jazz",
+    "Classical",
+    "Blues",
+    "Funk",
+    "Metal",
+    "Gospel",
+    "Punk",
+    "Alternative",
+    "World",
+    "Folk",
+    "Indie",
+    "Experimental",
+  ];
+
+  const genreObjects = genres.map((genre, index) => ({
+    name: genre,
+    number: index + 1,
+  }));
+
+  res.send({
+    genre: genreObjects,
+  });
+});
+
+router.get("/all/:startLetter", async (req, res) => {
+  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
+  const genres = [
+    "Pop",
+    "Rock",
+    "Hip-hop/Rap",
+    "Electronic",
+    "R&B/Soul",
+    "Country",
+    "Reggae",
+    "Latin",
+    "Jazz",
+    "Classical",
+    "Blues",
+    "Funk",
+    "Metal",
+    "Gospel",
+    "Punk",
+    "Alternative",
+    "World",
+    "Folk",
+    "Indie",
+    "Experimental",
+  ];
+
+  try {
+    const userRef = admin.firestore().collection("Music");
+    const snapshot = await userRef.get();
+
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      res.status(200).send([]);
+      return;
+    }
+
+    const musicDataList = [];
+    for (const doc of snapshot.docs) {
+      const musicData = doc.data();
+      let nameUser = "";
+
+      try {
+        const nameUserDoc = await admin.firestore().collection("Utilisateur").doc(doc.id).get();
+        const userData = nameUserDoc.data();
+        nameUser = userData.Nickname;
+
+        const matchingPositions = musicData.name
+          .map((name, index) => (name.startsWith(startLetter) ? index : -1))
+          .filter((index) => index !== -1);
+
+        if (matchingPositions.length > 0) {
+          for (let i = 0; i < matchingPositions.length; i++) {
+            const selectData = {
+              Url: musicData.URL[matchingPositions[i]],
+              Genre: genres[musicData.genre[matchingPositions[i]] - 1],
+              Name: musicData.name[matchingPositions[i]],
+              Nickname: nameUser,
+              id: doc.id,
+            };
+            musicDataList.push(selectData);
+          }
+        }
+      } catch (error) {
+        console.log("Error fetching user data:", error);
+        res.status(500).send("Error fetching user data");
+      }
+    }
+
+    res.status(200).json(musicDataList);
+  } catch (error) {
+    console.log("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
+  }
+});
+
+router.get("/instrument/all/:startLetter", async (req, res) => {
+  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
+
+  try {
+    const userRef = admin.firestore().collection("Utilisateur");
+    const snapshot = await userRef.get();
+
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      res.status(200).send([]);
+      return;
+    }
+
+    const userDataList = [];
+    snapshot.forEach((doc) => {
+      const userData = doc.data();
+      const matchingPositions = userData.Instrument.map((instrument, index) =>
+        instrument.startsWith(startLetter) ? index : -1
+      ).filter((index) => index !== -1);
+
+      if (matchingPositions.length > 0) {
+        const selectData = {
+          Nickname: userData.Nickname,
+          Instrument: userData.Instrument,
+          PhotoUrl: config + "/user/proxy-image?url=" + userData.PhotoUrl,
+          id: doc.id,
+        };
+        userDataList.push(selectData);
+      }
+    });
+
+    res.status(200).json(userDataList);
+  } catch (error) {
+    console.log("Error fetching user data:", error);
+    res.status(500).send("Error fetching user data");
   }
 });
 

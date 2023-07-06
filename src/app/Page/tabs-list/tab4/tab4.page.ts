@@ -25,7 +25,12 @@ export class Tab4Page implements OnInit {
   profileForm!: FormGroup<any>;
   isSubmitted = false;
   userCopy: any;
+  instrument:any;
+  instruments: any[] = ['Baterrie', 'djambe', 'piano'];
+  viewAddInstrument: boolean = false;
   options = { withCredentials: true };
+  isDeployed:any;
+  selectedInstruments:any;
 
   constructor(
     private platform: Platform,
@@ -47,6 +52,7 @@ export class Tab4Page implements OnInit {
       this.user.nickname = s.Nickname;
       this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
       this.user.email = s.Email;
+      this.instrument = s.Instrument;
       this.user.phone = s.Phone;
       this.user.country = s.Country;
       this.user.city = s.City;
@@ -62,7 +68,6 @@ export class Tab4Page implements OnInit {
   }
 
   emitEvent(show: boolean) {
-    console.log(show)
     this.dataSharingService.setData(show);
   }
 
@@ -98,11 +103,36 @@ export class Tab4Page implements OnInit {
     }
   }
 
+  addInstrument(value: any) {
+    this.instrument.push(value);
+
+    this.http.put(config.API_URL + '/user/instrument', {instrument:value}, this.options).subscribe();
+  }
+
+  delInstrument(index:number) {
+    this.instrument.splice(index,1);
+
+    this.http.delete(config.API_URL + '/user/instrument/'+index, this.options).subscribe();
+  }
+
   Deconnexion() {
     this.router.navigate(['/login']);
   }
 
-  Delete(){
-    this.http.delete(config.API_URL + '/user', this.options).subscribe()
+  Delete() {
+    this.http.delete(config.API_URL + '/user', this.options).subscribe();
+  }
+
+  viewInstrument() {
+    this.viewAddInstrument = true;
+  }
+
+  handleChange(event: any) {
+    this.addInstrument(event.target.value);
+    this.viewAddInstrument = false;
+  }
+
+  handleCancel() {
+    this.viewAddInstrument = false;
   }
 }
