@@ -150,31 +150,37 @@ async function verify(querySnapshot, list, indices) {
     if (data == []) {
       emptyId.push(doc.id);
       getMore++;
+      return;
     }
 
-    if (list !== [] && list.includes(doc.id)) {
-      if (data.length > 1) {
-        const target = doc.id;
-        let count = 0;
+    if (!emptyId.includes(doc.id)) {
+      if (list !== [] && list.includes(doc.id)) {
+        if (data.length > 1) {
+          const target = doc.id;
+          let count = 0;
 
-        for (let i = 0; i < list.length; i++) {
-          if (list[i] === target) {
-            count++;
+          for (let i = 0; i < list.length; i++) {
+            if (list[i] === target) {
+              count++;
+            }
           }
-        }
 
-        if (data.length <= count) {
+          if (data.length <= count) {
+            indices.splice(index, 1);
+            emptyId.push(doc.id);
+            getMore++;
+          }
+          else{
+            newIndice.push(indices[index]);
+          }
+        } else {
           indices.splice(index, 1);
           emptyId.push(doc.id);
           getMore++;
         }
       } else {
-        indices.splice(index, 1);
-        emptyId.push(doc.id);
-        getMore++;
+        newIndice.push(indices[index]);
       }
-    } else {
-      newIndice.push(indices[index]);
     }
   });
   return [getMore, emptyId, newIndice];
@@ -209,11 +215,13 @@ async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocument
 
   const musicDocuments = querySnapshots.map((querySnapshot) => {
     const doc = querySnapshot.docs[0];
+    const data = doc.data().URL;
+    let count= 0;
     if (!emptyId.includes(doc.id)) {
       if (list !== [] && list.includes(doc.id)) {
         if (data.length > 1) {
           const target = doc.id;
-          let count = 0;
+          count = 0;
 
           for (let i = 0; i < list.length; i++) {
             if (list[i] === target) {
@@ -239,15 +247,18 @@ async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocument
 
 router.get("/all/music", async (req, res) => {
   try {
-    console.log("hzez");
     const strList = req.query.list;
     const list = strList.split(",");
     const musicCollectionRef = admin.firestore().collection("Music");
     const totalDocuments = await musicCollectionRef.get().then((snapshot) => snapshot.size);
     const numberToGet = totalDocuments >= 10 ? 10 : totalDocuments;
-    const randomIndices = getRandomIndices(totalDocuments, numberToGet, []);
+    const randomIndices = getRandomIndices(totalDocuments, numberToGet);
     const docsData = await getRandomDocsSnapshot(musicCollectionRef, randomIndices, list, totalDocuments);
-
+    console.log()
+    console.log()
+    console.log(docsData[0])
+    console.log()
+    console.log()
     res.status(200).json(docsData);
   } catch (error) {
     console.error("Error retrieving random music documents:", error);

@@ -31,6 +31,7 @@ export class Tab1Page implements OnInit {
   public nickname: any = [];
   public titre: any = [];
   public login: boolean = false;
+  private stopLoad: boolean = false
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
 
@@ -142,18 +143,20 @@ export class Tab1Page implements OnInit {
   }
 
   async getMusic() {
-    this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
-      res.forEach((obj: any) => {
-        this.musics.push(obj.url);
-        this.usersId.push(obj.id);
-        this.titre.push(obj.titre);
-        this.swiperRef?.nativeElement.swiper.update();
+    setTimeout(() => {
+      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
+        res.forEach((obj: any) => {
+          this.musics.push(obj.url);
+          this.usersId.push(obj.id);
+          this.titre.push(obj.titre);
+          this.swiperRef?.nativeElement.swiper.update();
+        });
+        //    console.log(this.usersId);
+        console.log(this.swiperRef?.nativeElement.swiper);
       });
-      //    console.log(this.usersId);
-      console.log(this.swiperRef?.nativeElement.swiper);
-    });
-    // this.swiperRef?.nativeElement.swiper.update();
-    // console.log(this.swiperRef?.nativeElement.swiper);
+    }, 3000);
+    this.swiperRef?.nativeElement.swiper.update();
+    console.log(this.swiperRef?.nativeElement.swiper);
   }
 
   init() {
@@ -272,17 +275,26 @@ export class Tab1Page implements OnInit {
   }
 
   async loadItems() {
-    this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
+    if(!this.stopLoad){
+      this.swiperRef?.nativeElement.swiper.update();
+      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
+      console.log(res);
       res.forEach((obj: any) => {
-        this.musics.push(obj.url);
-        this.usersId.push(obj.id);
-        this.titre.push(obj.titre);
-        this.swiperRef?.nativeElement.swiper.update();
+        if (obj !== null) {
+          this.musics.push(obj.url);
+          this.usersId.push(obj.id);
+          this.titre.push(obj.titre);
+          this.swiperRef?.nativeElement.swiper.update();
+        } else {
+          this.stopLoad = true
+        }
       });
+      console.log(this.usersId);
       this.fetchNicknames();
       this.getlike();
       this.getComment();
     });
+    }
   }
 
   loadData() {
@@ -301,13 +313,13 @@ export class Tab1Page implements OnInit {
 
   deleteLike(name: any) {
     this.itemLikes[name] = false;
-    this.numLike[name]--
+    this.numLike[name]--;
     this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).subscribe();
   }
 
   like(name: any) {
     this.itemLikes[name] = true;
-    this.numLike[name]++
+    this.numLike[name]++;
     this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).subscribe();
   }
 
