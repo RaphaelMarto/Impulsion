@@ -44,6 +44,7 @@ export class Tab4Page implements OnInit {
 
   ngOnInit(): void {
     this.getInfoUser();
+    this.getInstrument();
   }
 
   getInfoUser(): void {
@@ -67,12 +68,19 @@ export class Tab4Page implements OnInit {
     });
   }
 
+  getInstrument(){
+    this.http.get(config.API_URL + "/music/instruments", this.options).subscribe((res:any)=>{
+      this.instruments = res.instruments;
+    })
+  }
+
   emitEvent(show: boolean) {
     this.dataSharingService.setData(show);
   }
 
   Edit(): void {
     this.userCopy = { ...this.user };
+    this.instruments  = this.instruments.filter(option => !this.instrument.includes(option));
     this.edit = true;
     this.emitEvent(false);
   }

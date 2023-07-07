@@ -289,6 +289,45 @@ router.get("/genre", async (req, res) => {
   });
 });
 
+router.get("/instruments", async (req, res) => {
+  const instruments = [
+    "Trombone",
+    "Saxophone",
+    "Trumpet",
+    "Tuba",
+    "French horn",
+    "Clarinet",
+    "Harp",
+    "Xylophone",
+    "Maracas",
+    "Bell",
+    "Harmonica",
+    "Accordion",
+    "Bass drum",
+    "Banjo",
+    "Double bass",
+    "Cello",
+    "Violin",
+    "Piano",
+    "Guitar",
+    "Bass guitar",
+    "Conga",
+    "Snare drum",
+    "Drums/ Drum set",
+    "DJ controller",
+    "Digital piano",
+    "singer",
+    "Synthesizer",
+    "Sampler",
+  ];
+
+  const sortedInstrument = instruments.sort();
+
+  res.send({
+    instruments: sortedInstrument,
+  });
+});
+
 router.get("/all/:startLetter", async (req, res) => {
   const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
   const genres = [
