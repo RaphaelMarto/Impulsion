@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { config } from '../../../../config/configuration';
 import { musicInterface } from 'src/app/interface/music.interface';
-import { map } from 'rxjs';
+import { map, take } from 'rxjs';
 
 @Injectable()
 export class Tab3Service {
@@ -18,7 +18,7 @@ export class Tab3Service {
     formData.append('desc', formValue.desc);
     console.log(audioFile.size);
     return new Promise((resolve, reject) => {
-      this.http.post(config.API_URL + '/music/upload', formData, options).subscribe({
+      this.http.post(config.API_URL + '/music/upload', formData, options).pipe(take(1)).subscribe({
         next: () => resolve(true),
         error: (e) => {
           console.error(e);
@@ -29,7 +29,7 @@ export class Tab3Service {
   }
 
   getGenre() {
-    return this.http.get(config.API_URL + '/music/genre').pipe(
+    return this.http.get(config.API_URL + '/music/genre').pipe(take(1)).pipe(
       map((response: any) => {
         return response.genre.map((genre: any) => ({
           name: genre.name,

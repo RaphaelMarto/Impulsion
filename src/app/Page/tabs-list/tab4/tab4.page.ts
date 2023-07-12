@@ -5,6 +5,7 @@ import { config } from 'src/app/config/configuration';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-tab4',
@@ -48,7 +49,7 @@ export class Tab4Page implements OnInit {
   }
 
   getInfoUser(): void {
-    this.http.get(config.API_URL + '/user', this.options).subscribe((s: any) => {
+    this.http.get(config.API_URL + '/user', this.options).pipe(take(1)).subscribe((s: any) => {
       this.userCopy = s;
       this.user.nickname = s.Nickname;
       this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
@@ -69,7 +70,7 @@ export class Tab4Page implements OnInit {
   }
 
   getInstrument(){
-    this.http.get(config.API_URL + "/music/instruments", this.options).subscribe((res:any)=>{
+    this.http.get(config.API_URL + "/music/instruments", this.options).pipe(take(1)).subscribe((res:any)=>{
       this.instruments = res.instruments;
     })
   }
@@ -106,7 +107,7 @@ export class Tab4Page implements OnInit {
       this.user.country = this.profileForm.controls['country'].value;
       this.user.city = this.profileForm.controls['city'].value;
       this.emitEvent(true);
-      this.http.put(config.API_URL + '/user', this.user, this.options).subscribe();
+      this.http.put(config.API_URL + '/user', this.user, this.options).pipe(take(1)).subscribe();
       this.edit = false;
     }
   }
@@ -114,13 +115,13 @@ export class Tab4Page implements OnInit {
   addInstrument(value: any) {
     this.instrument.push(value);
 
-    this.http.put(config.API_URL + '/user/instrument', {instrument:value}, this.options).subscribe();
+    this.http.put(config.API_URL + '/user/instrument', {instrument:value}, this.options).pipe(take(1)).subscribe();
   }
 
   delInstrument(index:number) {
     this.instrument.splice(index,1);
 
-    this.http.delete(config.API_URL + '/user/instrument/'+index, this.options).subscribe();
+    this.http.delete(config.API_URL + '/user/instrument/'+index, this.options).pipe(take(1)).subscribe();
   }
 
   Deconnexion() {
@@ -128,7 +129,7 @@ export class Tab4Page implements OnInit {
   }
 
   Delete() {
-    this.http.delete(config.API_URL + '/user', this.options).subscribe();
+    this.http.delete(config.API_URL + '/user', this.options).pipe(take(1)).subscribe();
   }
 
   viewInstrument() {

@@ -242,7 +242,8 @@ async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocument
       };
     }
   });
-  return musicDocuments;
+  filteredMusic = musicDocuments.filter((music) => music !== undefined);
+  return filteredMusic;
 }
 
 router.get("/all/music", async (req, res) => {
@@ -254,11 +255,6 @@ router.get("/all/music", async (req, res) => {
     const numberToGet = totalDocuments >= 10 ? 10 : totalDocuments;
     const randomIndices = getRandomIndices(totalDocuments, numberToGet);
     const docsData = await getRandomDocsSnapshot(musicCollectionRef, randomIndices, list, totalDocuments);
-    console.log()
-    console.log()
-    console.log(docsData[0])
-    console.log()
-    console.log()
     res.status(200).json(docsData);
   } catch (error) {
     console.error("Error retrieving random music documents:", error);

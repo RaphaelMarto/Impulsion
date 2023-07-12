@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
+import { take } from 'rxjs';
 import { config } from 'src/app/config/configuration';
 
 @Component({
@@ -42,19 +43,19 @@ export class Tab2Page implements OnInit {
   }
 
   InputArtist(query: any) {
-    this.http.get(config.API_URL + '/user/all/' + query, this.options).subscribe((res:any) => {
+    this.http.get(config.API_URL + '/user/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
       this.data = res;
     });
   }
 
   InputMusique(query: any) {
-    this.http.get(config.API_URL + '/music/all/' + query, this.options).subscribe((res:any) => {
+    this.http.get(config.API_URL + '/music/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
       this.data = res;
     });
   }
 
   InputInstrument(query: any) {
-    this.http.get(config.API_URL + '/music/instrument/all/' + query, this.options).subscribe((res:any) => {
+    this.http.get(config.API_URL + '/music/instrument/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
       this.data = res;
     });
   }

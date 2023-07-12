@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { TabsProfilService } from './service/tabs-profil.service';
-import { Subscription, interval } from 'rxjs';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from 'src/main';
+import { AuthService } from 'src/app/Authentication/auth.service';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
 
 @Component({
@@ -8,53 +10,75 @@ import { DataSharingService } from 'src/app/service/data-sharing.service';
   templateUrl: './tabs-profil-component.component.html',
   styleUrls: ['./tabs-profil-component.component.scss'],
 })
-export class TabsProfilComponentComponent implements OnInit, OnDestroy {
-  activeTab: string = 'music';
-  music: any[] = [];
-  follow: any[] = [];
-  private subscription!: Subscription;
-  destroy:boolean = false;
-  
-  constructor(private tabsProfilService: TabsProfilService, private cdr: ChangeDetectorRef,private dataSharingService:DataSharingService) {}
+export class TabsProfilComponentComponent implements OnInit {
+  public activeTab: string = 'music';
+  public music: any[] = [];
+  public follow: any[] = [];
+  unsub1: () => void = () => {};
+  unsub2: () => void = () => {};
+  private id: any;
+
+  constructor(
+    private tabsProfilService: TabsProfilService,
+    private authService: AuthService,
+    private dataSharingService: DataSharingService
+  ) {}
 
   ngOnInit() {
-    this.dataSharingService.getDataTab().subscribe((data: boolean) => {
-      this.destroy = data;
-
-      if(this.destroy){
-            this.stopRefresh()
-          } else {
-            this.refresh();
-          }
+    this.loadInital();
+    this.authService.getIdUser().subscribe((id:any) => {
+      this.id = id.res;
+      this.refresh();
+      this.dataSharingService.getDataTab().subscribe((val)=>{
+        if(val){
+          this.destroy()
+        } else{
+          this.refresh();
+        }
+      })
     });
-    this.loadInitialData();
   }
 
-  ngOnDestroy() {
+  destroy() {
     this.stopRefresh();
   }
 
   refresh() {
-    this.subscription = interval(500).subscribe(() => {
-      this.loadInitialData()
+    this.unsub1();
+    this.unsub2();
+
+    this.unsub1 = onSnapshot(doc(db, 'Music', this.id), (snapshot) => {
+      this.loadInitialMusicData();
+    });
+    this.unsub2 = onSnapshot(doc(db, 'Follow', this.id), (snapshot) => {
+      this.loadInitialFollowData();
     });
   }
 
   stopRefresh() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.unsub1();
+    this.unsub2();
   }
 
-  loadInitialData(): void {
-    this.tabsProfilService.getAllMusicUser().subscribe((data: any) => {
-      this.music = data;
+  loadInital(): void{
+    this.tabsProfilService.getAllMusicUser().subscribe((musicData: any) => {
+      this.music = musicData;
     });
+    this.tabsProfilService.getAllFollow().subscribe((followData: any) => {
+      this.follow = followData;
+    });
+  }
 
+  loadInitialMusicData(): void {
+    this.tabsProfilService.getAllMusicUser().subscribe((musicData: any) => {
+      this.music = musicData;
+    });
+  }
+
+  loadInitialFollowData(): void {
     this.tabsProfilService.getAllFollow().subscribe((data: any) => {
       this.follow = data;
     });
-    this.cdr.detectChanges();
   }
 
   deleteMusic(item: any): void {

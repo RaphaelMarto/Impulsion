@@ -5,6 +5,7 @@ import { config } from 'src/app/config/configuration';
 import { CommentModalComponent } from '../../../components/comment-modal/comment-modal.component';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { Router } from '@angular/router';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -144,7 +145,7 @@ export class Tab1Page implements OnInit {
 
   async getMusic() {
     setTimeout(() => {
-      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
+      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
         res.forEach((obj: any) => {
           this.musics.push(obj.url);
           this.usersId.push(obj.id);
@@ -268,7 +269,7 @@ export class Tab1Page implements OnInit {
 
   async fetchNicknames() {
     const nicknamePromises = this.usersId.map(async (userId: any) => {
-      const response: any = await this.http.get(config.API_URL + '/user/' + userId).toPromise();
+      const response: any = await this.http.get(config.API_URL + '/user/' + userId).pipe(take(1)).toPromise();
       return response.Nickname;
     });
     this.nickname = await Promise.all(nicknamePromises);
@@ -277,18 +278,19 @@ export class Tab1Page implements OnInit {
   async loadItems() {
     if(!this.stopLoad){
       this.swiperRef?.nativeElement.swiper.update();
-      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).subscribe((res: any) => {
+      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
       console.log(res);
-      res.forEach((obj: any) => {
-        if (obj !== null) {
-          this.musics.push(obj.url);
-          this.usersId.push(obj.id);
-          this.titre.push(obj.titre);
-          this.swiperRef?.nativeElement.swiper.update();
-        } else {
-          this.stopLoad = true
-        }
-      });
+      if(res.length>0){
+        res.forEach((obj: any) => {
+          console.log('obj',obj)
+            this.musics.push(obj.url);
+            this.usersId.push(obj.id);
+            this.titre.push(obj.titre);
+            this.swiperRef?.nativeElement.swiper.update();
+        });
+      } else {
+        this.stopLoad = true
+      }
       console.log(this.usersId);
       this.fetchNicknames();
       this.getlike();
@@ -314,26 +316,26 @@ export class Tab1Page implements OnInit {
   deleteLike(name: any) {
     this.itemLikes[name] = false;
     this.numLike[name]--;
-    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).subscribe();
+    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).pipe(take(1)).subscribe();
   }
 
   like(name: any) {
     this.itemLikes[name] = true;
     this.numLike[name]++;
-    this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).subscribe();
+    this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).pipe(take(1)).subscribe();
   }
 
   getlike() {
     if (this.login) {
       for (let titre of this.titre) {
-        this.http.get(config.API_URL + '/like/liked/' + titre, this.options).subscribe((res: any) => {
+        this.http.get(config.API_URL + '/like/liked/' + titre, this.options).pipe(take(1)).subscribe((res: any) => {
           this.itemLikes[res.name] = res.res;
           this.numLike[res.name] = res.like;
         });
       }
     } else {
       for (let titre of this.titre) {
-        this.http.get(config.API_URL + '/like/liked/anon/' + titre).subscribe((res: any) => {
+        this.http.get(config.API_URL + '/like/liked/anon/' + titre).pipe(take(1)).subscribe((res: any) => {
           this.numLike[res.name] = res.like;
         });
       }
@@ -352,7 +354,7 @@ export class Tab1Page implements OnInit {
 
   getComment() {
     for (let titre of this.titre) {
-      this.http.get(config.API_URL + '/comment/comment/anon/' + titre).subscribe((res: any) => {
+      this.http.get(config.API_URL + '/comment/comment/anon/' + titre).pipe(take(1)).subscribe((res: any) => {
         this.numCom[res.name] = res.nbCom;
       });
     }

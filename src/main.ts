@@ -6,7 +6,7 @@ import { environment } from './environments/environment';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import 'firebase/auth';
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
 
 
 defineCustomElements(window);
@@ -27,6 +27,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore()
+const colRef = collection(db,'Music')
+getDocs(colRef)
 const analytics = getAnalytics(app);
 
 platformBrowserDynamic().bootstrapModule(AppModule)

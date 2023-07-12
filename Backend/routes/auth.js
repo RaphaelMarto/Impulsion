@@ -71,6 +71,10 @@ router.get("/check-cookie", (req, res) => {
   }
 });
 
+router.get("/id",authenticate, (req, res) => {
+  res.send({res :req.uid});
+});
+
 router.get("/get-name", authenticate, (req, res) => {
   admin
     .firestore()

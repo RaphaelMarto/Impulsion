@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class DataSharingService {
   private data = new BehaviorSubject<boolean>(true);
-  private dataTab = new BehaviorSubject<boolean>(true);
+  private dataTab = new BehaviorSubject<boolean>(false);
 
   getData() {
     return this.data.asObservable();

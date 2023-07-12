@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { config } from 'src/app/config/configuration';
 import { Location } from '@angular/common';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-profile-other-users',
@@ -42,15 +43,21 @@ export class ProfileOtherUsersComponent implements OnInit {
   }
 
   async getInfoUser(): Promise<void> {
-    this.http.get(config.API_URL + '/user/' + this.idOther).subscribe((s: any) => {
-      this.user.nickname = s.Nickname;
-      this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
-      this.user.country = s.Country;
-    });
-    if(this.login){
-      this.http.get(config.API_URL + '/follow/' + this.idOther, this.options).subscribe((s: any) => {
-        this.followed = s.res;
+    this.http
+      .get(config.API_URL + '/user/' + this.idOther)
+      .pipe(take(1))
+      .subscribe((s: any) => {
+        this.user.nickname = s.Nickname;
+        this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
+        this.user.country = s.Country;
       });
+    if(this.login){
+      this.http
+        .get(config.API_URL + '/follow/' + this.idOther, this.options)
+        .pipe(take(1))
+        .subscribe((s: any) => {
+          this.followed = s.res;
+        });
     }
   }
 
@@ -60,31 +67,46 @@ export class ProfileOtherUsersComponent implements OnInit {
 
   follow() {
     this.followed = true;
-    this.http.post(config.API_URL + '/follow/' + this.idOther, {}, this.options).subscribe();
+    this.http
+      .post(config.API_URL + '/follow/' + this.idOther, {}, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
   unfollow() {
     this.followed = false;
-    this.http.delete(config.API_URL + '/follow/' + this.idOther, this.options).subscribe();
+    this.http
+      .delete(config.API_URL + '/follow/' + this.idOther, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
   getAllMusicUser() {
-    this.http.get(config.API_URL + '/music/' + this.idOther).subscribe((data: any) => {
-      this.music = data;
-      if(this.login){
-        this.getlike();
-      }
-    });
+    this.http
+      .get(config.API_URL + '/music/' + this.idOther)
+      .pipe(take(1))
+      .subscribe((data: any) => {
+        this.music = data;
+        if (this.login) {
+          this.getlike();
+        }
+      });
   }
 
   deleteLike(name: string) {
     this.itemLikes[name] = false;
-    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).subscribe();
+    this.http
+      .put(config.API_URL + '/like/del/' + name, {}, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
   like(name: string) {
     this.itemLikes[name] = true;
-    this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).subscribe();
+    this.http
+      .put(config.API_URL + '/like/add/' + name, {}, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
   getlike() {
@@ -92,6 +114,7 @@ export class ProfileOtherUsersComponent implements OnInit {
     for (music of this.music) {
       this.http
         .get(config.API_URL + '/like/liked/' + music.name, this.options)
+        .pipe(take(1))
         .subscribe((res: any) => {
           this.itemLikes[res.name] = res.res;
         });
