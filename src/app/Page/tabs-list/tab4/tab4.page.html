@@ -20,8 +20,9 @@
     </ion-header>
     <img
       id="myImage"
+      *ngIf="user?.avatar"
       class="profile-picture"
-      [src]="user.avatar"
+      [src]="ApiUrl + '/user/proxy-image?url='+user?.avatar"
       (onerror)="setDefaultImage()"
       alt="Profile Picture"
     />

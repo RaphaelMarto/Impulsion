@@ -32,6 +32,7 @@ export class Tab4Page implements OnInit {
   options = { withCredentials: true };
   isDeployed:any;
   selectedInstruments:any;
+  ApiUrl:string = config.API_URL;
 
   constructor(
     private platform: Platform,
@@ -52,7 +53,7 @@ export class Tab4Page implements OnInit {
     this.http.get(config.API_URL + '/user', this.options).pipe(take(1)).subscribe((s: any) => {
       this.userCopy = s;
       this.user.nickname = s.Nickname;
-      this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
+      this.user.avatar = s.PhotoUrl;
       this.user.email = s.Email;
       this.instrument = s.Instrument;
       this.user.phone = s.Phone;
@@ -64,7 +65,7 @@ export class Tab4Page implements OnInit {
         phone: [s.Phone],
         country: [s.Country],
         city: [s.City],
-        avatar: [config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl],
+        avatar: [s.PhotoUrl],
       });
     });
   }
