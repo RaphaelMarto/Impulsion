@@ -28,8 +28,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore()
-const colRef = collection(db,'Music')
-getDocs(colRef)
+// const colRef = collection(db,'Music')
+// getDocs(colRef)
 const analytics = getAnalytics(app);
 
 platformBrowserDynamic().bootstrapModule(AppModule)

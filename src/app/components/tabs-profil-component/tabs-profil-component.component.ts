@@ -4,6 +4,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from 'src/main';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-tabs-profil-component',
@@ -12,6 +13,8 @@ import { DataSharingService } from 'src/app/service/data-sharing.service';
 })
 export class TabsProfilComponentComponent implements OnInit {
   public activeTab: string = 'music';
+  public musicObserv!: Observable<any[]>;
+  public followObserv!: Observable<any[]>;
   public music: any[] = [];
   public follow: any[] = [];
   unsub1: () => void = () => {};
@@ -72,12 +75,14 @@ export class TabsProfilComponentComponent implements OnInit {
   loadInitialMusicData(): void {
     this.tabsProfilService.getAllMusicUser().subscribe((musicData: any) => {
       this.music = musicData;
+      this.musicObserv = of(musicData);
     });
   }
 
   loadInitialFollowData(): void {
     this.tabsProfilService.getAllFollow().subscribe((data: any) => {
       this.follow = data;
+      this.followObserv = of(data);
     });
   }
 

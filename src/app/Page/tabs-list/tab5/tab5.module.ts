@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { Tab5Page } from './tab5.page';
 
 import { Tab5RoutingModule } from './tab5-routing.module';
+import { UserListComponent } from 'src/app/components/user-list/user-list.component';
+import { EmptyScreenModule } from 'src/app/components/empty-screen/empty-screen.module';
 
 @NgModule({
   imports: [
@@ -14,7 +16,8 @@ import { Tab5RoutingModule } from './tab5-routing.module';
     FormsModule,
     Tab5RoutingModule,
     HeaderModule,
+    EmptyScreenModule
   ],
-  declarations: [Tab5Page]
+  declarations: [Tab5Page,UserListComponent]
 })
 export class Tab5PageModule {}

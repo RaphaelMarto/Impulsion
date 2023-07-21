@@ -6,7 +6,12 @@ const routes: Routes = [
   {
     path: '',
     component: Tab5Page,
+  },
+  {
+    path: 'private/:id',
+    loadChildren: () => import('./chat/chat.module').then( m => m.ChatPageModule),
   }
+
 ];
 
 @NgModule({

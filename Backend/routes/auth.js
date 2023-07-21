@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
+const config = "https://impulsion-api.site";
 
 router.post("/login", async (req, res) => {
   const idToken = req.body.token;
@@ -72,7 +73,30 @@ router.get("/check-cookie", (req, res) => {
 });
 
 router.get("/id",authenticate, (req, res) => {
-  res.send({res :req.uid});
+  res.send({res :req.uid}).status(200);
+});
+
+router.get("/all/id", authenticate, async (req, res) => {
+  const collectionRef = admin.firestore().collection("Utilisateur");
+  const documents = await collectionRef.get();
+
+  let documentFiltered = [];
+  let documentData = [];
+
+  documents.forEach((document) => {
+    document.id !== req.uid ? documentFiltered.push(document) : "";
+  });
+  documentFiltered.forEach((document) => {
+    const data = document.data();
+    const selectData = {
+      Nickname: data.Nickname,
+      PhotoUrl: config +'/user/proxy-image?url='+data.PhotoUrl,
+      id: document.id,
+    };
+    documentData.push(selectData);
+  });
+
+  res.send(documentData).status(200);
 });
 
 router.get("/get-name", authenticate, (req, res) => {
