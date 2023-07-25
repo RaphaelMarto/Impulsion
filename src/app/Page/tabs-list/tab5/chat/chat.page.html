@@ -1,12 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/chat" (click)="showbar()"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content [fullscreen]="true">
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/chat" (click)="showbar()"></ion-back-button>
-      </ion-buttons>
-      <ion-title>{{name}}</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
   <app-empty-screen
   *ngIf="(chats | async)?.length == 0" [model]="model"></app-empty-screen>
