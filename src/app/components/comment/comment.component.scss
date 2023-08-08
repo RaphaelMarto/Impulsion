@@ -1,0 +1,119 @@
+a{
+    color:white;
+    text-decoration:none;
+  }
+
+.firstDiv{
+  margin-top: 5px;
+}
+
+ /* CSS for the parent container div */
+.comment-container-image {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: stretch;
+  align-items: stretch;
+}
+
+/* CSS for the image container */
+.image-container {
+  flex: 0 0 auto;
+}
+
+.buttonsInteraction{
+  display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 5px;
+    margin-left: 50px;
+}
+
+button {
+  background-color: transparent;
+  padding: 5px;
+  color:gray;
+}
+
+.reply{
+  margin-left: 5px;
+    margin-right: 5px;
+//   ion-textarea {
+//     border: 1px solid var(--ion-color-medium);
+//     border-radius: 20px;
+//     margin: 0.5vh 0;
+//     padding-left: 10px;
+// }
+  margin-left: 3px;
+}
+
+.buttonShowMore{
+  display: flex;
+  justify-content: center;
+}
+
+// .buttonShowMore::before {
+//   content: "";
+//   height: 0.1px;
+//   margin-top: 10px;
+//   margin-right: 4px;
+//   width: 20px;
+//   background-color: white;
+//   transform: translateY(-50%);
+// }
+
+// /* Style for the right line */
+// .buttonShowMore::after {
+//   content: "";
+//   height: 0.1px;
+//   margin-top: 10px;
+//   margin-left: 4px;
+//   width: 20px;
+//   background-color: white;
+//   transform: translateY(-50%);
+// }
+
+// .hide-css .buttonShowMore::before,
+// .hide-css .buttonShowMore::after {
+//   display: none;
+// }
+
+/* CSS for the image */
+.image {
+  width: 50px; /* Adjust the width as per your requirement */
+}
+
+.image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+/* CSS for the comment container */
+.comment-container {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CSS for the author and comment */
+.author {
+  font-weight: 900;
+}
+
+.comment {
+  margin-top: 5px; /* Adjust margin as per your requirement */
+}
+
+/* CSS for the "REP" and "Del" buttons */
+ion-button {
+  display: block;
+  width: 20%;
+  height: 100%;
+  margin-top: 10px; /* Adjust margin as per your requirement */
+}
+
+/* CSS to hide the textarea when replyCommentVisible is false */
+.vanish {
+  display: none;
+}

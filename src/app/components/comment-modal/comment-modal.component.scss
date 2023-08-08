@@ -19,6 +19,41 @@
   display: none;
 }
 
+ion-content {
+  ion-list {
+      background: transparent;
+  }
+}
+ion-footer {
+  ion-toolbar {
+      padding: 0 3px;
+      ion-textarea {
+          border: 1px solid var(--ion-color-medium);
+          border-radius: 20px;
+          margin: 0.5vh 0;
+          padding-left: 10px;
+      }
+  }
+}
+
+a{
+  font-weight: 900;
+  color:white;
+  text-decoration:none;
+}
+
+.test {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  text-overflow: ellipsis;
+  overflow: inherit;
+  box-sizing: border-box;
+  place-content: center;
+}
+
 // .custom-list {
 //   --ion-item-text-padding: 0;
 // }

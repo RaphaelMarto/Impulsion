@@ -32,6 +32,7 @@ export class Tab1Page implements OnInit {
   public nickname: any = [];
   public titre: any = [];
   public login: boolean = false;
+  public titleShown: any = [];
   private stopLoad: boolean = false
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
@@ -153,11 +154,11 @@ export class Tab1Page implements OnInit {
           this.swiperRef?.nativeElement.swiper.update();
         });
         //    console.log(this.usersId);
-        console.log(this.swiperRef?.nativeElement.swiper);
+        // console.log(this.swiperRef?.nativeElement.swiper);
       });
     }, 3000);
     this.swiperRef?.nativeElement.swiper.update();
-    console.log(this.swiperRef?.nativeElement.swiper);
+    // console.log(this.swiperRef?.nativeElement.swiper);
   }
 
   init() {
@@ -182,7 +183,7 @@ export class Tab1Page implements OnInit {
   async visulize(canvas: ElementRef<HTMLCanvasElement>, URLmusic: string, playPause: boolean, loadUnload: boolean) {
     if (playPause) {
       if (loadUnload) {
-        console.log(URLmusic);
+        // console.log(URLmusic);
         const audio = await this.loadAudio(URLmusic);
         const analyser = this.context.createAnalyser();
         analyser.fftSize = 2048;
@@ -279,19 +280,21 @@ export class Tab1Page implements OnInit {
     if(!this.stopLoad){
       this.swiperRef?.nativeElement.swiper.update();
       this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
-      console.log(res);
+      // console.log(res);
       if(res.length>0){
         res.forEach((obj: any) => {
-          console.log('obj',obj)
+          // console.log('obj',obj)
             this.musics.push(obj.url);
             this.usersId.push(obj.id);
             this.titre.push(obj.titre);
+            let substring = obj.titre.replace(/^.*_/, "");
+            this.titleShown.push(substring);
             this.swiperRef?.nativeElement.swiper.update();
         });
       } else {
         this.stopLoad = true
       }
-      console.log(this.usersId);
+      // console.log(this.usersId);
       this.fetchNicknames();
       this.getlike();
       this.getComment();
@@ -308,7 +311,7 @@ export class Tab1Page implements OnInit {
 
   async updateSwiper() {
     const swiper = this.swiperRef?.nativeElement.swiper;
-    console.log(this.swiperRef?.nativeElement.swiper);
+    // console.log(this.swiperRef?.nativeElement.swiper);
 
     await swiper.update();
   }

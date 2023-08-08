@@ -5,17 +5,17 @@
           <ion-icon name="close-outline" slot="icon-only"></ion-icon>
         </ion-button>
         <div class="form-group">
-          <label>Nom</label>
+          <label>Name</label>
           <input type="text" class="form-control" formControlName="name" />
         </div>
         <div
           *ngIf="musicForm.get('name')!.invalid && (musicForm.get('name')!.dirty || musicForm.get('name')!.touched) || sending && musicForm.get('name')!.invalid"
         >
           <div *ngIf="musicForm.get('name')!.errors!['required']" class="error">Name is required.</div>
-          <div *ngIf="musicForm.get('name')!.errors?.['maxlength']" class="error">max 20 caracter for the name.</div>
+          <div *ngIf="musicForm.get('name')!.errors?.['maxlength']" class="error">Max 20 caracter for the name.</div>
         </div>
         <div class="form-group-2">
-          <label>Genre</label>
+          <label>Type</label>
           <ion-select formControlName="genre" class="form-control-2">
             <ion-select-option *ngFor="let option of genre" [value]="option.number"
               >{{ option.name }}</ion-select-option

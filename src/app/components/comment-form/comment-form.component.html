@@ -1,0 +1,9 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <ion-textarea [autoGrow]="true" class="comment-form-textarea" formControlName="title" placeholder="Reply"></ion-textarea>
+  <button class="comment-form-button" type="submit" [disabled]="form.invalid">
+    {{submitLabel}}
+  </button>
+  <button *ngIf="hasCancelButton" type="button" (click)="cancel()" class="comment-form-button comment-form-cancel-button">
+    Cancel
+  </button>
+</form>

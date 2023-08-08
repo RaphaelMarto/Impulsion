@@ -88,7 +88,6 @@ export class Tab3Page implements OnInit {
 
   async exportSelected() {
     const region: any = Object.values(this.wave.regions.list)[0];
-    console.log(this.file)
     if (region) {
       const start = region.start;
       const end = region.end;
@@ -96,7 +95,6 @@ export class Tab3Page implements OnInit {
         type: this.file.type,
         lastModified: this.file.lastModified,
       });
-      console.log(newFile)
       this.file = '';
       return newFile;
     } else {
@@ -158,7 +156,6 @@ export class Tab3Page implements OnInit {
 
   async uploadFiles(): Promise<void> {
     this.sending = true;
-    console.log(this.musicForm.valid)
     if (this.musicForm.valid) {
       const loading = await this.presentLoading();
       const newFile = await this.exportSelected();

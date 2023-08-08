@@ -5,7 +5,7 @@ import { config } from 'src/app/config/configuration';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
-import { take } from 'rxjs';
+import { of, take } from 'rxjs';
 
 @Component({
   selector: 'app-tab4',

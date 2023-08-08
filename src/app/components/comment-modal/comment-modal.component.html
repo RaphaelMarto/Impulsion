@@ -6,18 +6,26 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let comment of comments let comNumber = index">
-      <div class="comment-container">
-        <p>{{ UserComenting[comNumber] }}: {{ comment }}</p>
-    </div>
-    <ion-button slot="end" color="dark" (click)="deleteCom(comNumber)" [class]="UserComenting[comNumber] == name ? '' : 'vanish'">Del</ion-button>
-    </ion-item>
-  </ion-list>
-
-  <div class="input-container">
+  <app-comment *ngFor="let comment of (comments | async) let comNumber = index" [comments]="comment" [docId]="docId[comNumber]" [paths]="paths[comNumber]" [titre]="titre" [UserComenting]="UserComenting[comNumber]" [moreCom]="moreCom[comNumber]">
+  </app-comment>
+  <!-- <div class="input-container">
     <ion-item>
-      <ion-input type="text" placeholder="Commentaire" class="input" clear-input="true" color="dark" [disabled]="!login" (keyup.enter)="addComment($event)"></ion-input>
+      <ion-input type="text" placeholder="Commentaire" class="input" clear-input="true" color="dark" [disabled]="!login" (keyup.enter)="addComment()"></ion-input>
+       <ion-textarea autoGrow rows="1" placeholder="Send message" [(ngModel)]="message"></ion-textarea> 
     </ion-item>
-  </div>
+  </div> -->
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-textarea [autoGrow]="true" rows="1" placeholder="Send comment" color="dark" [(ngModel)]="message" [disabled]="!login"></ion-textarea>
+    <ion-buttons slot="end">
+      <ion-fab-button *ngIf="!isLoading" size="small" color="dark" (click)="addComment()" [disabled]="!login">
+        <ion-icon name="send"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button *ngIf="isLoading" size="small" color="dark">
+        <ion-spinner name="crescent" color="light"></ion-spinner>
+      </ion-fab-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

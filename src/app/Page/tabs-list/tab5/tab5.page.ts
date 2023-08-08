@@ -36,7 +36,6 @@ export class Tab5Page implements OnInit,OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('destroy')
     this.unsub1();
   }
 
@@ -76,7 +75,6 @@ export class Tab5Page implements OnInit,OnDestroy {
       .getChatRooms()
       .pipe(take(1))
       .subscribe((data: any) => {
-        console.log(data.user);
         this.time = new Date(); //this.time = new Date(data.createdAt._seconds * 1000 + data.createdAt._nanoseconds / 1000000);
         this.chatRooms = of(data.user);
       });

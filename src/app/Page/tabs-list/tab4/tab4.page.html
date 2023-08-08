@@ -7,8 +7,8 @@
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
-        <ion-button color="danger" (click)="Deconnexion()">Déconnexion</ion-button>
-        <ion-button color="danger" class="space" (click)="Delete()">Supprimer le compte</ion-button>
+        <ion-button color="danger" (click)="Deconnexion()">Disconnect</ion-button>
+        <ion-button color="danger" class="space" (click)="Delete()">Delete account</ion-button>
       </ion-content>
     </ion-menu>
     <ion-header *ngIf="!edit">
@@ -22,7 +22,7 @@
       id="myImage"
       *ngIf="user?.avatar"
       class="profile-picture"
-      [src]="ApiUrl + '/user/proxy-image?url='+user?.avatar"
+      [src]="ApiUrl + '/user/proxy-image?url='+(user?.avatar)"
       (onerror)="setDefaultImage()"
       alt="Profile Picture"
     />
@@ -81,7 +81,7 @@
       <p>Instrument: {{instrument}}</p>
       <p>Country: {{user.country}}</p>
       <p>City: {{user.city}}</p>
-      <ion-button shape="round" class="edit" (click)="Edit()">Edit Profile</ion-button>
+      <ion-button shape="round" color="dark" class="edit" (click)="Edit()">Edit Profile</ion-button>
     </div>
   </div>
   <div *ngIf="!edit">

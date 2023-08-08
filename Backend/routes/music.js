@@ -17,12 +17,13 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
   try {
     // Extract data from request:
     const file = req.file;
-    const name = req.body.name.trim();
+    const nameTrim = req.body.name.trim();
+    const name = nameTrim.charAt(0).toUpperCase() + nameTrim.toLowerCase().slice(1);
     const genre = req.body.genre;
     const desc = req.body.desc;
     // Upload file to Firebase Storage:
     const bucket = admin.storage().bucket();
-    const uniqueFilename = nanoid.nanoid() + "_" + file.originalname;
+    const uniqueFilename = nanoid.nanoid() + "_" + name;
     const fileUploadResponse = await bucket.upload(file.path, {
       destination: uniqueFilename,
     });
@@ -38,7 +39,7 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
     let genreArray = musicDoc.get("genre");
     let descArray = musicDoc.get("desc");
 
-    nameArray.push(name);
+    nameArray.push(uniqueFilename);
     genreArray.push(genre);
     descArray.push(desc);
 
@@ -49,7 +50,7 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
         .doc(req.uid)
         .set({
           URL: downloadUrl,
-          name: [name],
+          name: [uniqueFilename],
           genre: [genre],
           desc: [desc],
         });
@@ -65,15 +66,13 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
           desc: descArray,
         });
     }
-    await admin.firestore().collection("Liked").doc(name).set({
+    await admin.firestore().collection("Liked").doc(uniqueFilename).set({
       idUserLike: [],
       like: 0,
     });
 
-    await admin.firestore().collection("Comment").doc(name).set({
-      idUserCom: [],
+    await admin.firestore().collection("Comment").doc(uniqueFilename).set({
       nbCom: 0,
-      Comment:[],
     });
 
     fs.unlink(file.path, (err) => {
@@ -117,7 +116,7 @@ router.get("/user/all", authenticate, async (req, res) => {
       const musique = doc.data();
       InfoSelectedMusique = musique.name;
       const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
-        name: name,
+        name: name.replace(/^.*_/, ""),
         number: index + 1,
       }));
       res.send(musiqueObjects);
@@ -141,18 +140,18 @@ function getRandomIndices(totalDocuments, count) {
 }
 
 async function verify(querySnapshot, list, indices) {
-  let getMore = "";
+  let getMore = 0;
   let emptyId = [];
   let newIndice = [];
   querySnapshot.map(async (querySnapshot, index) => {
     const doc = querySnapshot.docs[0];
     const data = doc.data().URL;
-    if (data == []) {
+
+    if (data.length === 0) {
       emptyId.push(doc.id);
       getMore++;
       return;
     }
-
     if (!emptyId.includes(doc.id)) {
       if (list !== [] && list.includes(doc.id)) {
         if (data.length > 1) {
@@ -169,8 +168,7 @@ async function verify(querySnapshot, list, indices) {
             indices.splice(index, 1);
             emptyId.push(doc.id);
             getMore++;
-          }
-          else{
+          } else {
             newIndice.push(indices[index]);
           }
         } else {
@@ -216,7 +214,7 @@ async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocument
   const musicDocuments = querySnapshots.map((querySnapshot) => {
     const doc = querySnapshot.docs[0];
     const data = doc.data().URL;
-    let count= 0;
+    let count = 0;
     if (!emptyId.includes(doc.id)) {
       if (list !== [] && list.includes(doc.id)) {
         if (data.length > 1) {
@@ -336,7 +334,7 @@ router.get("/instruments", async (req, res) => {
 });
 
 router.get("/all/:startLetter", async (req, res) => {
-  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
+  const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.toLowerCase().slice(1);
   const genres = [
     "Pop",
     "Rock",
@@ -379,21 +377,23 @@ router.get("/all/:startLetter", async (req, res) => {
         const nameUserDoc = await admin.firestore().collection("Utilisateur").doc(doc.id).get();
         const userData = nameUserDoc.data();
         nameUser = userData.Nickname;
-
-        const matchingPositions = musicData.name
-          .map((name, index) => (name.startsWith(startLetter) ? index : -1))
-          .filter((index) => index !== -1);
-
-        if (matchingPositions.length > 0) {
-          for (let i = 0; i < matchingPositions.length; i++) {
-            const selectData = {
-              Url: musicData.URL[matchingPositions[i]],
-              Genre: genres[musicData.genre[matchingPositions[i]] - 1],
-              Name: musicData.name[matchingPositions[i]],
-              Nickname: nameUser,
-              id: doc.id,
-            };
-            musicDataList.push(selectData);
+        if (musicData.name.length > 0) {
+          const titleShown = musicData.name.map((name) => name.replace(/^.*_/, ""));
+          const matchingPositions = titleShown
+            .map((name, index) => (name.startsWith(startLetter) ? index : -1))
+            .filter((index) => index !== -1);
+    
+          if (matchingPositions.length > 0) {
+            for (let i = 0; i < matchingPositions.length; i++) {
+              const selectData = {
+                Url: musicData.URL[matchingPositions[i]],
+                Genre: genres[musicData.genre[matchingPositions[i]] - 1],
+                Name: titleShown[matchingPositions[i]],
+                Nickname: nameUser,
+                id: doc.id,
+              };
+              musicDataList.push(selectData);
+            }
           }
         }
       } catch (error) {

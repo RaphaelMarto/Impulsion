@@ -24,6 +24,7 @@ export class ProfileOtherUsersComponent implements OnInit {
   music: any;
   followed: boolean = false;
   itemLikes: { [name: string]: boolean } = {};
+  titleShown: string[]=[];
   @ViewChild('audioPlayer', { static: false }) audioPlayerRef!: ElementRef<HTMLAudioElement>;
 
   constructor(
@@ -86,6 +87,9 @@ export class ProfileOtherUsersComponent implements OnInit {
       .get(config.API_URL + '/music/' + this.idOther)
       .pipe(take(1))
       .subscribe((data: any) => {
+        data.forEach((song:any) => {
+          this.titleShown.push(song.name.replace(/^.*_/, ""))
+        });
         this.music = data;
         if (this.login) {
           this.getlike();

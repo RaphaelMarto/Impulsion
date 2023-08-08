@@ -1,9 +1,9 @@
 <ion-content #content [fullscreen]="true" id="content" scrollY="false">
-  <swiper-container #swiper direction="vertical"   (reachend)="loadData()">
+  <swiper-container #swiper direction="vertical"   (reachend)="loadData()" *ngIf="musics">
     <swiper-slide [id]="'page-' + PageNumber" *ngFor="let music of musics let PageNumber = index">
       <canvas #visual [attr.id]="'canva-' + PageNumber"></canvas>
       <div class="info-container">
-        <p>{{titre[PageNumber]}}</p>
+        <p>{{titleShown[PageNumber]}}</p>
         <p><a [routerLink]="['/otherProfile', usersId[PageNumber]]">{{nickname[PageNumber]}}</a></p>
       </div>
       <div class="reaction-container">

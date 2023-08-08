@@ -42,7 +42,6 @@ export class ChatPage implements OnInit,OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('destroyeddd')
     this.unsub1();
   }
 
@@ -57,7 +56,6 @@ export class ChatPage implements OnInit,OnDestroy {
   }
 
   refresh() {
-    console.log(this.roomId)
     const chatRoomCollection =  collection(db,'ChatRoom',this.roomId,'chat') 
     this.unsub1 = onSnapshot(chatRoomCollection, (snapshot) => {
       this.getChatRoomMessages();
@@ -67,7 +65,6 @@ export class ChatPage implements OnInit,OnDestroy {
   getChatRoomMessages() {
     this.chatService.getChatRoomMessage(this.roomId).pipe(take(1)).subscribe((data: any) => {
       this.currentUserId = this.chatService.currentUserId;
-      console.log(data);
       this.chats = of(data);
     });
   }
