@@ -23,6 +23,7 @@ export class CommentModalComponent implements OnInit, OnDestroy {
   public docId:string[]=[];
   public paths:string[]=[];
   public moreCom:number[]=[];
+  public picture:string[]=[];
   options = { withCredentials: true };
   private unsubscribe: any;
 
@@ -41,6 +42,7 @@ export class CommentModalComponent implements OnInit, OnDestroy {
 
   async refresh() {
     this.unsubscribe = onSnapshot(collection(db,'Comment') , (snapshot) => {
+      console.log('here')
       this.getCom();
     });
   }
@@ -70,6 +72,7 @@ export class CommentModalComponent implements OnInit, OnDestroy {
         this.docId = res.docId;
         this.paths = res.path;
         this.moreCom = res.moreCom;
+        this.picture = res.pictures;
       });
   }
 }

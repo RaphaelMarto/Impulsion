@@ -2,7 +2,7 @@
   <div class="comment-container-image">
     <div class="image-container">
       <div class="image">
-        <img src="../../../assets/icon/user.png">
+        <img [src]="ApiUrl + '/user/proxy-image?url='+picture">
       </div>
     </div>
     <div class="comment-container">
@@ -16,7 +16,7 @@
   </div>
   <div class="buttonsInteraction">
     <button color="dark" (click)="showReplyComment()">Reply</button>
-    <button color="dark" (click)="deleteCom()" [class]="UserComenting == name ? '' : 'vanish'">Del</button>
+    <button color="dark" (click)="deleteCom(paths)" [class]="UserComenting == name ? '' : 'vanish'">Del</button>
   </div>
   <div class="reply" *ngIf="replyCommentVisible">
     <!-- <ion-textarea [autoGrow]="true" placeholder="Message" [class]="replyCommentVisible ? '' : 'vanish'" [(ngModel)]="replyCommentText"></ion-textarea> -->
@@ -29,5 +29,5 @@
   <app-more-commentaire *ngIf="showMoreCom" [titre]="titre"></app-more-commentaire> -->
 </div>
 <!-- <app-more-commentaire *ngIf="showMoreCom" [docId]="docId" [paths]="paths"></app-more-commentaire> -->
-<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async) let comNumber2 = index" [comments]="comment2" [docId]="docId2[comNumber2]" [paths]="paths2[comNumber2]" [titre]="titre" [UserComenting]="UserComenting2[comNumber2]" [moreCom]="moreCom2[comNumber2]" [numberReply]="numberReply">
+<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async) let comNumber2 = index" [comments]="comment2" [docId]="docId2[comNumber2]" [paths]="paths2[comNumber2]" [titre]="titre" [UserComenting]="UserComenting2[comNumber2]" [moreCom]="moreCom2[comNumber2]" [numberReply]="numberReply" [picture]="picture2[comNumber2]">
 </app-comment></div>

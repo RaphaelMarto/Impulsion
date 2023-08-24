@@ -18,16 +18,19 @@ export class CommentComponent implements OnInit {
   @Input() paths: string = '';
   @Input() moreCom: number = 0;
   @Input() numberReply:number = 0;
+  @Input() picture:string= '';
   comments2: any;
-  UserComenting2: string = '';
-  docId2: string = '';
-  paths2: string = '';
-  moreCom2: number[] = [];
+  public UserComenting2: string[]=[];
+  public moreCom2: number[] = [];
+  public docId2:string[]=[];
+  public paths2:string[]=[];
+  public picture2:string[]=[];
   public name: any;
   public replyCommentVisible: boolean = false;
   public replyCommentText: string = '';
   public showMoreCom: boolean = false;
   public marginValue:number=15;
+  ApiUrl:string = config.API_URL;
   options = { withCredentials: true };
   public login!: boolean;
   unsubscribe: any;
@@ -66,22 +69,24 @@ export class CommentComponent implements OnInit {
         this.docId2 = res.docId;
         this.paths2 = res.path;
         this.moreCom2 = res.moreCom
+        this.picture2 = res.pictures
         this.showMoreCom = true;
         this.numberReply++;
         this.marginValue =this.marginValue*this.numberReply;
+        console.log(this.paths)
       });
   }
 
-  deleteCom() {
+  deleteCom(path:string) {
     this.http
-      .delete(config.API_URL + '/comment/del/' + this.docId + '/' + this.titre, this.options)
+      .put(config.API_URL + '/comment/del/' + this.docId + '/' + this.titre, {path:path, numReply:this.numberReply}, this.options)
       .pipe(take(1))
       .subscribe();
   }
 
   addComment({ text, docId }: { text: string; docId: null | string }) {
     this.http
-      .post(config.API_URL + '/comment/add/reply/' + docId, { comment: text, path: this.paths }, this.options)
+      .post(config.API_URL + '/comment/add/reply/' + docId+'/'+this.titre, { comment: text, path: this.paths }, this.options)
       .pipe(take(1))
       .subscribe();
   }

@@ -6,7 +6,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <app-comment *ngFor="let comment of (comments | async) let comNumber = index" [comments]="comment" [docId]="docId[comNumber]" [paths]="paths[comNumber]" [titre]="titre" [UserComenting]="UserComenting[comNumber]" [moreCom]="moreCom[comNumber]">
+  <app-comment *ngFor="let comment of (comments | async) let comNumber = index" [comments]="comment" [docId]="docId[comNumber]" [paths]="paths[comNumber]" [titre]="titre" [UserComenting]="UserComenting[comNumber]" [moreCom]="moreCom[comNumber]" [picture]="picture[comNumber]">
   </app-comment>
   <!-- <div class="input-container">
     <ion-item>
