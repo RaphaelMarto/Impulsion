@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { config } from '../config/configuration';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, take } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private router: Router) {}
 
   async login(token: string): Promise<boolean> {
     const options = { withCredentials: true };
@@ -23,9 +24,9 @@ export class AuthService {
 
   logout(): void {
     const options = { withCredentials: true };
-    this.http.get(config.API_URL + '/auth/logout', options).pipe(take(1)).subscribe(
-      (response) => console.log('sent successfully', response),
-      (error) => console.error('Error sending token:', error)
+    this.http.get(config.API_URL + '/auth/logout', options).pipe(take(1)).subscribe(()=>{
+      location.reload();
+    }
     );
   }
 
