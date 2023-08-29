@@ -47,7 +47,7 @@
           </ion-text>
         </p>
       </ion-label>
-      <ion-text slot="end" color="medium">{{time | date: 'HH:mm'}}</ion-text>
+      <ion-text slot="end" color="medium">{{item.createdAt._seconds | timeOrDate}}</ion-text>
     </ion-item>
   </ion-list>
 

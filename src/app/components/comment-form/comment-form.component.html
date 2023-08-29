@@ -1,5 +1,12 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <ion-toolbar>
   <ion-textarea [autoGrow]="true" class="comment-form-textarea" formControlName="title" placeholder="Reply"></ion-textarea>
+  <ion-buttons slot="end">
+    <button type="submit" size="small" color="dark" [disabled]="form.invalid">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </ion-buttons>
+</ion-toolbar>
   <button class="comment-form-button" type="submit" [disabled]="form.invalid">
     {{submitLabel}}
   </button>

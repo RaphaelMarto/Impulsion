@@ -15,8 +15,9 @@
     </div>
   </div>
   <div class="buttonsInteraction">
-    <button color="dark" (click)="showReplyComment()">Reply</button>
+    <button color="dark" (click)="showReplyComment()" [disabled]="!login">Reply</button>
     <button color="dark" (click)="deleteCom(paths)" [class]="UserComenting == name ? '' : 'vanish'">Del</button>
+    <button slot="end">{{comments.createdAt._seconds *1000 | date: 'dd MMM'}}</button>
   </div>
   <div class="reply" *ngIf="replyCommentVisible">
     <!-- <ion-textarea [autoGrow]="true" placeholder="Message" [class]="replyCommentVisible ? '' : 'vanish'" [(ngModel)]="replyCommentText"></ion-textarea> -->

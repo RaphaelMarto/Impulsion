@@ -148,6 +148,25 @@ router.get("/comment/:nameMusic", authenticate, async (req, res) => {
       );
     }
 
+    const combinedData = data.map((item, index) => ({
+      data: item,
+      createdAt: item.createdAt._seconds * 1000,
+      nameUser: nameUser[index],
+      pictureUrl: pictureUrl[index],
+      docId: docId[index],
+      path: paths[index],
+      moreCom: moreCom[index]
+    }));
+
+    combinedData.sort((a, b) => b.createdAt - a.createdAt);
+  
+    data = combinedData.map(item => item.data);
+    nameUser = combinedData.map(item => item.nameUser);
+    pictureUrl = combinedData.map(item => item.pictureUrl);
+    docId = combinedData.map(item => item.docId);
+    paths = combinedData.map(item => item.path);
+    moreCom = combinedData.map(item => item.moreCom);
+
     res.status(200).send({ docId: docId, data: data, name: nameUser, path: paths, moreCom: moreCom, pictures:pictureUrl });
   } catch (error) {
     console.log("Error fetching user data:", error);
@@ -194,6 +213,25 @@ router.post("/comment/reply/:docId", authenticate, async (req, res) => {
         nameUser.push((await admin.firestore().collection("Utilisateur").doc(local_data.idUser).get()).data().Nickname);
         pictureUrl.push((await admin.firestore().collection("Utilisateur").doc(local_data.idUser).get()).data().PhotoUrl);
       }
+
+      const combinedData = data.map((item, index) => ({
+        data: item,
+        createdAt: item.createdAt._seconds * 1000,
+        nameUser: nameUser[index],
+        pictureUrl: pictureUrl[index],
+        docId: docIds[index],
+        path: paths[index],
+        moreCom: moreCom[index]
+      }));
+  
+      combinedData.sort((a, b) => b.createdAt - a.createdAt);
+    
+      data = combinedData.map(item => item.data);
+      nameUser = combinedData.map(item => item.nameUser);
+      pictureUrl = combinedData.map(item => item.pictureUrl);
+      docIds = combinedData.map(item => item.docId);
+      paths = combinedData.map(item => item.path);
+      moreCom = combinedData.map(item => item.moreCom);
     }
     res.status(200).send({ docId: docIds, data: data, name: nameUser, path: paths, moreCom: moreCom, pictures:pictureUrl });
   } catch (error) {

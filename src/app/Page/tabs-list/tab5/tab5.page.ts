@@ -18,7 +18,6 @@ export class Tab5Page implements OnInit,OnDestroy {
   public user!: Array<any>;
   public loading: boolean = false;
   public chatRooms!: Observable<any[]>;
-  public time!: Date;
   unsub1: any;
   model = {
     icon: 'chatbubbles-outline',
@@ -75,7 +74,6 @@ export class Tab5Page implements OnInit,OnDestroy {
       .getChatRooms()
       .pipe(take(1))
       .subscribe((data: any) => {
-        this.time = new Date(); //this.time = new Date(data.createdAt._seconds * 1000 + data.createdAt._nanoseconds / 1000000);
         this.chatRooms = of(data.user);
       });
   }
