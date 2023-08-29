@@ -7,8 +7,9 @@ import { IonicModule } from '@ionic/angular';
 import { ChatPageRoutingModule } from './chat-routing.module';
 
 import { ChatPage } from './chat.page';
-import { ChatBoxComponent } from 'src/app/components/chat-box/chat-box.component';
+
 import { EmptyScreenModule } from 'src/app/components/empty-screen/empty-screen.module';
+import { ChatBoxModule } from 'src/app/components/chat-box/chat-box.module';
 
 @NgModule({
   imports: [
@@ -16,8 +17,9 @@ import { EmptyScreenModule } from 'src/app/components/empty-screen/empty-screen.
     FormsModule,
     IonicModule,
     ChatPageRoutingModule,
-    EmptyScreenModule
+    EmptyScreenModule,
+    ChatBoxModule,
   ],
-  declarations: [ChatPage,ChatBoxComponent],
+  declarations: [ChatPage],
 })
 export class ChatPageModule {}
