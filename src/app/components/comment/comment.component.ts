@@ -25,7 +25,7 @@ export class CommentComponent implements OnInit {
   public docId2:string[]=[];
   public paths2:string[]=[];
   public picture2:string[]=[];
-  public name: any;
+  public name: any = '';
   public replyCommentVisible: boolean = false;
   public replyCommentText: string = '';
   public showMoreCom: boolean = false;
@@ -40,9 +40,11 @@ export class CommentComponent implements OnInit {
   ngOnInit() {
     this.authService.isLoggedIn.subscribe(async (logedIn) => {
       this.login = logedIn;
-      this.authService.getName().subscribe((res) => {
-        this.name = res.Nickname;
-      });
+      if(this.login){
+        this.authService.getName().subscribe((res) => {
+          this.name = res.Nickname;
+        });
+      }
     });
   }
 

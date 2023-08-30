@@ -119,7 +119,7 @@ async function deleteSubcollections(path ,docId) {
     }
 }
 
-router.get("/comment/:nameMusic", authenticate, async (req, res) => {
+router.get("/comment/:nameMusic", async (req, res) => {
   const path = "/Comment/" + req.params.nameMusic + "/topCom";
   let nameUser = [];
   let pictureUrl = [];
@@ -174,7 +174,7 @@ router.get("/comment/:nameMusic", authenticate, async (req, res) => {
   }
 });
 
-router.post("/comment/reply/:docId", authenticate, async (req, res) => {
+router.post("/comment/reply/:docId", async (req, res) => {
   const path = req.body.path;
   const docId = req.params.docId;
   let nameUser = [];
