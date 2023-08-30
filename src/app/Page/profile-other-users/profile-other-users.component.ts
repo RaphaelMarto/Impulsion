@@ -88,7 +88,7 @@ export class ProfileOtherUsersComponent implements OnInit {
       .pipe(take(1))
       .subscribe((data: any) => {
         data.forEach((song:any) => {
-          this.titleShown.push(song.name.replace(/^.*_/, ""))
+          this.titleShown[song.name] = song.name.replace(/^.*_/, "")
         });
         this.music = data;
         if (this.login) {

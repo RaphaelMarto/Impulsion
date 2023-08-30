@@ -35,7 +35,7 @@
               <ion-button (click)="playAudio(item.url)" class="invisible">
                 <ion-icon name="play-outline"></ion-icon>
               </ion-button>
-              <p class="Text-center">{{ titleShown }}</p>
+              <p class="Text-center">{{ titleShown[item.name] }}</p>
             </ion-col>
             <ion-col size="2">
               <ion-button *ngIf="login" [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="itemLikes[item.name] ? deleteLike(item.name) : like(item.name)"
