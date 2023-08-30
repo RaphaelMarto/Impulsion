@@ -51,7 +51,7 @@ export class ChatPage implements OnInit,OnDestroy {
 
   scrollToBottom() {
     if (this.chats) {
-      this.content.scrollToBottom(500);
+      this.content.scrollToBottom();
     }
   }
 
