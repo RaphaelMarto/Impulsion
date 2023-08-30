@@ -65,6 +65,8 @@ export class Tab1Page implements OnInit {
       this.init();
     });
   }
+  public condition0 = 0
+  public added = 0
 
   setUpObservers() {
     // Stop all the sounds from the previous observer, if any
@@ -85,6 +87,8 @@ export class Tab1Page implements OnInit {
       threshold: 0.5,
     };
 
+    this.added = 0;
+
     this.visuals.forEach((canva, index) => {
       const row = canva.nativeElement;
       let audio = this.audioMap.get(row); // Get existing audio element for the row, if any
@@ -104,17 +108,16 @@ export class Tab1Page implements OnInit {
             otherAudio.pause();
           }
         });
-
         audio.play();
-        this.visulize(canva, this.musics[index], true, true);
+        this.visulize(canva, this.musics[index], false, true);
       };
 
       const stopPlaying = () => {
         audio.pause();
-        this.visulize(canva, this.musics[index], true, false);
+        this.visulize(canva, this.musics[index], false, false);
       };
 
-      const togglePlaying = () => {
+      function togglePlaying()  {
         if (audio.paused) {
           startPlaying();
         } else {
@@ -122,16 +125,23 @@ export class Tab1Page implements OnInit {
         }
       };
 
+      // row.removeEventListener('click', togglePlaying,true)
+      if(this.condition0==this.added){
+        row.addEventListener('click', togglePlaying,true);
+        this.condition0++
+      }
+      this.added++;
+      
       const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             // Start playing the audio when the row comes into view
-            startPlaying();
-            row.addEventListener('click', togglePlaying);
+            audio.play();
+            this.visulize(canva, this.musics[index], true, true);
           } else {
             // Pause audio when row goes out of view
-            stopPlaying();
-            row.removeEventListener('click', togglePlaying);
+            audio.pause();
+            this.visulize(canva, this.musics[index], true, false);
           }
         });
       }, options);
@@ -146,19 +156,9 @@ export class Tab1Page implements OnInit {
 
   async getMusic() {
     setTimeout(() => {
-      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
-        res.forEach((obj: any) => {
-          this.musics.push(obj.url);
-          this.usersId.push(obj.id);
-          this.titre.push(obj.titre);
-          this.swiperRef?.nativeElement.swiper.update();
-        });
-        //    console.log(this.usersId);
-        // console.log(this.swiperRef?.nativeElement.swiper);
-      });
+      this.loadItems()
     }, 3000);
     this.swiperRef?.nativeElement.swiper.update();
-    // console.log(this.swiperRef?.nativeElement.swiper);
   }
 
   init() {
@@ -183,7 +183,6 @@ export class Tab1Page implements OnInit {
   async visulize(canvas: ElementRef<HTMLCanvasElement>, URLmusic: string, playPause: boolean, loadUnload: boolean) {
     if (playPause) {
       if (loadUnload) {
-        // console.log(URLmusic);
         const audio = await this.loadAudio(URLmusic);
         const analyser = this.context.createAnalyser();
         analyser.fftSize = 2048;
@@ -255,7 +254,7 @@ export class Tab1Page implements OnInit {
         }
 
         draw();
-      } else if (this.source) {
+      } else if (this.source && !loadUnload) {
         this.source.stop();
       }
     } else {
@@ -280,10 +279,8 @@ export class Tab1Page implements OnInit {
     if(!this.stopLoad){
       this.swiperRef?.nativeElement.swiper.update();
       this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
-      // console.log(res);
       if(res.length>0){
         res.forEach((obj: any) => {
-          // console.log('obj',obj)
             this.musics.push(obj.url);
             this.usersId.push(obj.id);
             this.titre.push(obj.titre);
@@ -294,7 +291,6 @@ export class Tab1Page implements OnInit {
       } else {
         this.stopLoad = true
       }
-      // console.log(this.usersId);
       this.fetchNicknames();
       this.getlike();
       this.getComment();
@@ -311,7 +307,6 @@ export class Tab1Page implements OnInit {
 
   async updateSwiper() {
     const swiper = this.swiperRef?.nativeElement.swiper;
-    // console.log(this.swiperRef?.nativeElement.swiper);
 
     await swiper.update();
   }
