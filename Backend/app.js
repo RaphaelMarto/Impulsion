@@ -51,6 +51,20 @@ app.use("/like", likeRouter);
 app.use("/chat", chatRouter);
 app.use("/comment", commentRouter);
 
+// require('dotenv').config()
+
+// const mysql = require('mysql2')
+// Create the connection to the database
+// const connection = mysql.createConnection(process.env.DATABASE_URL)
+
+// simple query
+// connection.query('show tables', function (err, results, fields) {
+//   console.log(results+'end') // results contains rows returned by server
+//   console.log(fields) // fields contains extra metadata about results, if available
+// })
+
+// connection.end()
+
 const serviceAccount = require("./security/impulsion-6bca6-firebase-adminsdk-w7go6-f24f59f4a0.json");
 
 if(!firebaseAdmin.apps.length){
@@ -76,15 +90,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
-
-// const db = require("./models");
-
-// if (process.env.NODE_ENV !== "test") {
-//   db.sequelize
-//     .sync()
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// }
 
 module.exports = app;

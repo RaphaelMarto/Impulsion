@@ -1,76 +1,114 @@
 var express = require("express");
 var router = express.Router();
 const { authenticate } = require("../middleware/auth");
-const admin = require("firebase-admin");
 const axios = require("axios");
-const config = "https://impulsion-api.site";
+const {
+  User,
+  Address,
+  Instrument,
+  City,
+  Country,
+  InstrumentToUser,
+  Social,
+  Comment,
+  Music,
+  Follow,
+  Liked,
+  InstrumentToUsers,
+} = require("../models");
+const MyError = require("../middleware/Error");
+const { Op } = require("sequelize");
 
-router.get("", authenticate, (req, res) => {
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        // No document found for the given UID
-        res.status(404).send("Document not found");
-      } else {
-        // Retrieve the data from the document
-        const userData = doc.data();
-        const selectData = {
-          Nickname: userData.Nickname,
-          Email: userData.Email,
-          Phone: userData.Phone,
-          Instrument: userData.Instrument,
-          Country: userData.Country,
-          City: userData.City,
-          PhotoUrl: userData.PhotoUrl,
-        };
-        res.send(selectData);
-      }
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
-    });
-});
-
-router.put("/instrument",authenticate, async (req, res) => {
+router.get("/info", async (req, res) => {
   try {
-    const instrument = req.body.instrument;
-
-    const musicDoc = await admin.firestore().collection("Utilisateur").doc(req.uid).get();
-    let instruArray = musicDoc.get("Instrument");
-
-    instruArray.push(instrument);
-    admin.firestore().collection("Utilisateur").doc(req.uid).update({
-      Instrument: instruArray,
+    const UserInfo = await User.findOne({
+      where: {
+        id: req.cookies.user_session[1],
+      },
+      attributes: ["Nickname", "Email", "Phone", "PictureUrl"],
+      include: [
+        {
+          model: Address,
+          attributes: ["Street", "HouseNum", "PostCode"],
+          include: [
+            {
+              model: City,
+              attributes: ["Name"],
+              include: [
+                {
+                  model: Country,
+                  attributes: ["Name"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
+    const InstrumentUser = await InstrumentToUser.findAll({
+      where: { UserId: req.cookies.user_session[1] },
+      attributes: ["InstrumentId"],
+      raw: true,
+    }).then((Instruments) => {
+      const InstrumentIds = Instruments.map((Instrument) => Instrument.InstrumentId);
 
-    res.status(200).send();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error adding instrument." + error);
+      return Instrument.findAll({
+        where: {
+          id: InstrumentIds,
+        },
+        attributes: ["id","Name"],
+      })
+    });
+    res.status(200).send({ UserInfo: UserInfo, InstrumentUser: InstrumentUser });
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
-router.delete("/instrument/:indexInstru",authenticate, async (req, res) => {
+router.get("/instrument/all", async (req, res) => {
   try {
-    const instrument = req.params.indexInstru;
+    const newInstrument = await Instrument.findAll({
+      attributes: ['id','Name'],
+      
+    })
+    res.status(200).send(newInstrument);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
 
-    const musicDoc = await admin.firestore().collection("Utilisateur").doc(req.uid).get();
-    let instruArray = musicDoc.get("Instrument");
+router.get("/instrument/:idInstrument", authenticate, async (req, res) => {
+  try {
+    const instrumentId = req.params.idInstrument;
 
-    instruArray.splice(instrument, 1);
-    admin.firestore().collection("Utilisateur").doc(req.uid).update({
-      Instrument: instruArray,
+    const newInstrument = await InstrumentToUser.create({
+      InstrumentId: instrumentId,
+      UserId: req.cookies.user_session[1],
     });
-
     res.status(200).send();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error deleting instrument." + error);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.delete("/instrument/:idInstrument", authenticate, async (req, res) => {
+  try {
+    const instrumentId = req.params.idInstrument;
+
+    const deletedRows = await InstrumentToUser.destroy({
+      where: {
+        InstrumentId: instrumentId,
+        UserId: req.cookies.user_session[1],
+      },
+    });
+    if (deletedRows < 0) throw new MyError("No instrument", 401);
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
@@ -79,70 +117,68 @@ router.get("/all/:startLetter", async (req, res) => {
   const endLetter = String.fromCharCode(startLetter.charCodeAt(0) + 1);
 
   try {
-    const userRef = admin.firestore().collection("Utilisateur");
-    const snapshot = await userRef.where("Nickname", ">=", startLetter).where("Nickname", "<", endLetter).get();
-
-    if (snapshot.empty) {
-      console.log("No matching documents.");
-      res.status(200).send([]);
-      return;
-    }
-
-    const userDataList = [];
-    snapshot.forEach((doc) => {
-      const userData = doc.data();
-      const selectData = {
-        Nickname: userData.Nickname,
-        Country: userData.Country,
-        PhotoUrl: config +'/user/proxy-image?url='+userData.PhotoUrl,
-        id: doc.id,
-      };
-      userDataList.push(selectData);
+    const users = await User.findAll({
+      where: {
+        Nickname: {
+          [Op.gte]: startLetter,
+          [Op.lt]: endLetter,
+        },
+      },
+      attributes: ["Nickname", "PictureUrl", "id"],
+      include: [
+        {
+          model: Address,
+          attributes: ["id"],
+          include: [
+            {
+              model: City,
+              attributes: ["Name"],
+              include: [
+                {
+                  model: Country,
+                  attributes: ["Name"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
-
-    res.status(200).json(userDataList);
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+    if (!users || users.length === 0) throw new MyError("No Users found", 401);
+    res.status(200).json(users);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
-router.get("/condition",authenticate, async (req,res)=> {
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        // No document found for the given UID
-        res.status(404).send("Document not found");
-      } else {
-        // Retrieve the data from the document
-        const userData = doc.data();
+router.get("/condition", async (req, res) => {
+  try {
+    const PolicyCheck = await User.findOne({ where: { id: req.cookies.user_session[1] }, attributes: ["PolicyCheck"] });
+    res.status(200).json(PolicyCheck);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
 
-        res.send(userData.PolicyCheck);
-      }
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
-    });
-})
-
-router.put("/condition",authenticate, async (req,res)=> {
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(req.uid)
-    .update({
-      PolicyCheck: true,
-    });
-})
+router.put("/condition", authenticate, async (req, res) => {
+  try {
+    const numOfUpdatedRows = await User.update(
+      { PolicyCheck: true }, // Set the new value for PolicyCheck
+      { where: { id: req.cookies.user_session[1] } } // Include returning option to get the updated user
+    );
+    if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
 
 router.get("/proxy-image", async (req, res) => {
   try {
-    const imageUrl = req.query.url; // The URL of the image to proxy
+    const imageUrl = req.query.url;
     const imageResponse = await axios.get(imageUrl, {
       responseType: "arraybuffer", // Set the response type to arraybuffer to handle binary data
     });
@@ -159,70 +195,157 @@ router.get("/proxy-image", async (req, res) => {
   }
 });
 
-
-router.get("/:UserId", (req, res) => {
+router.get("/:UserId", async (req, res) => {
   const userId = req.params.UserId;
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(userId)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        // No document found for the given UID
-        res.status(404).send("Document not found");
-      } else {
-        // Retrieve the data from the document
-        const userData = doc.data();
-        const selectData = {
-          Nickname: userData.Nickname,
-          Country: userData.Country,
-          PhotoUrl: userData.PhotoUrl,
-        };
-        res.send(selectData);
-      }
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
+  try {
+    const UserInfo = await User.findOne({
+      where: { id: userId },
+      attributes: ["Nickname", "PictureUrl"],
+      include: [
+        {
+          model: Address,
+          attributes: ["id"],
+          include: [
+            {
+              model: City,
+              attributes: ["Name"],
+              include: [
+                {
+                  model: Country,
+                  attributes: ["Name"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
+    if (!UserInfo) throw new MyError("User Not Found", 401);
+    res.status(200).json(UserInfo);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
-router.put("", authenticate, (req, res) => {
-  const updatedUserData = {
-    Nickname: req.body.nickname,
-    Email: req.body.email,
-    Phone: req.body.phone,
-    Country: req.body.country,
-    City: req.body.city,
-    PhotoUrl: req.body.avatar,
-  };
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(req.uid)
-    .update(updatedUserData)
-    .then(() => {
-      res.status(200).send({ result: "User data updated successfully" });
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send("An error occurred while updating the user data");
+router.put("", authenticate, async (req, res) => {
+  try {
+    const numOfUpdatedRows = await User.update(
+      {
+        Nickname: req.body.nickname,
+        Email: req.body.email,
+        Phone: req.body.phone,
+        PictureUrl: req.body.avatar,
+      },
+      { where: { id: req.cookies.user_session[1] } }
+    );
+    if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
+
+    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
+      if (user) {
+        return user.Address.update({ CityId: req.body.city }).then(function (result) {
+          return result;
+        });
+      } else {
+        throw new MyError("No User Found", 404);
+      }
     });
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
 router.delete("", authenticate, async (req, res) => {
-  const musicRef = await admin.firestore().collection("Music").doc(req.uid).get();
-  const dataNameMusic = musicRef.data().name;
+  try {
+    const numOfUpdatedRows = await User.update(
+      {
+        Nickname: "Deleted User",
+        Email: null,
+        Phone: null,
+        PictureUrl: null,
+        isActive: false,
+        PolicyCheck: false,
+        Password: null,
+        UID: null,
+      },
+      { where: { id: req.cookies.user_session[1] } }
+    );
+    if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
 
-  for(let name of dataNameMusic){
-    await admin.firestore().collection("Liked").doc(name).delete();
-    await admin.firestore().collection("Comment").doc(name).delete();
+    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
+      if (user) {
+        return user.Address.update({ CityId: 1, PostCode: null, HouseNum: null, Street: null }).then(function (result) {
+          return result;
+        });
+      } else {
+        throw new MyError("No User Found", 404);
+      }
+    });
+
+    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Social }] }).then(function (user) {
+      if (user) {
+        return user.Social.update({ Spotify: null, Youtube: null, Facebook: null, Soundcloud: null }).then(function (
+          result
+        ) {
+          return result;
+        });
+      } else {
+        throw new MyError("No User Found", 404);
+      }
+    });
+
+    await RoleToUser.update(
+      {
+        RoleId: 1,
+      },
+      {
+        where: { UserId: req.cookies.user_session[1] },
+      }
+    );
+
+    const userMusic = await Music.findAll({
+      where: { idUser: req.cookies.user_session[1] },
+      attributes: ["id"],
+    });
+
+    // Extract music IDs
+    const musicIds = userMusic.map((music) => music.id);
+    await Music.destroy({
+      where: { idUser: req.cookies.user_session[1] },
+    });
+
+    await Comment.destroy({
+      where: { idMusic: musicIds },
+    });
+
+    await Liked.destroy({
+      where: { idMusic: musicIds },
+    });
+
+    const userFollow = await Follow.findAll({
+      where: {
+        [Op.or]: [{ idUserFollowing: req.cookies.user_session[1] }, { idUserFollowed: req.cookies.user_session[1] }],
+      },
+      attributes: ["id"],
+    });
+
+    // Extract music IDs
+    const FollowIds = userFollow.map((follow) => follow.id);
+    await Follow.destroy({
+      where: { id: FollowIds },
+    });
+
+    await InstrumentToUsers.destroy({
+      where: { UserId: req.cookies.user_session[1] },
+    });
+
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
-
-  await admin.firestore().collection("Follow").doc(req.uid).delete();
-  await admin.firestore().collection("Music").doc(req.uid).delete();
-  await admin.firestore().collection("Utilisateur").doc(req.uid).delete();
 });
 
 module.exports = router;

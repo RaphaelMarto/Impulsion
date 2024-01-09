@@ -39,17 +39,17 @@
       <div class="form-group">
         <label>Instrument</label>
         <ion-list lines="full">
-          <ion-item *ngFor="let value of instrument let instruIndex =  index">
-            <ion-label>{{value}}</ion-label>
-            <ion-button slot="end" class="del-instrument" (click)="delInstrument(instruIndex)">
+          <ion-item *ngFor="let value of instrument">
+            <ion-label>{{value.Name}}</ion-label>
+            <ion-button slot="end" class="del-instrument" (click)="delInstrument(value.id, value.Name)">
               <ion-icon name="close-outline"></ion-icon>
             </ion-button>
           </ion-item>
           <ion-item class="centered-button">
             <ion-select class="select"  label="Instrument" label-placement="floating" fill="solid" *ngIf="viewAddInstrument"
             (ionChange)="handleChange($event)" (ionCancel)="handleCancel()">
-              <ion-select-option *ngFor="let option of instruments" [value]="option"
-                >{{ option }}</ion-select-option
+              <ion-select-option *ngFor="let option of instruments" [value]="option.id"
+                >{{ option.Name }}</ion-select-option
               >
             </ion-select>
             <ion-button class="add-instrument" *ngIf="!viewAddInstrument" (click)="viewInstrument()">
@@ -78,7 +78,7 @@
       <h1>{{user.nickname}}</h1>
       <p>Email: {{user.email}}</p>
       <p>Phone: {{user.phone}}</p>
-      <p>Instrument: {{instrument}}</p>
+      <p>Instrument: {{instrumentShow}}</p>
       <p>Country: {{user.country}}</p>
       <p>City: {{user.city}}</p>
       <ion-button shape="round" color="dark" class="edit" (click)="Edit()">Edit Profile</ion-button>

@@ -1,142 +1,83 @@
 var express = require("express");
 const { authenticate } = require("../middleware/auth");
-const admin = require("firebase-admin");
 var router = express.Router();
+const { Follow, User } = require("../models");
+const MyError = require("../middleware/Error");
 
-router.post("/:followedUid", authenticate, async (req, res) => {
+router.get("/all", async (req, res) => {
+  const followInfo = await Follow.findAll({
+    where: { idUserFollowing: req.cookies.user_session[1] },
+    attributes: ["idUserFollowed"],
+    raw: true,
+  }).then((followeds) => {
+    const followedUserIds = followeds.map((followed) => followed.idUserFollowed);
+
+    return User.findAll({
+      where: {
+        id: followedUserIds,
+      },
+      attributes: ["id", "Nickname"],
+    });
+  });
+  if (followInfo.length == 0 || !Array.isArray(followInfo)) throw new MyError("You don't follow anyone", 404);
+  res.status(200).json(followInfo);
+});
+
+router.get("/new/:followedId", authenticate, async (req, res) => {
   try {
-    const followedUid  = req.params.followedUid;
-    const followingDoc = await admin.firestore().collection("Follow").doc(req.uid).get();
-    const followedDoc = await admin.firestore().collection("Follow").doc(followedUid).get();
-    if (!followingDoc.exists) {
-      await admin
-        .firestore()
-        .collection("Follow")
-        .doc(req.uid)
-        .set({
-          followed: [],
-          following: [followedUid],
-        });
-    } else {
-      await admin
-        .firestore()
-        .collection("Follow")
-        .doc(req.uid)
-        .update({
-          following: admin.firestore.FieldValue.arrayUnion(followedUid),
-        });
-    }
-    if (!followedDoc.exists) {
-      await admin
-        .firestore()
-        .collection("Follow")
-        .doc(followedUid)
-        .set({
-          followed: [req.uid],
-          following: [],
-        });
-    } else {
-      await admin
-        .firestore()
-        .collection("Follow")
-        .doc(followedUid)
-        .update({
-          followed: admin.firestore.FieldValue.arrayUnion(req.uid),
-        });
-    }
+    const newFollow = await Follow.create({
+      idUserFollowing: req.cookies.user_session[1],
+      idUserFollowed: req.params.followedId,
+    });
 
     res.send({ res: true });
-  } catch (error) {
-    console.log("Error:", error);
-    res.sendStatus(500);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
-router.get("/all", authenticate, async (req, res) => {
-  admin
-    .firestore()
-    .collection("Follow")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      const follow = doc.data();
-      InfoSelectedFollow = follow.following;
-      const promises = InfoSelectedFollow.map((uid) => admin.firestore().collection("Utilisateur").doc(uid).get());
-      Promise.all(promises)
-        .then((snapshot) => {
-          const names = snapshot.map((doc) => {return doc.data().Nickname});
-          const followObjects = names.map((name, index) => ({
-            uid: InfoSelectedFollow[index],
-            name: name,
-            number: index + 1,
-          }));
-          res.send(followObjects).status(200)
-        })
-        .catch((error) => {
-          console.log("Error fetching names:", error);
-        });
-    })
-    .catch((error) => {
-      res.status(500).send("Error fetching user data");
-    });
-});
+router.get("/following/:followID", async (req, res) => {
+  try {
+    const followedId = parseInt(req.params.followID);
 
-router.get("/:followID", authenticate, async (req, res) => {
-  const followedId = req.params.followID;
-  admin
-    .firestore()
-    .collection("Follow")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      const follow = doc.data();
-      InfoSelectedFollow = follow.following;
-      if ( InfoSelectedFollow.indexOf(followedId) !== -1){
-        res.status(200).send({res:true})
-      }
-    })
-    .catch((error) => {
-      res.status(500).send("Error fetching user data");
+    const followInfo = await Follow.findOne({
+      where: {
+        idUserFollowing: req.cookies.user_session[1],
+        idUserFollowed: followedId,
+      },
+      attributes: ["idUserFollowed"],
     });
+
+    const isFollowed = !!followInfo;
+    let isMe  = false;
+    console.log(req.params.followID,req.cookies.user_session[1],"idddd",req.params.followID === req.cookies.user_session[1])
+    if(followedId === req.cookies.user_session[1]){
+      console.log('got in')
+      isMe = true
+    }
+    res.status(200).send({isFollowed:isFollowed, isMe:isMe});
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
 router.delete("/:followedId", authenticate, async (req, res) => {
   const followedId = req.params.followedId;
 
   try {
-    const followingRef = await admin.firestore().collection("Follow").doc(req.uid).get();
-    const followedRef = await admin.firestore().collection("Follow").doc(followedId).get();
-
-    // Check if the music entry exists
-    if (!followingRef.exists) {
-      res.status(404).send("Follow entry not found.");
-      return;
-    }
-    const dataFollowing = followingRef.data();
-    const dataFollowed = followedRef.data();
-    
-    const indexToRemoveFollowing = dataFollowing.following.indexOf(followedId);
-    const indexToRemoveFollowed = dataFollowed.followed.indexOf(req.uid);
-
-    await admin
-      .firestore()
-      .collection("Follow")
-      .doc(req.uid)
-      .update({
-        following: admin.firestore.FieldValue.arrayRemove(dataFollowing["following"][indexToRemoveFollowing]),
-      });
-
-    await admin
-      .firestore()
-      .collection("Follow")
-      .doc(followedId)
-      .update({
-        followed: admin.firestore.FieldValue.arrayRemove(dataFollowed["followed"][indexToRemoveFollowed]),
-      });
-
+    const deletedRows = await Follow.destroy({
+      where: {
+        idUserFollowing: req.cookies.user_session[1],
+        idUserFollowed: followedId,
+      },
+    });
+    if (deletedRows < 0) throw new MyError("Not following this user", 401);
     res.status(200).send();
-  } catch (error) {
-    res.status(500).send("Error deleting entry.");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 

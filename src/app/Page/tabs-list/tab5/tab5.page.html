@@ -37,7 +37,7 @@
 
     <ion-item detail *ngFor="let item of (chatRooms | async)" (click)="getChat(item)">
       <ion-avatar slot="start">
-        <img [src]="item.PhotoUrl"/>
+        <img [src]="item.PictureUrl"/>
       </ion-avatar>
       <ion-label>
         {{item.Nickname}}

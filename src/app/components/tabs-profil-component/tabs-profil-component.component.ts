@@ -15,55 +15,25 @@ export class TabsProfilComponentComponent implements OnInit {
   public activeTab: string = 'music';
   public musicObserv!: Observable<any[]>;
   public followObserv!: Observable<any[]>;
-  public music: any = [];
-  unsub1: () => void = () => {};
-  unsub2: () => void = () => {};
-  private id: any;
 
-  constructor(
-    private tabsProfilService: TabsProfilService,
-    private authService: AuthService,
-    private dataSharingService: DataSharingService
-  ) {}
+  constructor(private dataSharingService: DataSharingService,private tabsProfilService: TabsProfilService, private authService: AuthService) {}
 
   ngOnInit() {
-    this.authService.getIdUser().subscribe((id: any) => {
-      this.id = id.res;
-      this.refresh();
-      this.dataSharingService.getDataTab().subscribe((val) => {
-        if (val) {
-          this.destroy();
-        } else {
-          this.refresh();
-        }
-      });
-    });
-  }
-
-  destroy() {
-    this.stopRefresh();
+    this.refresh();
+    this.dataSharingService.getDataTab().subscribe((val) => {
+      if (!val) {
+        this.refresh();
+      } 
+    })
   }
 
   refresh() {
-    this.unsub1();
-    this.unsub2();
-
-    this.unsub1 = onSnapshot(doc(db, 'Music', this.id), (snapshot) => {
-      this.loadInitialMusicData();
-    });
-    this.unsub2 = onSnapshot(doc(db, 'Follow', this.id), (snapshot) => {
-      this.loadInitialFollowData();
-    });
-  }
-
-  stopRefresh() {
-    this.unsub1();
-    this.unsub2();
+    this.loadInitialMusicData();
+    this.loadInitialFollowData();
   }
 
   loadInitialMusicData(): void {
     this.tabsProfilService.getAllMusicUser().subscribe((musicData: any) => {
-      this.music = musicData;
       this.musicObserv = of(musicData);
     });
   }
@@ -74,14 +44,15 @@ export class TabsProfilComponentComponent implements OnInit {
     });
   }
 
-  deleteMusic(item: any): void {
-    const index = this.music.indexOf(item);
-    if (index > -1) {
-      this.tabsProfilService.deleteMusic(index).subscribe();
-    }
+  deleteMusic(id: any): void {
+    this.tabsProfilService.deleteMusic(id).subscribe(() => {
+      this.loadInitialMusicData();
+    });
   }
 
-  deleteFollow(item: any): void {
-    this.tabsProfilService.deleteFollow(item.uid).subscribe();
+  deleteFollow(id: any): void {
+    this.tabsProfilService.deleteFollow(id).subscribe(() => {
+      this.loadInitialFollowData();
+    });
   }
 }

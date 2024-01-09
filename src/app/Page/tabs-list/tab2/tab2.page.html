@@ -4,11 +4,11 @@
  <ion-button [color]="buttonFocus == 'musique' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('musique')">Music</ion-button>
  <ion-button [color]="buttonFocus == 'instrument' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('instrument')">Instrument</ion-button>
  <div *ngIf="buttonFocus == 'artiste'">
-  <ion-card *ngFor="let user of data" (click)="getProfile(user.id)" >
-    <img alt="photo de profile" [src]="user.PhotoUrl" />
+  <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.id)" >
+    <img alt="photo de profile" [src]="user.PictureUrl" />
     <ion-card-header>
       <ion-card-title>{{user.Nickname}}</ion-card-title>
-      <ion-card-subtitle>{{user.Country}}</ion-card-subtitle>
+      <ion-card-subtitle>{{user.Address.City.Country.Name+', '+user.Address.City.Name}}</ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>
@@ -18,25 +18,25 @@
  </div>
 
  <div *ngIf="buttonFocus == 'musique'">
-  <ion-card *ngFor="let music of data" (click)="getProfile(music.id)">
+  <ion-card *ngFor="let music of (dataObserv | async)" (click)="getProfile(music.idUser)">
     <ion-card-header>
       <ion-card-title>{{music.Name}}</ion-card-title>
-      <ion-card-subtitle>{{music.Genre}}</ion-card-subtitle>
-      <ion-card-subtitle><b>{{music.Nickname}}</b></ion-card-subtitle>
+      <ion-card-subtitle>{{music.TypeName}}</ion-card-subtitle>
+      <ion-card-subtitle><b>{{music.UserName}}</b></ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>
-      <audio #audioPlayer controls [src]="music.Url"></audio>
+      <audio #audioPlayer controls [src]="music.FilePath"></audio>
     </ion-card-content>
   </ion-card>
  </div>
 
  <div *ngIf="buttonFocus == 'instrument'">
-  <ion-card *ngFor="let user of data" (click)="getProfile(user.id)">
-    <img alt="photo de profile" [src]="user.PhotoUrl" />
+  <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.id)">
+    <img alt="photo de profile" [src]="user.PictureUrl" />
     <ion-card-header>
       <ion-card-title>{{user.Nickname}}</ion-card-title>
-      <ion-card-subtitle>{{user.Instrument}}</ion-card-subtitle>
+      <ion-card-subtitle>{{instrument}}</ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>

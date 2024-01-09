@@ -1,24 +1,24 @@
 <ion-content #content [fullscreen]="true" id="content" scrollY="false">
   <swiper-container #swiper direction="vertical"   (reachend)="loadData()" *ngIf="musics">
-    <swiper-slide [id]="'page-' + PageNumber" *ngFor="let music of musics let PageNumber = index">
+    <swiper-slide [id]="'page-' + PageNumber" *ngFor="let music of (musicsObserv | async) let PageNumber = index">
       <canvas #visual [attr.id]="'canva-' + PageNumber"></canvas>
       <div class="info-container">
-        <p>{{titleShown[PageNumber]}}</p>
-        <p><a [routerLink]="['/otherProfile', usersId[PageNumber]]">{{nickname[PageNumber]}}</a></p>
+        <p>{{music.Name}}</p>
+        <p><a [routerLink]="['/otherProfile', music.idUser]">{{music.Nickname}}</a></p>
       </div>
       <div class="reaction-container">
         <ion-buttons class="reaction-toolbar">
-          <button (click)="itemLikes[titre[PageNumber]] ? deleteLike(titre[PageNumber]) : like(titre[PageNumber])" [disabled]="!login">
+          <button (click)="itemLikes[music.id] ? deleteLike(music.id) : like(music.id)" [disabled]="!login">
             <ion-icon
               slot="icon-only"
-              [name]="itemLikes[titre[PageNumber]] ? 'heart' : 'heart-outline'"
-              [class]="itemLikes[titre[PageNumber]] ? 'heart' : ''"
+              [name]="itemLikes[music.id] ? 'heart' : 'heart-outline'"
+              [class]="itemLikes[music.id] ? 'heart' : ''"
             ></ion-icon>
-            <p slot="icon-only">{{numLike[titre[PageNumber]]}}</p>
+            <p slot="icon-only">{{numLike[music.id]}}</p>
           </button>
-          <button (click)="openCommentModal(titre[PageNumber])">
+          <button (click)="openCommentModal(music.id)">
             <ion-icon slot="icon-only" name="chatbubble-ellipses" ></ion-icon>
-            <p slot="icon-only">{{numCom[titre[PageNumber]]}}</p>
+            <p slot="icon-only">{{numCom[music.id]}}</p>
           </button>
           <button>
             <ion-icon slot="icon-only" name="share-social"></ion-icon>

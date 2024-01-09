@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "dev",
+    "username": "7nc01yfrho28ll9h25ef",
     "password": null,
-    "database": "impulsion",
-    "host": "localhost",
+    "database": "impulsion-data",
+    "host": "aws.connect.psdb.cloud",
     "dialect": "mysql"
   },
   "test": {

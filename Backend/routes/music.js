@@ -6,10 +6,8 @@ const fs = require("fs");
 const nanoid = require("nanoid");
 var router = express.Router();
 const axios = require("axios");
-const { MusicService } = require("../service/music.service");
-
-const musicService = new MusicService();
-const config = "https://impulsion-api.site";
+const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, sequelize } = require("../models");
+const { Op } = require("sequelize");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -19,7 +17,7 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
     const file = req.file;
     const nameTrim = req.body.name.trim();
     const name = nameTrim.charAt(0).toUpperCase() + nameTrim.toLowerCase().slice(1);
-    const genre = req.body.genre;
+    const genre = parseInt(req.body.genre);
     const desc = req.body.desc;
     // Upload file to Firebase Storage:
     const bucket = admin.storage().bucket();
@@ -34,45 +32,12 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
       expires: "03-17-2025",
     });
 
-    const musicDoc = await admin.firestore().collection("Music").doc(req.uid).get();
-    let nameArray = musicDoc.get("name");
-    let genreArray = musicDoc.get("genre");
-    let descArray = musicDoc.get("desc");
-
-    nameArray.push(uniqueFilename);
-    genreArray.push(genre);
-    descArray.push(desc);
-
-    if (!musicDoc.exists) {
-      await admin
-        .firestore()
-        .collection("Music")
-        .doc(req.uid)
-        .set({
-          URL: downloadUrl,
-          name: [uniqueFilename],
-          genre: [genre],
-          desc: [desc],
-        });
-    } else {
-      admin
-        .firestore()
-        .collection("Music")
-        .doc(req.uid)
-        .update({
-          URL: admin.firestore.FieldValue.arrayUnion(downloadUrl[0]),
-          name: nameArray,
-          genre: genreArray,
-          desc: descArray,
-        });
-    }
-    await admin.firestore().collection("Liked").doc(uniqueFilename).set({
-      idUserLike: [],
-      like: 0,
-    });
-
-    await admin.firestore().collection("Comment").doc(uniqueFilename).set({
-      nbCom: 0,
+    const newMusic = Music.create({
+      FilePath: downloadUrl[0],
+      Name: name,
+      Description: desc,
+      TypeMusicId: genre,
+      idUser: req.cookies.user_session[1],
     });
 
     fs.unlink(file.path, (err) => {
@@ -81,9 +46,9 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
       }
     });
     res.status(200).send();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error uploading file." + error);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
@@ -100,312 +65,132 @@ router.get("/proxy-audio", async (req, res) => {
 
     // Send the audio data as the response
     res.send(audioResponse.data);
-  } catch (error) {
-    console.error("Error proxying audio:", error);
-    res.sendStatus(500);
-  }
-});
-
-router.get("/user/all", authenticate, async (req, res) => {
-  admin
-    .firestore()
-    .collection("Music")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      const musique = doc.data();
-      InfoSelectedMusique = musique.name;
-      const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
-        name: name.replace(/^.*_/, ""),
-        number: index + 1,
-      }));
-      res.send(musiqueObjects);
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
-    });
-});
-
-// Function to generate an array of random indices
-function getRandomIndices(totalDocuments, count) {
-  const indices = [];
-  while (indices.length < count) {
-    const randomIndex = Math.floor(Math.random() * totalDocuments);
-    if (!indices.includes(randomIndex)) {
-      indices.push(randomIndex);
-    }
-  }
-  return indices;
-}
-
-async function verify(querySnapshot, list, indices) {
-  let getMore = 0;
-  let emptyId = [];
-  let newIndice = [];
-  querySnapshot.map(async (querySnapshot, index) => {
-    const doc = querySnapshot.docs[0];
-    const data = doc.data().URL;
-
-    if (data.length === 0) {
-      emptyId.push(doc.id);
-      getMore++;
-      return;
-    }
-    if (!emptyId.includes(doc.id)) {
-      if (list !== [] && list.includes(doc.id)) {
-        if (data.length > 1) {
-          const target = doc.id;
-          let count = 0;
-
-          for (let i = 0; i < list.length; i++) {
-            if (list[i] === target) {
-              count++;
-            }
-          }
-
-          if (data.length <= count) {
-            indices.splice(index, 1);
-            emptyId.push(doc.id);
-            getMore++;
-          } else {
-            newIndice.push(indices[index]);
-          }
-        } else {
-          indices.splice(index, 1);
-          emptyId.push(doc.id);
-          getMore++;
-        }
-      } else {
-        newIndice.push(indices[index]);
-      }
-    }
-  });
-  return [getMore, emptyId, newIndice];
-}
-
-// Function to fetch the random documents based on the generated indices
-async function getRandomDocsSnapshot(collectionRef, indices, list, totalDocuments) {
-  const promises = indices.map((index) => {
-    return collectionRef.limit(1).offset(index).get();
-  });
-  let querySnapshots = await Promise.all(promises);
-
-  let more = await verify(querySnapshots, list, indices);
-
-  let getMore = more == undefined ? 0 : more[0];
-  let emptyId = more == undefined ? [] : more[1];
-
-  if (more !== undefined) {
-    indices = more[2];
-  }
-
-  if (getMore !== 0) {
-    let newIndice = getRandomIndices(totalDocuments, getMore);
-    indices.concat(newIndice);
-    if (indices.length == 10) {
-      const promises = indices.map((index) => {
-        return collectionRef.limit(1).offset(index).get();
-      });
-      querySnapshots = await Promise.all(promises);
-    }
-  }
-
-  const musicDocuments = querySnapshots.map((querySnapshot) => {
-    const doc = querySnapshot.docs[0];
-    const data = doc.data().URL;
-    let count = 0;
-    if (!emptyId.includes(doc.id)) {
-      if (list !== [] && list.includes(doc.id)) {
-        if (data.length > 1) {
-          const target = doc.id;
-          count = 0;
-
-          for (let i = 0; i < list.length; i++) {
-            if (list[i] === target) {
-              count++;
-            }
-          }
-        }
-        return {
-          url: doc.data().URL[count],
-          titre: doc.data().name[count],
-          id: doc.id,
-        };
-      }
-      return {
-        url: doc.data().URL[0],
-        titre: doc.data().name[0],
-        id: doc.id,
-      };
-    }
-  });
-  filteredMusic = musicDocuments.filter((music) => music !== undefined);
-  return filteredMusic;
-}
-
-router.get("/all/music", async (req, res) => {
-  try {
-    const strList = req.query.list;
-    const list = strList.split(",");
-    const musicCollectionRef = admin.firestore().collection("Music");
-    const totalDocuments = await musicCollectionRef.get().then((snapshot) => snapshot.size);
-    const numberToGet = totalDocuments >= 10 ? 10 : totalDocuments;
-    const randomIndices = getRandomIndices(totalDocuments, numberToGet);
-    const docsData = await getRandomDocsSnapshot(musicCollectionRef, randomIndices, list, totalDocuments);
-    res.status(200).json(docsData);
-  } catch (error) {
-    console.error("Error retrieving random music documents:", error);
-    res.status(500).send("Internal Server Error Music");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
 router.get("/genre", async (req, res) => {
-  const genres = [
-    "Pop",
-    "Rock",
-    "Hip-hop/Rap",
-    "Electronic",
-    "R&B/Soul",
-    "Country",
-    "Reggae",
-    "Latin",
-    "Jazz",
-    "Classical",
-    "Blues",
-    "Funk",
-    "Metal",
-    "Gospel",
-    "Punk",
-    "Alternative",
-    "World",
-    "Folk",
-    "Indie",
-    "Experimental",
-  ];
+  try {
+    const Genre = await TypeMusic.findAll({ attributes: ['Name','id']});
 
-  const genreObjects = genres.map((genre, index) => ({
-    name: genre,
-    number: index + 1,
-  }));
-
-  res.send({
-    genre: genreObjects,
-  });
+    res.status(200).json(Genre);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
-router.get("/instruments", async (req, res) => {
-  const instruments = [
-    "Trombone",
-    "Saxophone",
-    "Trumpet",
-    "Tuba",
-    "French horn",
-    "Clarinet",
-    "Harp",
-    "Xylophone",
-    "Maracas",
-    "Bell",
-    "Harmonica",
-    "Accordion",
-    "Bass drum",
-    "Banjo",
-    "Double bass",
-    "Cello",
-    "Violin",
-    "Piano",
-    "Guitar",
-    "Bass guitar",
-    "Conga",
-    "Snare drum",
-    "Drums/ Drum set",
-    "DJ controller",
-    "Digital piano",
-    "singer",
-    "Synthesizer",
-    "Sampler",
-  ];
 
-  const sortedInstrument = instruments.sort();
+router.get("/user/all", async (req, res) => {
+  try {
+    const musics = await Music.findAll({
+      where: { idUser: req.cookies.user_session[1] },
+      attributes: ["id","Name"],
+    });
 
-  res.send({
-    instruments: sortedInstrument,
+    res.status(200).json(musics);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+async function getRandomIndices(excludedIds) {
+  const indices = new Set();
+
+  const allIds = await Music.findAll({ attributes: ['id'], raw: true });
+  while (indices.size < 10 && indices.size < allIds.length-excludedIds.length) {
+    const randomIndex = Math.floor(Math.random() * allIds.length);
+    const randomId = allIds[randomIndex].id;
+
+    if (!excludedIds.includes(randomId)) {
+      indices.add(randomId);
+    }
+  }
+
+  return Array.from(indices);
+}
+
+// Function to fetch random music documents based on indices
+async function getRandomMusic(indices) {
+  const musicDocuments = await Music.findAll({
+    attributes: ['id', 'Name', 'FilePath','idUser'],
+    where: {
+      id: {
+        [Op.in]: indices,
+      },
+    },
+    include: [
+      {
+        model: User,
+        attributes: ['Nickname'],
+      },
+    ],
   });
+
+  return musicDocuments.map((music) => ({
+    id: music.id,
+    Name: music.Name,
+    FilePath: music.FilePath,
+    idUser: music.idUser,
+    Nickname: music.User.Nickname,
+  }));
+}
+
+router.get('/random/music', async (req, res) => {
+  try {
+    const excludedIds = req.query.list;
+    const randomIndices = await getRandomIndices(excludedIds);
+    const randomMusic = await getRandomMusic(randomIndices);
+
+    res.status(200).json(randomMusic);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
 router.get("/all/:startLetter", async (req, res) => {
   const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.toLowerCase().slice(1);
-  const genres = [
-    "Pop",
-    "Rock",
-    "Hip-hop/Rap",
-    "Electronic",
-    "R&B/Soul",
-    "Country",
-    "Reggae",
-    "Latin",
-    "Jazz",
-    "Classical",
-    "Blues",
-    "Funk",
-    "Metal",
-    "Gospel",
-    "Punk",
-    "Alternative",
-    "World",
-    "Folk",
-    "Indie",
-    "Experimental",
-  ];
-
   try {
-    const userRef = admin.firestore().collection("Music");
-    const snapshot = await userRef.get();
+    const musics = await Music.findAll({
+      where: { Name: { [Op.like]: `${startLetter}%` } },
+      attributes: ["Name", "FilePath", "TypeMusicId", "idUser"],
+    });
 
-    if (snapshot.empty) {
-      console.log("No matching documents.");
-      res.status(200).send([]);
-      return;
-    }
+    const userIds = musics.map((music) => music.idUser);
+    const typeMusicIds = musics.map((music) => music.TypeMusicId);
 
-    const musicDataList = [];
-    for (const doc of snapshot.docs) {
-      const musicData = doc.data();
-      let nameUser = "";
+    const users = await User.findAll({
+      where: { id: userIds },
+      attributes: ["id", "Nickname"],
+    });
 
-      try {
-        const nameUserDoc = await admin.firestore().collection("Utilisateur").doc(doc.id).get();
-        const userData = nameUserDoc.data();
-        nameUser = userData.Nickname;
-        if (musicData.name.length > 0) {
-          const titleShown = musicData.name.map((name) => name.replace(/^.*_/, ""));
-          const matchingPositions = titleShown
-            .map((name, index) => (name.startsWith(startLetter) ? index : -1))
-            .filter((index) => index !== -1);
-    
-          if (matchingPositions.length > 0) {
-            for (let i = 0; i < matchingPositions.length; i++) {
-              const selectData = {
-                Url: musicData.URL[matchingPositions[i]],
-                Genre: genres[musicData.genre[matchingPositions[i]] - 1],
-                Name: titleShown[matchingPositions[i]],
-                Nickname: nameUser,
-                id: doc.id,
-              };
-              musicDataList.push(selectData);
-            }
-          }
-        }
-      } catch (error) {
-        console.log("Error fetching user data:", error);
-        res.status(500).send("Error fetching user data");
-      }
-    }
+    const typeMusics = await TypeMusic.findAll({
+      where: { id: typeMusicIds },
+      attributes: ["id", "Name"],
+    });
 
-    res.status(200).json(musicDataList);
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+    // const [users, typeMusics] = await Promise.all([usersPromise, typeMusicsPromise]);
+
+    const modifiedMusics = musics.map((music, index) => {
+      const modifiedName = music.Name;
+      const userName = users.find((user) => user.id === music.idUser).Nickname;
+      const typeName = typeMusics.find((typeMusic) => typeMusic.id === music.TypeMusicId).Name;
+      return {
+        Name: modifiedName,
+        FilePath: music.FilePath,
+        UserName: userName,
+        TypeName: typeName,
+        idUser: music.idUser,
+      };
+    });
+    res.status(200).json(modifiedMusics);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
@@ -413,105 +198,70 @@ router.get("/instrument/all/:startLetter", async (req, res) => {
   const startLetter = req.params.startLetter.charAt(0).toUpperCase() + req.params.startLetter.slice(1);
 
   try {
-    const userRef = admin.firestore().collection("Utilisateur");
-    const snapshot = await userRef.get();
-
-    if (snapshot.empty) {
-      console.log("No matching documents.");
-      res.status(200).send([]);
-      return;
-    }
-
-    const userDataList = [];
-    snapshot.forEach((doc) => {
-      const userData = doc.data();
-      const matchingPositions = userData.Instrument.map((instrument, index) =>
-        instrument.startsWith(startLetter) ? index : -1
-      ).filter((index) => index !== -1);
-
-      if (matchingPositions.length > 0) {
-        const selectData = {
-          Nickname: userData.Nickname,
-          Instrument: userData.Instrument,
-          PhotoUrl: config + "/user/proxy-image?url=" + userData.PhotoUrl,
-          id: doc.id,
-        };
-        userDataList.push(selectData);
-      }
+    const instruments = await Instrument.findAll({
+      where: { Name: { [Op.like]: `${startLetter}%` } },
+      attributes: ["id", "Name"],
     });
 
-    res.status(200).json(userDataList);
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+    let instrumentData = {};
+
+    for (const instrument of instruments) {
+      const instrumentId = instrument.id;
+
+      const usersWithInstrument = await InstrumentToUser.findAll({
+        where: { InstrumentId: instrumentId },
+        attributes: ["UserId"],
+      });
+
+      const userIds = usersWithInstrument.map((user) => user.UserId);
+
+      const users = await User.findAll({
+        where: { id: userIds },
+        attributes: ["id", "Nickname", "PictureUrl"],
+      });
+
+      instrumentData = {user :users, instrument:instrument.Name};
+    }
+
+    res.status(200).json(instrumentData);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
 router.get("/:userId", async (req, res) => {
-  const userId = req.params.userId;
+  try {
+    const userId = req.params.userId;
 
-  admin
-    .firestore()
-    .collection("Music")
-    .doc(userId)
-    .get()
-    .then((doc) => {
-      const musique = doc.data();
-      if (musique !== undefined) {
-        InfoSelectedMusique = musique.name;
-        const musiqueObjects = InfoSelectedMusique.map((name, index) => ({
-          name: name,
-          url: musique.URL[index],
-          number: index + 1,
-        }));
-        res.send(musiqueObjects);
-      }
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
-    });
+    const MusicList = await Music.findAll({ where: { idUser: userId }, attribute: ["id","Name", "FilePath"] });
+    res.status(200).json(MusicList);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
 });
 
-router.delete("/user/music/:musicId", authenticate, async (req, res) => {
+router.delete("/:musicId", authenticate, async (req, res) => {
   const musicId = req.params.musicId;
 
   try {
-    const musicRef = await admin.firestore().collection("Music").doc(req.uid).get();
+    await Music.destroy({
+      where: { id: musicId },
+    });
 
-    // Check if the music entry exists
-    if (!musicRef.exists) {
-      res.status(404).send("Music entry not found.");
-      return;
-    }
-    const dataMusic = musicRef.data();
+    await Comment.destroy({
+      where: { idMusic: musicId },
+    });
 
-    await admin.firestore().collection("Liked").doc(dataMusic["name"][musicId]).delete();
-    await admin.firestore().collection("Comment").doc(dataMusic["name"][musicId]).delete();
-
-    let nameArray = musicRef.get("name");
-    let genreArray = musicRef.get("genre");
-    let descArray = musicRef.get("desc");
-
-    nameArray.splice(musicId, 1);
-    genreArray.splice(musicId, 1);
-    descArray.splice(musicId, 1);
-
-    await admin
-      .firestore()
-      .collection("Music")
-      .doc(req.uid)
-      .update({
-        URL: admin.firestore.FieldValue.arrayRemove(dataMusic["URL"][musicId]),
-        desc:  descArray,
-        genre:  genreArray,
-        name: nameArray,
-      });
+    await Liked.destroy({
+      where: { idMusic: musicId },
+    });
 
     res.status(200).send();
-  } catch (error) {
-    console.log("Error deleting music entry:", error);
-    res.status(500).send("Error deleting music entry.");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 

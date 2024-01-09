@@ -17,8 +17,8 @@
         <div class="form-group-2">
           <label>Type</label>
           <ion-select formControlName="genre" class="form-control-2">
-            <ion-select-option *ngFor="let option of genre" [value]="option.number"
-              >{{ option.name }}</ion-select-option
+            <ion-select-option *ngFor="let option of genre" [value]="option.id"
+              >{{ option.Name }}</ion-select-option
             >
           </ion-select>
           <input class="selectForm" />

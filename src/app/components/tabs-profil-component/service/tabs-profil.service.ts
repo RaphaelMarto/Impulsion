@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { config } from '../../../config/configuration';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,25 +11,17 @@ export class TabsProfilService {
 
   getAllMusicUser(): Observable<{}> {
     const options = { withCredentials: true };
-    return this.http.get(config.API_URL + '/music/user/all', options).pipe(
-      map((response: any) => {
-        return response;
-      })
-    );
+    return this.http.get(config.API_URL + '/music/user/all', options);
   }
 
   getAllFollow() {
     const options = { withCredentials: true };
-    return this.http.get(config.API_URL + '/follow/all', options).pipe(
-      map((response: any) => {
-        return response;
-      })
-    );
+    return this.http.get(config.API_URL + '/follow/all', options)
   }
 
   deleteMusic(musicId: number) {
     const options = { withCredentials: true };
-    return this.http.delete(config.API_URL + '/music/user/music/' + musicId, options);
+    return this.http.delete(config.API_URL + '/music/' + musicId, options);
   }
 
   deleteFollow(followedId:any) {

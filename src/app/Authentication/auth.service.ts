@@ -55,6 +55,6 @@ export class AuthService {
 
   getIdUser(){
     const options = { withCredentials: true };
-    return this.http.get(config.API_URL + '/auth/id', options);
+    return this.http.get(config.API_URL + '/auth/userId', options)
   }
 }

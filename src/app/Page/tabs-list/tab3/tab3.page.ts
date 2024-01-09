@@ -13,7 +13,6 @@ import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
   styleUrls: ['tab3.page.scss'],
 })
 export class Tab3Page implements OnInit {
-  public isIOS: boolean;
   public name: string = '';
   public minutes: number = 0;
   public secondes: number = 0;
@@ -31,15 +30,12 @@ export class Tab3Page implements OnInit {
   @ViewChild('waveform', { static: false }) waveformcontainer!: ElementRef;
 
   constructor(
-    private platform: Platform,
     private tab3Service: Tab3Service,
     public loadingController: LoadingController,
     public toastController: ToastController,
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
-  ) {
-    this.isIOS = this.platform.is('ios');
-  }
+  ) {}
 
   ngOnInit(): void {
     this.tab3Service.getGenre().subscribe((data) => {

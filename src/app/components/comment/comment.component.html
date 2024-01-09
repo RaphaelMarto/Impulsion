@@ -2,33 +2,29 @@
   <div class="comment-container-image">
     <div class="image-container">
       <div class="image">
-        <img [src]="ApiUrl + '/user/proxy-image?url='+picture">
+        <img [src]="ApiUrl + '/user/proxy-image?url='+comments.User.PictureUrl">
       </div>
     </div>
     <div class="comment-container">
       <div class="author">
-        <a [routerLink]="['/otherProfile', comments.idUser]" (click)="cancel()"><b>{{ UserComenting }}</b></a>:
+        <a [routerLink]="['/otherProfile', comments.User.id]" (click)="cancel()"><b>{{ comments.User.Nickname }}</b></a>:
       </div>
       <div class="comment">
-        {{ comments.comment }}
+        {{ comments.Message }}
       </div>
     </div>
   </div>
   <div class="buttonsInteraction">
     <button color="dark" (click)="showReplyComment()" [disabled]="!login">Reply</button>
-    <button color="dark" (click)="deleteCom(paths)" [class]="UserComenting == name ? '' : 'vanish'">Del</button>
-    <button slot="end">{{comments.createdAt._seconds *1000 | date: 'dd MMM'}}</button>
+    <button color="dark" (click)="deleteCom(comments.id)" [class]="comments.User.Nickname == name ? '' : 'vanish'">Del</button>
+    <button slot="end">{{comments.createdAt | date: 'dd MMM YYYY'}}</button>
   </div>
   <div class="reply" *ngIf="replyCommentVisible">
-    <!-- <ion-textarea [autoGrow]="true" placeholder="Message" [class]="replyCommentVisible ? '' : 'vanish'" [(ngModel)]="replyCommentText"></ion-textarea> -->
-    <app-comment-form submitLabel="Write" (handleSubmit)="addComment({text:$event, docId:docId})" (cancelAction)="cancelAnswer($event)"></app-comment-form>
+    <app-comment-form submitLabel="Write" (handleSubmit)="addComment($event,comments.id)" (cancelAction)="cancelAnswer($event)"></app-comment-form>
   </div>
-  <div [class]="!moreCom ? '' : 'buttonShowMore'" *ngIf="moreCom !==0">
-    <a (click)="showMoreComment()" *ngIf="!showMoreCom">Show more</a>
+  <div [class]="!comments.replyCount ? '' : 'buttonShowMore'" *ngIf="comments.replyCount !==0">
+    <a (click)="showMoreComment(comments.id)" *ngIf="!showMoreCom">Show more</a>
   </div>
-  <!-- <app-comment-form submitLabel="Write" (handleSubmit)="addComment({text:$event, docId:docId})"></app-comment-form>
-  <app-more-commentaire *ngIf="showMoreCom" [titre]="titre"></app-more-commentaire> -->
 </div>
-<!-- <app-more-commentaire *ngIf="showMoreCom" [docId]="docId" [paths]="paths"></app-more-commentaire> -->
-<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async) let comNumber2 = index" [comments]="comment2" [docId]="docId2[comNumber2]" [paths]="paths2[comNumber2]" [titre]="titre" [UserComenting]="UserComenting2[comNumber2]" [moreCom]="moreCom2[comNumber2]" [numberReply]="numberReply" [picture]="picture2[comNumber2]">
+<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async)" [comments]="comment2" [idMusic]="idMusic" [numberReply]="numberReply">
 </app-comment></div>

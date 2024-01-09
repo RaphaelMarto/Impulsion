@@ -7,13 +7,15 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
+const db = require("../models");
+require('dotenv').config();
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
 console.log(`app listening at http://localhost:${port}`);
 /**
  * Create HTTP server.
@@ -25,9 +27,18 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+if (process.env.NODE_ENV !== "test") {
+  db.sequelize
+    .sync()
+    .then(() => {
+      server.listen(port);
+      server.on("error", onError);
+      server.on("listening", onListening);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
 /**
  * Normalize a port into a number, string, or false.

@@ -93,7 +93,7 @@ export class Tab5Page implements OnInit,OnDestroy {
       },
     };
 
-    (await this.chatService.createChatRoom(item.id)).pipe(take(1)).subscribe((res: any) => {
+    (await this.chatService.createChatRoom(item.UID)).pipe(take(1)).subscribe((res: any) => {
       const id = res.id;
       this.cancel();
       this.loading = false;

@@ -6,43 +6,44 @@
     <img
       id="myImage"
       class="profile-picture"
-      [src]="user.avatar"
+      [src]="APIurl + '/user/proxy-image?url='+(user?.PictureUrl)"
       alt="Profile Picture"
     />
-    <ion-button *ngIf="login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? unfollow() : follow()">
+    <ion-button *ngIf="login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? unfollow() : follow()" [disabled]="isMe">
       <ion-icon [name]="followed ? 'heart' : 'heart-outline'" slot="icon-only"></ion-icon>
       <p>{{ followed ? "Unfollow" : "Follow" }}</p>
     </ion-button>
-    <ion-button *ngIf="!login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="connexion()">
-      <ion-icon [name]="followed ? 'heart' : 'heart-outline'" slot="icon-only"></ion-icon>
-      <p>{{ followed ? "Unfollow" : "Follow" }}</p>
+    <ion-button *ngIf="!login" class="follow-button" (click)="connexion()">
+      <ion-icon name="heart-outline" slot="icon-only"></ion-icon>
+      <p>{{ "Follow" }}</p>
     </ion-button>
     <div class="profile-info">
-      <h1>{{ user.nickname }}</h1>
-      <p>Country: {{ user.country }}</p>
+      <h1>{{ user?.Nickname }}</h1>
+      <p>Country: {{ user?.Address?.City.Country.Name }}</p>
+      <p>City: {{ user?.Address?.City.Name }}</p>
     </div>
     <ion-list>
       <div>
         <p class="centered-inline" *ngIf="music == null">Pas de musique, pour l'instant ! ♫</p>
       </div>
-      <ion-item *ngFor="let item of music" class="item-container">
+      <ion-item *ngFor="let item of music let number = index" class="item-container">
         <ion-label class="label-container">
           <ion-row>
             <ion-col size="2" class="centered-inline">
-              <p class="Text-center">{{ item.number }}</p>
+              <p class="Text-center">{{ number+1 }}</p>
             </ion-col>
             <ion-col size="8" class="centered-inline">
-              <ion-button (click)="playAudio(item.url)" class="invisible">
+              <ion-button (click)="playAudio(item.FilePath)" class="invisible">
                 <ion-icon name="play-outline"></ion-icon>
               </ion-button>
-              <p class="Text-center">{{ titleShown[item.name] }}</p>
+              <p class="Text-center">{{ item.Name }}</p>
             </ion-col>
             <ion-col size="2">
-              <ion-button *ngIf="login" [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="itemLikes[item.name] ? deleteLike(item.name) : like(item.name)"
-                ><ion-icon [name]="itemLikes[item.name] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
+              <ion-button *ngIf="login" [color]="itemLikes[item.id] ? 'danger' : 'tertiary'" (click)="itemLikes[item.id] ? deleteLike(item.id) : like(item.id)"
+                ><ion-icon [name]="itemLikes[item.id] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
               </ion-button>
-              <ion-button *ngIf="!login" [color]="itemLikes[item.name] ? 'danger' : 'tertiary'" (click)="connexion()"
-              ><ion-icon [name]="itemLikes[item.name] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
+              <ion-button *ngIf="!login" [color]="itemLikes[item.id] ? 'danger' : 'tertiary'" (click)="connexion()"
+              ><ion-icon name="heart-outline"></ion-icon>
             </ion-button>
             </ion-col>
           </ion-row>

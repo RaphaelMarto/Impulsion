@@ -12,18 +12,16 @@ import { take } from 'rxjs';
   styleUrls: ['./profile-other-users.component.scss'],
 })
 export class ProfileOtherUsersComponent implements OnInit {
-  user: any = {
-    nickname: '',
-    avatar: '',
-    country: '',
-  };
+  user: any= {PictureUrl:'https://lh3.googleusercontent.com/a/AGNmyxbULLaSSq9aYWP1-JqEmoZ0bBc7-Gkw_SJJMQixsw=s96-c'};
+  APIurl = config.API_URL;
   login: any;
   liked: boolean = false;
   options = { withCredentials: true };
   idOther = this.route.snapshot.paramMap.get('id');
   music: any;
+  isMe:any;
   followed: boolean = false;
-  itemLikes: { [name: string]: boolean } = {};
+  itemLikes: { [name: number]: boolean } = {};
   titleShown: string[]=[];
   @ViewChild('audioPlayer', { static: false }) audioPlayerRef!: ElementRef<HTMLAudioElement>;
 
@@ -48,16 +46,16 @@ export class ProfileOtherUsersComponent implements OnInit {
       .get(config.API_URL + '/user/' + this.idOther)
       .pipe(take(1))
       .subscribe((s: any) => {
-        this.user.nickname = s.Nickname;
-        this.user.avatar = config.API_URL + '/user/proxy-image?url=' + s.PhotoUrl;
-        this.user.country = s.Country;
+        this.user = s;
       });
     if(this.login){
       this.http
-        .get(config.API_URL + '/follow/' + this.idOther, this.options)
+        .get(config.API_URL + '/follow/following/' + this.idOther, this.options)
         .pipe(take(1))
         .subscribe((s: any) => {
-          this.followed = s.res;
+          this.followed = s.isFollowed;
+          this.isMe = s.isMe;
+          console.log(this.isMe)
         });
     }
   }
@@ -69,7 +67,7 @@ export class ProfileOtherUsersComponent implements OnInit {
   follow() {
     this.followed = true;
     this.http
-      .post(config.API_URL + '/follow/' + this.idOther, {}, this.options)
+      .get(config.API_URL + '/follow/new/' + this.idOther, this.options)
       .pipe(take(1))
       .subscribe();
   }
@@ -87,9 +85,6 @@ export class ProfileOtherUsersComponent implements OnInit {
       .get(config.API_URL + '/music/' + this.idOther)
       .pipe(take(1))
       .subscribe((data: any) => {
-        data.forEach((song:any) => {
-          this.titleShown[song.name] = song.name.replace(/^.*_/, "")
-        });
         this.music = data;
         if (this.login) {
           this.getlike();
@@ -97,18 +92,18 @@ export class ProfileOtherUsersComponent implements OnInit {
       });
   }
 
-  deleteLike(name: string) {
-    this.itemLikes[name] = false;
+  deleteLike(idMusic: number) {
+    this.itemLikes[idMusic] = false;
     this.http
-      .put(config.API_URL + '/like/del/' + name, {}, this.options)
+      .delete(config.API_URL + '/like/del/' + idMusic, this.options)
       .pipe(take(1))
       .subscribe();
   }
 
-  like(name: string) {
-    this.itemLikes[name] = true;
+  like(idMusic: number) {
+    this.itemLikes[idMusic] = true;
     this.http
-      .put(config.API_URL + '/like/add/' + name, {}, this.options)
+      .get(config.API_URL + '/like/add/' + idMusic, this.options)
       .pipe(take(1))
       .subscribe();
   }
@@ -117,10 +112,10 @@ export class ProfileOtherUsersComponent implements OnInit {
     let music: any;
     for (music of this.music) {
       this.http
-        .get(config.API_URL + '/like/liked/' + music.name, this.options)
+        .get(config.API_URL + '/like/liked/' + music.id, this.options)
         .pipe(take(1))
         .subscribe((res: any) => {
-          this.itemLikes[res.name] = res.res;
+          this.itemLikes[music.id] = res.isLiked;
         });
     }
   }

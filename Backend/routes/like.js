@@ -1,73 +1,56 @@
 var express = require("express");
 const { authenticate } = require("../middleware/auth");
-const admin = require("firebase-admin");
 var router = express.Router();
+const { Liked } = require("../models");
 
-router.put("/add/:nameMusic", authenticate, async (req, res) => {
-  const name = req.params.nameMusic;
+router.get("/add/:idMusic", authenticate, async (req, res) => {
   try {
-    admin
-      .firestore()
-      .collection("Liked")
-      .doc(name)
-      .update({
-        idUserLike: admin.firestore.FieldValue.arrayUnion(req.uid),
-        like: admin.firestore.FieldValue.increment(1),
-      });
+    const idMusic = req.params.idMusic;
+    const like = await Liked.create({
+      idMusic: idMusic,
+      idUser: req.cookies.user_session[1],
+    });
     res.status(200).send();
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
-router.put("/del/:nameMusic", authenticate, async (req, res) => {
-  const name = req.params.nameMusic;
-
+router.delete("/del/:idMusic", authenticate, async (req, res) => {
   try {
-    const likeInfo = (await admin.firestore().collection("Liked").doc(name).get()).data();
-    const idUser = await likeInfo.idUserLike.indexOf(req.uid);
-
-    admin
-      .firestore()
-      .collection("Liked")
-      .doc(name)
-      .update({
-        idUserLike: admin.firestore.FieldValue.arrayRemove(likeInfo.idUserLike[idUser]),
-        like: admin.firestore.FieldValue.increment(-1),
-      });
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+    const idMusic = req.params.idMusic;
+    const deletedRows = await Liked.destroy({
+      where: {
+        idMusic: idMusic,
+        idUser: req.cookies.user_session[1],
+      },
+    });
+    if (deletedRows < 0) throw new MyError("No like", 401);
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
-router.get("/liked/:nameMusic", authenticate, async (req, res) => {
-  const name = req.params.nameMusic;
-  try {
-    let userLiking = (await admin.firestore().collection("Liked").doc(name).get()).data().idUserLike;
-    let nbLike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
+router.get("/liked/:idMusic", async (req, res) => {
+  const idMusic = parseInt(req.params.idMusic);
 
-    if (userLiking.indexOf(req.uid) !== -1) {
-      res.status(200).send({ res: true, like: nbLike, name: name });
-    } else{
-      res.status(200).send({ res: false, like: nbLike, name: name });
+  try {
+    const numberOfLikes = await Liked.count({ where: { idMusic: idMusic } });
+    let likedEntry = null;
+
+    if (req.cookies.user_session) {
+      likedEntry = await Liked.findOne({ where: { idUser: req.cookies.user_session[1], idMusic: idMusic } });
     }
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
-  }
-});
 
-router.get("/liked/anon/:nameMusic", async (req, res) => {
-  const name = req.params.nameMusic;
-  try {
-    let nbLike = (await admin.firestore().collection("Liked").doc(name).get()).data().like;
-
-    res.status(200).send({like: nbLike, name: name });
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+    const isLiked = !!likedEntry;
+    res.status(200).send({numberOfLikes : numberOfLikes,isLiked: isLiked});
+    
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 

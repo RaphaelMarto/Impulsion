@@ -1,24 +1,31 @@
 module.exports = (sequelize, DataTypes) => {
+  const Music = sequelize.define("Music", {
+    FilePath: {
+      type: DataTypes.STRING(999),
+    },
+    Likes: {
+      type: DataTypes.INTEGER,
+    },
+    Name: {
+      type: DataTypes.STRING,
+    },
+    Description: {
+      type: DataTypes.STRING,
+    },
+    TypeMusicId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    idUser: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  });
 
-    const Music = sequelize.define("Music", {
-        File: {
-            type: DataTypes.BLOB('long'),
-            allowNull: false
-        },
-        SongName: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        Desc: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-    })
+  Music.associate = (models) => {
+    Music.belongsTo(models.TypeMusic, { foreignKey: "TypeMusicId" });
+    Music.belongsTo(models.User, { foreignKey: "idUser" });
+  };
 
-    Music.associate = (models) => {
-        Music.belongsTo(models.User, { foreignKey: 'IdUser' });
-        models.User.hasMany(Music, { foreignKey: 'IdUser' }); 
-    }
-
-    return Music;
-}
+  return Music;
+};

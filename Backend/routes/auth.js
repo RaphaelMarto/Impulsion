@@ -1,33 +1,55 @@
 var express = require("express");
 var router = express.Router();
-const { authenticate } = require("../middleware/auth");
 const admin = require("firebase-admin");
-const config = "https://impulsion-api.site";
+const { User, Social, Address, RoleToUser, Follow } = require("../models");
+const MyError = require("../middleware/Error");
+const { authenticate } = require("../middleware/auth");
 
 router.post("/login", async (req, res) => {
   const idToken = req.body.token;
   try {
     // Verify token and get user ID
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-  
+
     const uid = decodedToken.uid;
     const user = await admin.auth().getUser(uid);
+    let UserId = "";
+    let SocialId = "";
+    let AddressId = "";
+
     // Check if user exists in database
-    const userDoc = await admin.firestore().collection("Utilisateur").doc(uid).get();
-    if (!userDoc.exists) {
+    const userExist = await User.findOne({ where: { UID: uid } });
+    if (userExist === null) {
       // User doesn't exist, create new user document
-      await admin.firestore().collection("Utilisateur").doc(uid).set({
-        Email: user.providerData[0].email,
-        Nickname: user.displayName,
-        PhotoUrl: user.photoURL,
-        Instrument: [],
-        Country:null,
-        City: null,
-        Role: 1,
-        PolicyCheck: false,
-        IsActive: true,
-        Phone: null,
+      Social.create().then((social) => {
+        SocialId = social.id;
+        Address.create().then((adress) => {
+          AddressId = adress.id;
+          User.create({
+            Nickname: user.displayName,
+            Email: user.providerData[0].email,
+            Password: "InFirebase",
+            Phone: null,
+            PictureUrl: user.photoURL,
+            PolicyCheck: false,
+            IsActive: true,
+            Role: 1,
+            idSocials: SocialId,
+            AdressId: AddressId,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            UID: uid,
+          }).then((user) => {
+            UserId = user.id;
+            RoleToUser.create({
+              RoleId: 1,
+              UserId: UserId,
+            });
+          });
+        });
       });
+    } else {
+      UserId = userExist.dataValues.id;
     }
 
     // Create session cookie
@@ -35,7 +57,7 @@ router.post("/login", async (req, res) => {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
     // Set session cookie in response
-    res.cookie("user_session", sessionCookie, {
+    res.cookie("user_session", [sessionCookie, UserId, uid], {
       maxAge: expiresIn,
       expires: new Date(Date.now() + expiresIn),
       httpOnly: true,
@@ -43,7 +65,7 @@ router.post("/login", async (req, res) => {
     // res.setHeader(
     //   "Set-Cookie",
     //   "user_session=" +
-    //     sessionCookie +
+    //     [sessionCookie, UserId] +
     //     "; expires=" +
     //     new Date(Date.now() + expiresIn) +
     //     "; Secure; httpOnly; SameSite=None; Path=/"
@@ -61,7 +83,11 @@ router.get("/logout", function (req, res) {
   //   "Set-Cookie",
   //   "user_session='x'; expires=" + new Date(Date.now()) + "; Secure; httpOnly; SameSite=None; Path=/"
   // );
-   res.send();
+  res.send();
+});
+
+router.get("/userId", authenticate, async (req, res) => {
+  res.status(200).json(req.cookies.user_session[2]);
 });
 
 router.get("/check-cookie", (req, res) => {
@@ -72,56 +98,39 @@ router.get("/check-cookie", (req, res) => {
   }
 });
 
-router.get("/id",authenticate, (req, res) => {
-  res.send({res :req.uid}).status(200);
-});
+router.get("/all/id", async (req, res) => {
+  try {
+    const UserIds = await Follow.findAll({
+      where: { idUserFollowing: req.cookies.user_session[1] },
+      attributes: ["idUserFollowed"],
+      raw: true,
+    }).then((followeds) => {
+      const followedUserIds = followeds.map((followed) => followed.idUserFollowed);
 
-router.get("/all/id", authenticate, async (req, res) => {
-  const collectionRef = admin.firestore().collection("Utilisateur");
-  const documents = await collectionRef.get();
-
-  let documentFiltered = [];
-  let documentData = [];
-
-  documents.forEach((document) => {
-    document.id !== req.uid ? documentFiltered.push(document) : "";
-  });
-  documentFiltered.forEach((document) => {
-    const data = document.data();
-    const selectData = {
-      Nickname: data.Nickname,
-      PhotoUrl: config +'/user/proxy-image?url='+data.PhotoUrl,
-      id: document.id,
-    };
-    documentData.push(selectData);
-  });
-
-  res.send(documentData).status(200);
-});
-
-router.get("/get-name", authenticate, (req, res) => {
-  admin
-    .firestore()
-    .collection("Utilisateur")
-    .doc(req.uid)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        // No document found for the given UID
-        res.status(404).send("Document not found");
-      } else {
-        // Retrieve the data from the document
-        const userData = doc.data();
-        const selectData = {
-          Nickname: userData.Nickname
-        };
-        res.send(selectData);
-      }
-    })
-    .catch((error) => {
-      console.log("Error fetching user data:", error);
-      res.status(500).send("Error fetching user data");
+      return User.findAll({
+        where: {
+          id: followedUserIds,
+        },
+        attributes: ["id", "Nickname", "PictureUrl",'UID'],
+      });
     });
+    if (UserIds.length == 0 || !Array.isArray(UserIds)) throw new MyError("You don't follow anyone", 401);
+    res.status(200).json(UserIds);
+  } catch (e) {
+    const status = e.status || 500;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.get("/get-name", async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { id: req.cookies.user_session[1] }, attributes: ["Nickname"] });
+    if (!user) throw new MyError("No User", 404);
+    res.status(200).json(user);
+  } catch (e) {
+    const status = e.status || 500;
+    res.status(status).json({ error: e.message });
+  }
 });
 
 

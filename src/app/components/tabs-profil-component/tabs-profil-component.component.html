@@ -12,17 +12,17 @@
 <div class="tab-content">
   <ng-container *ngIf="activeTab === 'music'">
     <ion-list>
-      <ion-item *ngFor="let item of (musicObserv | async)" class="centerItem">
+      <ion-item *ngFor="let item of (musicObserv | async) let number = index" class="centerItem">
         <ion-label>
           <ion-row>
             <ion-col size="2">
-              <p class="Text-center">{{ item.number }}</p>
+              <p class="Text-center">{{ number+1 }}</p>
             </ion-col>
             <ion-col size="8">
-              <p class="Text-center">{{ item.name }}</p>
+              <p class="Text-center">{{ item.Name }}</p>
             </ion-col>
             <ion-col size="2">
-              <ion-button color="danger" (click)="deleteMusic(item)"
+              <ion-button color="danger" (click)="deleteMusic(item.id)"
                 ><ion-icon name="trash-outline"></ion-icon
               ></ion-button>
             </ion-col>
@@ -33,17 +33,17 @@
   </ng-container>
   <ng-container *ngIf="activeTab === 'follow'">
     <ion-list>
-      <ion-item *ngFor="let item of (followObserv | async)" class="centerItem">
+      <ion-item *ngFor="let item of (followObserv | async) let itemNumber = index" class="centerItem">
         <ion-label>
           <ion-row>
             <ion-col size="2">
-              <p class="Text-center">{{ item.number }}</p>
+              <p class="Text-center">{{ itemNumber+1 }}</p>
             </ion-col>
             <ion-col size="8">
-              <p class="Text-center"><a [routerLink]="['/otherProfile', item.uid]">{{ item.name }}</a></p>
+              <p class="Text-center"><a [routerLink]="['/otherProfile', item.id]">{{ item.Nickname }}</a></p>
             </ion-col>
             <ion-col size="2">
-              <ion-button color="danger" (click)="deleteFollow(item)"
+              <ion-button color="danger" (click)="deleteFollow(item.id)"
                 ><ion-icon name="heart-dislike-outline"></ion-icon>
               </ion-button>
             </ion-col>

@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Platform } from '@ionic/angular';
-import { take } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { config } from 'src/app/config/configuration';
 
 @Component({
@@ -11,14 +10,14 @@ import { config } from 'src/app/config/configuration';
   styleUrls: ['tab2.page.scss'],
 })
 export class Tab2Page implements OnInit {
-  public isIOS: boolean;
-  public data: any;
   public buttonFocus: string = 'artiste';
   private options = { withCredentials: true };
+  public dataObserv!: Observable<any[]>;
+  public instrument: string='';
   @ViewChild('searchBar') searchBar: any;
 
-  constructor(private platform: Platform, private http: HttpClient, private router: Router) {
-    this.isIOS = this.platform.is('ios');
+  constructor(private http: HttpClient, private router: Router) {
+    
   }
 
   async ngOnInit() {}
@@ -38,25 +37,28 @@ export class Tab2Page implements OnInit {
           break;
       }
     } else {
-      this.data = [];
+      this.dataObserv = of([]);
     }
   }
 
   InputArtist(query: any) {
     this.http.get(config.API_URL + '/user/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
-      this.data = res;
+      this.dataObserv = of(res);
     });
   }
 
   InputMusique(query: any) {
     this.http.get(config.API_URL + '/music/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
-      this.data = res;
+      console.log(res)
+      this.dataObserv = of(res);
     });
   }
 
   InputInstrument(query: any) {
     this.http.get(config.API_URL + '/music/instrument/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
-      this.data = res;
+      console.log(res)
+      this.instrument = res.instrument;
+      this.dataObserv = of(res.user);
     });
   }
 
@@ -67,6 +69,6 @@ export class Tab2Page implements OnInit {
   onButtonClick(name: string) {
     this.buttonFocus = name;
     this.searchBar.value = '';
-    this.data = [];
+    this.dataObserv = of([]);
   }
 }

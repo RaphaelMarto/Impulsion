@@ -5,7 +5,7 @@ import { config } from 'src/app/config/configuration';
 import { CommentModalComponent } from '../../../components/comment-modal/comment-modal.component';
 import { AuthService } from 'src/app/Authentication/auth.service';
 import { Router } from '@angular/router';
-import { take } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -28,12 +28,13 @@ export class Tab1Page implements OnInit {
   public audioElements: any;
   public pausedAt: number = 0;
   private source: any;
-  public usersId: any = [];
+  public MusicIds: any = [];
   public nickname: any = [];
   public titre: any = [];
   public login: boolean = false;
   public titleShown: any = [];
-  private stopLoad: boolean = false
+  private stopLoad: boolean = false;
+  public musicsObserv!: Observable<any[]>;
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
 
@@ -65,8 +66,8 @@ export class Tab1Page implements OnInit {
       this.init();
     });
   }
-  public condition0 = 0
-  public added = 0
+  public condition0 = 0;
+  public added = 0;
 
   setUpObservers() {
     // Stop all the sounds from the previous observer, if any
@@ -117,21 +118,21 @@ export class Tab1Page implements OnInit {
         this.visulize(canva, this.musics[index], false, false);
       };
 
-      function togglePlaying()  {
+      function togglePlaying() {
         if (audio.paused) {
           startPlaying();
         } else {
           stopPlaying();
         }
-      };
+      }
 
       // row.removeEventListener('click', togglePlaying,true)
-      if(this.condition0==this.added){
-        row.addEventListener('click', togglePlaying,true);
-        this.condition0++
+      if (this.condition0 == this.added) {
+        row.addEventListener('click', togglePlaying, true);
+        this.condition0++;
       }
       this.added++;
-      
+
       const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -156,7 +157,7 @@ export class Tab1Page implements OnInit {
 
   async getMusic() {
     setTimeout(() => {
-      this.loadItems()
+      this.loadItems();
     }, 3000);
     this.swiperRef?.nativeElement.swiper.update();
   }
@@ -267,34 +268,25 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  async fetchNicknames() {
-    const nicknamePromises = this.usersId.map(async (userId: any) => {
-      const response: any = await this.http.get(config.API_URL + '/user/' + userId).pipe(take(1)).toPromise();
-      return response.Nickname;
-    });
-    this.nickname = await Promise.all(nicknamePromises);
-  }
-
   async loadItems() {
-    if(!this.stopLoad){
+    if (!this.stopLoad) {
       this.swiperRef?.nativeElement.swiper.update();
-      this.http.get(config.API_URL + '/music/all/music?list=' + this.usersId).pipe(take(1)).subscribe((res: any) => {
-      if(res.length>0){
-        res.forEach((obj: any) => {
-            this.musics.push(obj.url);
-            this.usersId.push(obj.id);
-            this.titre.push(obj.titre);
-            let substring = obj.titre.replace(/^.*_/, "");
-            this.titleShown.push(substring);
-            this.swiperRef?.nativeElement.swiper.update();
+      this.http
+        .get(config.API_URL + '/music/random/music?list=' + this.MusicIds)
+        .pipe(take(1))
+        .subscribe((res: any) => {
+          if (res.length > 0) {
+            this.musicsObserv = of(res);
+            res.forEach((obj: any) => {
+              this.musics.push(obj.FilePath);
+              this.MusicIds.push(obj.id);
+              this.getlike(obj.id);
+              this.getComment(obj.id);
+            });
+          } else {
+            this.stopLoad = true;
+          }
         });
-      } else {
-        this.stopLoad = true
-      }
-      this.fetchNicknames();
-      this.getlike();
-      this.getComment();
-    });
     }
   }
 
@@ -311,50 +303,50 @@ export class Tab1Page implements OnInit {
     await swiper.update();
   }
 
-  deleteLike(name: any) {
-    this.itemLikes[name] = false;
-    this.numLike[name]--;
-    this.http.put(config.API_URL + '/like/del/' + name, {}, this.options).pipe(take(1)).subscribe();
+  deleteLike(idMusic: number) {
+    this.itemLikes[idMusic] = false;
+    this.numLike[idMusic]--;
+    this.http
+      .delete(config.API_URL + '/like/del/' + idMusic, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
-  like(name: any) {
-    this.itemLikes[name] = true;
-    this.numLike[name]++;
-    this.http.put(config.API_URL + '/like/add/' + name, {}, this.options).pipe(take(1)).subscribe();
+  like(idMusic: number) {
+    this.itemLikes[idMusic] = true;
+    this.numLike[idMusic]++;
+    this.http
+      .get(config.API_URL + '/like/add/' + idMusic, this.options)
+      .pipe(take(1))
+      .subscribe();
   }
 
-  getlike() {
-    if (this.login) {
-      for (let titre of this.titre) {
-        this.http.get(config.API_URL + '/like/liked/' + titre, this.options).pipe(take(1)).subscribe((res: any) => {
-          this.itemLikes[res.name] = res.res;
-          this.numLike[res.name] = res.like;
-        });
-      }
-    } else {
-      for (let titre of this.titre) {
-        this.http.get(config.API_URL + '/like/liked/anon/' + titre).pipe(take(1)).subscribe((res: any) => {
-          this.numLike[res.name] = res.like;
-        });
-      }
-    }
+  getlike(idMusic: number) {
+    this.http
+      .get(config.API_URL + '/like/liked/' + idMusic, this.options)
+      .pipe(take(1))
+      .subscribe((res: any) => {
+        this.numLike[idMusic] = res.numberOfLikes;
+        this.itemLikes[idMusic] = res.isLiked;
+      });
   }
 
-  async openCommentModal(titre: string) {
+  async openCommentModal(idMusic: string) {
     const modal = await this.modalController.create({
       component: CommentModalComponent,
       componentProps: {
-        titre: titre,
+        idMusic: idMusic,
       },
     });
     await modal.present();
   }
 
-  getComment() {
-    for (let titre of this.titre) {
-      this.http.get(config.API_URL + '/comment/comment/anon/' + titre).pipe(take(1)).subscribe((res: any) => {
-        this.numCom[res.name] = res.nbCom;
+  getComment(idMusic: number) {
+    this.http
+      .get(config.API_URL + '/comment/comment/anon/' + idMusic)
+      .pipe(take(1))
+      .subscribe((res: any) => {
+        this.numCom[idMusic] = res.nbCom;
       });
-    }
   }
 }

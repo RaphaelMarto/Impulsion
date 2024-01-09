@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { of, take } from 'rxjs';
 import { AuthService } from 'src/app/Authentication/auth.service';
@@ -12,35 +12,25 @@ import { config } from 'src/app/config/configuration';
 })
 export class CommentComponent implements OnInit {
   @Input() comments: any;
-  @Input() UserComenting: string = '';
-  @Input() titre: string = '';
-  @Input() docId: string = '';
-  @Input() paths: string = '';
-  @Input() moreCom: number = 0;
-  @Input() numberReply:number = 0;
-  @Input() picture:string= '';
+  @Input() idMusic: number = 0;
+  @Input() numberReply: number = 0;
+  @Output() cancelAction = new EventEmitter<boolean>();
   comments2: any;
-  public UserComenting2: string[]=[];
-  public moreCom2: number[] = [];
-  public docId2:string[]=[];
-  public paths2:string[]=[];
-  public picture2:string[]=[];
   public name: any = '';
   public replyCommentVisible: boolean = false;
   public replyCommentText: string = '';
   public showMoreCom: boolean = false;
-  public marginValue:number=15;
-  ApiUrl:string = config.API_URL;
+  public marginValue: number = 15;
+  ApiUrl: string = config.API_URL;
   options = { withCredentials: true };
   public login!: boolean;
-  unsubscribe: any;
 
   constructor(private modalCtrl: ModalController, private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
     this.authService.isLoggedIn.subscribe(async (logedIn) => {
       this.login = logedIn;
-      if(this.login){
+      if (this.login) {
         this.authService.getName().subscribe((res) => {
           this.name = res.Nickname;
         });
@@ -56,41 +46,44 @@ export class CommentComponent implements OnInit {
     return this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  showMoreComment() {
-    this.getReply()
+  showMoreComment(commentsId: number) {
+    this.getReply(commentsId);
   }
 
-  
-  getReply(){
+  refresh(commentsId: number) {
+    this.getReply(commentsId);
+  }
+
+  getReply(CommentId: number) {
     this.http
-      .post(config.API_URL + '/comment/comment/reply/'+ this.docId, {path:this.paths}, this.options)
+      .get(config.API_URL + '/comment/comment/' + this.idMusic + '/' + CommentId, this.options)
       .pipe(take(1))
       .subscribe((res: any) => {
-        this.comments2 = of(res.data);
-        this.UserComenting2 = res.name;
-        this.docId2 = res.docId;
-        this.paths2 = res.path;
-        this.moreCom2 = res.moreCom
-        this.picture2 = res.pictures
+        console.log(res);
+        this.comments2 = of(res);
         this.showMoreCom = true;
         this.numberReply++;
-        this.marginValue =this.marginValue*this.numberReply;
-        console.log(this.paths)
+        this.marginValue = this.marginValue * this.numberReply;
       });
   }
 
-  deleteCom(path:string) {
+  deleteCom(CommentId: number) {
     this.http
-      .put(config.API_URL + '/comment/del/' + this.docId + '/' + this.titre, {path:path, numReply:this.numberReply}, this.options)
+      .delete(config.API_URL + '/comment/del/' + CommentId, this.options)
       .pipe(take(1))
-      .subscribe();
+      .subscribe(() => {
+        this.cancelAction.emit(true);
+      });
+  this.cancelAction.emit(false);
   }
 
-  addComment({ text, docId }: { text: string; docId: null | string }) {
+  addComment(text: string, CommentId: number) {
     this.http
-      .post(config.API_URL + '/comment/add/reply/' + docId+'/'+this.titre, { comment: text, path: this.paths }, this.options)
+      .post(config.API_URL + '/comment/add/' + this.idMusic, { comment: text, reply: CommentId }, this.options)
       .pipe(take(1))
-      .subscribe();
+      .subscribe(() => {
+        this.refresh(CommentId);
+      });
   }
 
   cancelAnswer(bool: boolean) {

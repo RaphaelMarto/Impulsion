@@ -6,14 +6,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <app-comment *ngFor="let comment of (comments | async) let comNumber = index" [comments]="comment" [docId]="docId[comNumber]" [paths]="paths[comNumber]" [titre]="titre" [UserComenting]="UserComenting[comNumber]" [moreCom]="moreCom[comNumber]" [picture]="picture[comNumber]">
+  <app-comment *ngFor="let comment of (comments | async)" [comments]="comment" [idMusic]="idMusic" (cancelAction)="refresh($event)">
   </app-comment>
-  <!-- <div class="input-container">
-    <ion-item>
-      <ion-input type="text" placeholder="Commentaire" class="input" clear-input="true" color="dark" [disabled]="!login" (keyup.enter)="addComment()"></ion-input>
-       <ion-textarea autoGrow rows="1" placeholder="Send message" [(ngModel)]="message"></ion-textarea> 
-    </ion-item>
-  </div> -->
 </ion-content>
 
 <ion-footer>

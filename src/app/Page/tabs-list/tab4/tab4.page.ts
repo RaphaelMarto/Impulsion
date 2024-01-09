@@ -23,11 +23,13 @@ export class Tab4Page implements OnInit {
     city: '',
   };
   public edit: boolean = false;
+  instrumentShow:any[]=[];
   profileForm!: FormGroup<any>;
   isSubmitted = false;
   userCopy: any;
-  instrument:any;
-  instruments: any[] = ['Baterrie', 'djambe', 'piano'];
+  instrument:any[]=[];
+  instruments: any[] = [];
+  instrumentsCopy: any[] = [];
   viewAddInstrument: boolean = false;
   options = { withCredentials: true };
   isDeployed:any;
@@ -50,29 +52,30 @@ export class Tab4Page implements OnInit {
   }
 
   getInfoUser(): void {
-    this.http.get(config.API_URL + '/user', this.options).pipe(take(1)).subscribe((s: any) => {
-      this.userCopy = s;
-      this.user.nickname = s.Nickname;
-      this.user.avatar = s.PhotoUrl;
-      this.user.email = s.Email;
-      this.instrument = s.Instrument;
-      this.user.phone = s.Phone;
-      this.user.country = s.Country;
-      this.user.city = s.City;
+    this.http.get(config.API_URL + '/user/info', this.options).pipe(take(1)).subscribe((s: any) => {
+      this.user.nickname = s.UserInfo.Nickname;
+      this.user.avatar = s.UserInfo.PictureUrl;
+      this.user.email = s.UserInfo.Email;
+      this.instrumentShow = s.InstrumentUser.map((instrument:any) => instrument.Name)
+      this.instrument = s.InstrumentUser;
+      this.user.phone = s.UserInfo.Phone;
+      this.user.country = s.UserInfo.Address.City.Country.Name; // s.UserInfo.Address.City.Street s.UserInfo.Address.City.HouseNum s.UserInfo.Address.City.PostCode
+      this.user.city = s.UserInfo.Address.City.Name;
       this.profileForm = this.formBuilder.group({
-        nickname: [s.Nickname, Validators.required],
-        email: [s.Email, [Validators.required, Validators.email]],
-        phone: [s.Phone],
-        country: [s.Country],
-        city: [s.City],
-        avatar: [s.PhotoUrl],
+        nickname: [s.UserInfo.Nickname, Validators.required],
+        email: [s.UserInfo.Email, [Validators.required, Validators.email]],
+        phone: [s.UserInfo.Phone],
+        country: [s.UserInfo.Address.City.Country.Name],
+        city: [s.UserInfo.Address.City.Name],
+        avatar: [s.UserInfo.PictureUrl],
       });
     });
   }
 
   getInstrument(){
-    this.http.get(config.API_URL + "/music/instruments", this.options).pipe(take(1)).subscribe((res:any)=>{
-      this.instruments = res.instruments;
+    this.http.get(config.API_URL + "/user/instrument/all", this.options).pipe(take(1)).subscribe((res:any)=>{
+      this.instruments = res;
+      this.instrumentsCopy = res;
     })
   }
 
@@ -82,7 +85,7 @@ export class Tab4Page implements OnInit {
 
   Edit(): void {
     this.userCopy = { ...this.user };
-    this.instruments  = this.instruments.filter(option => !this.instrument.includes(option));
+    this.instruments  = this.instrumentsCopy.filter(option => !this.instrumentShow.includes(option.Name));
     this.edit = true;
     this.emitEvent(false);
   }
@@ -106,23 +109,33 @@ export class Tab4Page implements OnInit {
       this.user.email = this.profileForm.controls['email'].value;
       this.user.phone = this.profileForm.controls['phone'].value;
       this.user.country = this.profileForm.controls['country'].value;
-      this.user.city = this.profileForm.controls['city'].value;
+      this.user.city = 1;//this.profileForm.controls['city'].value;
       this.emitEvent(true);
       this.http.put(config.API_URL + '/user', this.user, this.options).pipe(take(1)).subscribe();
       this.edit = false;
     }
   }
 
-  addInstrument(value: any) {
-    this.instrument.push(value);
+  addInstrument(idInstrument: number) {
+    const newInstrument = this.instruments.find(item => item.id === idInstrument);
+    if (newInstrument) {
+      this.instrumentShow.push(newInstrument.Name);
+      this.instrument.push(newInstrument);
+    }
 
-    this.http.put(config.API_URL + '/user/instrument', {instrument:value}, this.options).pipe(take(1)).subscribe();
+    this.http.get(config.API_URL + '/user/instrument/'+ idInstrument, this.options).pipe(take(1)).subscribe();
+    this.instruments  = this.instrumentsCopy.filter(option => !this.instrumentShow.includes(option.Name));
   }
 
-  delInstrument(index:number) {
-    this.instrument.splice(index,1);
-
-    this.http.delete(config.API_URL + '/user/instrument/'+index, this.options).pipe(take(1)).subscribe();
+  delInstrument(idInstrument:number, NameInstru:string) {
+    const indexInstrument = this.instrumentShow.indexOf(NameInstru);
+    this.instrument = this.instrument.filter(item => item.id !== idInstrument);
+    
+    if (indexInstrument) {
+      this.instrumentShow.splice(indexInstrument,1);
+      this.http.delete(config.API_URL + '/user/instrument/'+idInstrument, this.options).pipe(take(1)).subscribe();
+      this.instruments  = this.instrumentsCopy.filter(option => !this.instrumentShow.includes(option.Name));
+    }
   }
 
   Deconnexion() {

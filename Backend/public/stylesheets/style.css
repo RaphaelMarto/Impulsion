@@ -1,6 +1,12 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 20px Tahoma,"Lucida Grande", Helvetica, Arial, sans-serif;
+  text-align: center;
+  padding-top: 20%;
+  background-image: url(./logo.jpg);
+  background-size: cover; 
+  height: 100%;
+  /* background-position:center; */
+  background-repeat: no-repeat;
 }
 
 a {
