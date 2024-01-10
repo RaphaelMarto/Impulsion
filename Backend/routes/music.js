@@ -6,7 +6,7 @@ const fs = require("fs");
 const nanoid = require("nanoid");
 var router = express.Router();
 const axios = require("axios");
-const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, sequelize } = require("../models");
+const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, TempNewInstrument,sequelize } = require("../models");
 const { Op } = require("sequelize");
 
 const upload = multer({ dest: "uploads/" });
@@ -188,6 +188,59 @@ router.get("/all/:startLetter", async (req, res) => {
       };
     });
     res.status(200).json(modifiedMusics);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.post('/instrumentTemp/new', async (req, res) => {
+  try {
+    await TempNewInstrument.create({
+      Name: req.body.name,
+      Reference: req.body.reference
+    })
+
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.get('/instrumentTemp', async (req, res) => {
+  try {
+    const TempInstru = await TempNewInstrument.findAll({attributes:['id','Name','Reference']})
+
+    res.status(200).json(TempInstru);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.post('/instrumentTemp/accepted', async (req, res) => {
+  try {
+    await Instrument.create({
+      Name: req.body.name
+    })
+
+    await TempNewInstrument.destroy({
+      where: { id: req.body.id },
+    });
+
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.delete('/instrumentTemp/:idNewInstru', async (req, res) => {
+  try {
+    await TempNewInstrument.destroy({ where: { id: req.params.idNewInstru },})
+
+    res.status(200).send();
   } catch (e) {
     const status = e.status || 401;
     res.status(status).json({ error: e.message });

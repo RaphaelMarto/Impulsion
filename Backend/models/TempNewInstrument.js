@@ -3,6 +3,9 @@ module.exports = (sequelize, DataTypes) => {
       Name: {
         type: DataTypes.STRING,
       },
+      Reference:{
+        type: DataTypes.STRING(999),
+      },
     });
   
     return TempNewInstrument;

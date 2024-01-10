@@ -1,0 +1,29 @@
+<ion-content>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button fill="clear" color="dark" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title size="large">Statistics</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="stats-container">
+    <h2>This Month Stats:</h2>
+    <div class="stat-item">
+      <p>Your videos got 625 views</p>
+    </div>
+    <div class="stat-item">
+      <p>Your most listened-to music is Koala</p>
+    </div>
+    <div class="stat-item">
+      <p>You got a total of 2123 Likes</p>
+    </div>
+    <div class="stat-item">
+      <p>Your most liked video is Koala</p>
+    </div>
+  </div>
+
+  <canvas #myChart id="myChart"></canvas>
+</ion-content>

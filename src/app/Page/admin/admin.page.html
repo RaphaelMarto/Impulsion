@@ -1,0 +1,51 @@
+<ion-content [fullscreen]="true">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button fill="clear" color="dark" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title slot="end">Admin Dashboard</ion-title>
+    </ion-toolbar>
+
+    <ion-segment [value]="segment" mode="md" (ionChange)="onSegmentChanged($event)" color="dark">
+      <ion-segment-button value="request">
+        <ion-label>Req. Instrument</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="report">
+        <ion-label>Report</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-header>
+  <ion-grid *ngIf="segment == 'request'">
+    <ion-row class="header-row">
+      <ion-col size="1">N</ion-col>
+      <ion-col size="4">Name</ion-col>
+      <ion-col size="4">Reference</ion-col>
+      <ion-col size="2"></ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let item of items let number = index">
+      <ion-col size="1"><p>{{ number+1 }}</p></ion-col>
+      <ion-col size="4"><p>{{ item.Name }}</p></ion-col>
+      <ion-col size="3"><p><a [href]="item.Reference" *ngIf="item.Reference">Link</a></p><p *ngIf="!item.Reference">Link</p></ion-col>
+      <ion-col size="4">
+        <ion-button color="success" class="ion-button-perso" (click)="validate(item.Name,item.id)"><ion-icon name="checkmark-outline"></ion-icon></ion-button>
+        <ion-button color="danger" class="ion-button-perso" (click)="deleteReq(item.id)"><ion-icon name="trash-outline"></ion-icon></ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-segment [value]="segment2" mode="md" (ionChange)="onSegmentChanged2($event)" color="dark" *ngIf="segment == 'report'">
+    <ion-segment-button value="music">
+      <ion-label>Music</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="comments">
+      <ion-label>Comments</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="pm">
+      <ion-label>Private Message</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-content>

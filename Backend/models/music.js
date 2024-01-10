@@ -3,9 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     FilePath: {
       type: DataTypes.STRING(999),
     },
-    Likes: {
-      type: DataTypes.INTEGER,
-    },
     Name: {
       type: DataTypes.STRING,
     },

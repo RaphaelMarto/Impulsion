@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Platform } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
-import { of, take } from 'rxjs';
+import { take } from 'rxjs';
+import { InstrumentModalComponent } from 'src/app/components/instrument-modal/instrument-modal.component';
 
 @Component({
   selector: 'app-tab4',
@@ -41,7 +42,8 @@ export class Tab4Page implements OnInit {
     private http: HttpClient,
     private router: Router,
     private formBuilder: FormBuilder,
-    private dataSharingService: DataSharingService
+    private dataSharingService: DataSharingService,
+    private modalController: ModalController,
   ) {
     this.isIOS = this.platform.is('ios');
   }
@@ -117,7 +119,7 @@ export class Tab4Page implements OnInit {
   }
 
   addInstrument(idInstrument: number) {
-    const newInstrument = this.instruments.find(item => item.id === idInstrument);
+    const newInstrument = this.instrumentsCopy.find(item => item.id === idInstrument);
     if (newInstrument) {
       this.instrumentShow.push(newInstrument.Name);
       this.instrument.push(newInstrument);
@@ -130,8 +132,8 @@ export class Tab4Page implements OnInit {
   delInstrument(idInstrument:number, NameInstru:string) {
     const indexInstrument = this.instrumentShow.indexOf(NameInstru);
     this.instrument = this.instrument.filter(item => item.id !== idInstrument);
-    
-    if (indexInstrument) {
+
+    if (indexInstrument+1) {
       this.instrumentShow.splice(indexInstrument,1);
       this.http.delete(config.API_URL + '/user/instrument/'+idInstrument, this.options).pipe(take(1)).subscribe();
       this.instruments  = this.instrumentsCopy.filter(option => !this.instrumentShow.includes(option.Name));
@@ -142,12 +144,32 @@ export class Tab4Page implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  goAdmin(){
+    this.router.navigate(['/admin']);
+  }
+
+  goStats(){
+    this.router.navigate(['/statistics']);
+  }
+
   Delete() {
     this.http.delete(config.API_URL + '/user', this.options).pipe(take(1)).subscribe();
   }
 
-  viewInstrument() {
-    this.viewAddInstrument = true;
+  async viewInstrument() {
+    const modal = await this.modalController.create({
+      component: InstrumentModalComponent,
+      componentProps: {
+        instrumentList: this.instruments,
+      },
+    });
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      this.addInstrument(data);
+    }
   }
 
   handleChange(event: any) {

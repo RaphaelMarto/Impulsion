@@ -1,0 +1,108 @@
+.music-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.profile-info h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+ion-button {
+    --box-shadow: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin:10% 0 10% 0;
+}
+
+form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+form input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    font-size: 16px;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+}
+
+.selectForm{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-top: 20px;
+    z-index: 0; 
+}
+
+.form-group-2{
+    position: relative;
+    margin-bottom: 20px;  
+    width: 70%;    
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.selection-window {
+    width: 20%;
+    height: 10px;
+    background-color: rgba(255, 0, 0, 0.5);
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.div-button {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(1, auto);
+    gap: 10px;
+    justify-content: center;
+}
+
+.ion-button-justify {
+    justify-self: center;
+}
+
+.error{
+    margin-bottom: 10%;
+    color:rgba(255, 0, 0, 0.5);
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 90%;
+}
+
+.right-button {
+    right: 2%;
+    top: 3%;
+    position: absolute;
+    --background: transparent;
+    padding: 3px 3px 0px 3px;
+    --box-shadow: none;
+}
+
+.title{
+    margin-left: 5%;
+    margin-top: 10%;
+}

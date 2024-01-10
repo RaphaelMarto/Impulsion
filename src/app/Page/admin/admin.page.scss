@@ -1,0 +1,46 @@
+ion-title{
+    letter-spacing: 2px;
+    font-size: 1.8rem;
+}
+
+/* Add this in your component's stylesheet or global styles */
+
+ion-grid {
+    // width: 100%;
+    border-collapse: collapse;
+    color:rgb(255, 255, 255);
+  }
+  
+  .header-row {
+    background-color: #6e6b6b;
+    font-weight: bold;
+  }
+  
+  ion-row {
+    border-bottom: 1px solid #ddd;
+    color:rgb(255, 255, 255);
+  }
+  
+  ion-col {
+    padding: 12px;
+    text-align: left;
+    color:rgb(255, 255, 255);
+  }
+  
+  ion-col:last-child {
+    text-align: center;
+  }
+  
+  .ion-button-perso {
+    --color: #fff;
+    --ion-color-contrast:#fff !important;
+    font-size: 14px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 4px;
+    padding-right: 4px;
+    --padding-start: 0.5em;
+    --padding-end: 0.5em;
+  }
+  
+  

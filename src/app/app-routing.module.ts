@@ -23,6 +23,15 @@ const routes: Routes = [
     path: 'otherProfile/:id',
     component: ProfileOtherUsersComponent,
   },
+  {
+    path: 'admin',
+    loadChildren: () => import('./Page/admin/admin.module').then( m => m.AdminPageModule)
+  },  {
+    path: 'statistics',
+    loadChildren: () => import('./Page/statistics/statistics.module').then( m => m.StatisticsPageModule)
+  },
+
+
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],

@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <h2 class="title">Request for an instrument</h2>
+  <form [formGroup]="InsturmentForm" id="music-form" (submit)="SendInstrument()">
+    <div class="form-group">
+      <label>Instrument Name</label>
+      <input type="text" class="form-control" formControlName="name" />
+    </div>
+    <div
+      *ngIf="InsturmentForm.get('name')!.invalid && (InsturmentForm.get('name')!.dirty || InsturmentForm.get('name')!.touched)"
+    >
+      <div *ngIf="InsturmentForm.get('name')!.errors!['required']" class="error">Name is required.</div>
+    </div>
+    <div class="form-group">
+      <label>References (Optional)</label>
+      <input type="text" class="form-control" formControlName="reference" />
+    </div>
+    <ion-fab-button>
+      <ion-button type="submit">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-fab-button>
+  </form>
+</ion-content>

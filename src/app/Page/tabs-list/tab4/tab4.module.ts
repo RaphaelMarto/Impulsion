@@ -6,6 +6,7 @@ import { Tab4Page } from './tab4.page';
 
 import { Tab4RoutingModule } from './tab4-routing.module';
 import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-component/tabs-profil-component.module';
+import { InstrumentModalModule } from 'src/app/components/instrument-modal/instrument-modal.module';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { TabsProfilComponentModule } from 'src/app/components/tabs-profil-compon
     Tab4RoutingModule,
     ReactiveFormsModule,
     TabsProfilComponentModule,
+    InstrumentModalModule
   ],
   declarations: [Tab4Page],
 })
