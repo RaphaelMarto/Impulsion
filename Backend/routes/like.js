@@ -2,6 +2,7 @@ var express = require("express");
 const { authenticate } = require("../middleware/auth");
 var router = express.Router();
 const { Liked } = require("../models");
+const MyError = require("../middleware/Error");
 
 router.get("/add/:idMusic", authenticate, async (req, res) => {
   try {
@@ -35,9 +36,12 @@ router.delete("/del/:idMusic", authenticate, async (req, res) => {
 });
 
 router.get("/liked/:idMusic", async (req, res) => {
-  const idMusic = parseInt(req.params.idMusic);
+  const idMusic = isNaN(req.params.idMusic) ? false : parseInt(req.params.idMusic, 10);
 
   try {
+    if(idMusic === false){
+      throw new MyError('Wrong params',401)
+    }
     const numberOfLikes = await Liked.count({ where: { idMusic: idMusic } });
     let likedEntry = null;
 

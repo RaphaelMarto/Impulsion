@@ -92,9 +92,9 @@ router.get("/userId", authenticate, async (req, res) => {
 
 router.get("/check-cookie", (req, res) => {
   if (req.cookies.user_session) {
-    res.send(true);
+    res.status(200).send(true);
   } else {
-    res.send(false);
+    res.status(500).send(false);
   }
 });
 

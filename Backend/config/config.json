@@ -7,17 +7,17 @@
     "dialect": "mysql"
   },
   "test": {
-    "username": "dev",
+    "username": "7nc01yfrho28ll9h25ef",
     "password": null,
-    "database": "impulsion",
-    "host": "localhost",
+    "database": "impulsion-data",
+    "host": "aws.connect.psdb.cloud",
     "dialect": "mysql"
   },
   "production": {
-    "username": "null",
+    "username": "7nc01yfrho28ll9h25ef",
     "password": null,
-    "database": "null",
-    "host": "null",
-    "dialect": "null"
+    "database": "impulsion-data",
+    "host": "aws.connect.psdb.cloud",
+    "dialect": "mysql"
   }
 }

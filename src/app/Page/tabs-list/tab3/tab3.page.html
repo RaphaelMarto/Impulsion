@@ -11,7 +11,7 @@
         <div
           *ngIf="musicForm.get('name')!.invalid && (musicForm.get('name')!.dirty || musicForm.get('name')!.touched) || sending && musicForm.get('name')!.invalid"
         >
-          <div *ngIf="musicForm.get('name')!.errors!['required']" class="error">Name is required.</div>
+          <div *ngIf="musicForm.get('name')!.errors!['required']" class="error" data-testid="name-required">Name is required.</div>
           <div *ngIf="musicForm.get('name')!.errors?.['maxlength']" class="error">Max 20 caracter for the name.</div>
         </div>
         <div class="form-group-2">

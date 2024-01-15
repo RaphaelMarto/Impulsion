@@ -1,10 +1,9 @@
 var express = require("express");
 const { authenticate } = require("../middleware/auth");
-const admin = require("firebase-admin");
 var router = express.Router();
-const crypto = require("crypto");
 const { Comment, User } = require("../models");
 const { Op,literal } = require("sequelize");
+const MyError = require("../middleware/Error");
 
 router.post("/add/:idMusic", authenticate, async (req, res) => {
   const MusicId = req.params.idMusic;
@@ -56,21 +55,27 @@ router.delete("/del/:commentId", authenticate, async (req, res) => {
 });
 
 router.get("/comment/anon/:idMusic", async (req, res) => {
-  const idMusic = req.params.idMusic;
+  const idMusic = isNaN(req.params.idMusic) ? false : parseInt(req.params.idMusic, 10);
   try {
+    if(idMusic === false){
+      throw new MyError('param are wrong', 500)
+    }
     const nbCom = await Comment.count({ where: { idMusic: idMusic } });
 
     res.status(200).send({ nbCom: nbCom });
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
 router.get("/comment/:idMusic/:idReply", async (req, res) => {
-  const idMusic =  req.params.idMusic;
-  const idReply =  req.params.idReply;
+  const idMusic = isNaN(req.params.idMusic) ? false : parseInt(req.params.idMusic, 10);
+  const idReply = isNaN(req.params.idReply) ? false : parseInt(req.params.idReply, 10);
   try {
+    if(idMusic === false || idReply === false){
+      throw new MyError('param are wrong', 500)
+    }
     const comments = await Comment.findAll({
       where: {
         [Op.and]: [
@@ -89,9 +94,9 @@ router.get("/comment/:idMusic/:idReply", async (req, res) => {
     });
 
     res.json(comments).status(200)
-  } catch (error) {
-    console.log("Error fetching user data:", error);
-    res.status(500).send("Error fetching user data");
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
   }
 });
 
