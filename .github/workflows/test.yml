@@ -1,0 +1,34 @@
+name: Backend Test
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: Backend/
+
+    - name: Load environment variables
+      run: |
+        echo "NODE_ENV=development" >> Backend/.env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> Backend/.env
+
+    - name: Run tests
+      run: npm test
+      env:
+        NODE_ENV: development
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      working-directory: Backend/
