@@ -5,6 +5,11 @@
       <div class="info-container">
         <p>{{music.Name}}</p>
         <p><a [routerLink]="['/otherProfile', music.idUser]">{{music.Nickname}}</a></p>
+        <div (click)="toggleDescription()" class="desc-container">
+          <p>{{music.Description.length > 20 ? showLess ? music.Description : music.Description.slice(0, 20) + '...' : music.Description}}
+          <span *ngIf="music.Description.length > 20" class="show-more">{{ showLess ? 'Show Less' : 'Show More' }}</span>
+          </p>
+        </div>
       </div>
       <div class="reaction-container">
         <ion-buttons class="reaction-toolbar">

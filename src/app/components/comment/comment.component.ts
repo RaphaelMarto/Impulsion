@@ -24,6 +24,7 @@ export class CommentComponent implements OnInit {
   ApiUrl: string = config.API_URL;
   options = { withCredentials: true };
   public login!: boolean;
+  public showLess:boolean = false;
 
   constructor(private modalCtrl: ModalController, private http: HttpClient, private authService: AuthService) {}
 
@@ -88,5 +89,9 @@ export class CommentComponent implements OnInit {
 
   cancelAnswer(bool: boolean) {
     this.replyCommentVisible = !bool;
+  }
+
+  toggleComment() {
+    this.showLess = !this.showLess;
   }
 }

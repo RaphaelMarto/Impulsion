@@ -9,8 +9,9 @@
       <div class="author">
         <a [routerLink]="['/otherProfile', comments.User.id]" (click)="cancel()"><b>{{ comments.User.Nickname }}</b></a>:
       </div>
-      <div class="comment">
-        {{ comments.Message }}
+      <div class="comment" (click)="toggleComment()">
+        <span>{{comments.Message.length > 50 ? showLess ? comments.Message : comments.Message.slice(0, 50) + '...' : comments.Message}}</span>
+        <b  *ngIf="comments.Message.length > 50" class="show-more">{{ showLess ? ' Show Less' : ' Show More' }}</b>
       </div>
     </div>
   </div>
@@ -23,7 +24,7 @@
     <app-comment-form submitLabel="Write" (handleSubmit)="addComment($event,comments.id)" (cancelAction)="cancelAnswer($event)"></app-comment-form>
   </div>
   <div [class]="!comments.replyCount ? '' : 'buttonShowMore'" *ngIf="comments.replyCount !==0">
-    <a (click)="showMoreComment(comments.id)" *ngIf="!showMoreCom">Show more</a>
+    <a (click)="showMoreComment(comments.id)" *ngIf="!showMoreCom">Show reply</a>
   </div>
 </div>
 <div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async)" [comments]="comment2" [idMusic]="idMusic" [numberReply]="numberReply">
