@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/Authentication/auth.service';
 import { config } from 'src/app/config/configuration';
 import { Location } from '@angular/common';
 import { take } from 'rxjs';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-profile-other-users',
@@ -30,7 +31,8 @@ export class ProfileOtherUsersComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location
+    private location: Location, 
+    public alertController: AlertController
   ) {}
 
   ngOnInit(): void {
@@ -131,5 +133,53 @@ export class ProfileOtherUsersComponent implements OnInit {
 
   connexion(){
     this.router.navigate(['/login'])
+  }
+
+  async FollowDeleteConfirm() {
+    const alert = await this.alertController.create({
+      header: 'Confirm unfollow?',
+      message: 'Are you sure you want to unfollow ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'medium',
+        },
+        {
+          text: 'Delete',
+          role: 'confirm',
+          cssClass: 'alert-button-delete',
+          handler: () => {
+            this.unfollow()
+          },
+        },
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async LikeDeleteConfirm(id:number) {
+    const alert = await this.alertController.create({
+      header: 'Confirm?',
+      message: 'Are you sure you want to unlike this music ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'medium',
+        },
+        {
+          text: 'Delete',
+          role: 'confirm',
+          cssClass: 'alert-button-delete',
+          handler: () => {
+            this.deleteLike(id)
+          },
+        },
+      ]
+    });
+
+    await alert.present();
   }
 }
