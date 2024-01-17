@@ -8,6 +8,7 @@ var router = express.Router();
 const axios = require("axios");
 const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, TempNewInstrument,sequelize } = require("../models");
 const { Op } = require("sequelize");
+const MyError = require("../middleware/Error");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -73,7 +74,7 @@ router.get("/proxy-audio", async (req, res) => {
 
 router.get("/genre", async (req, res) => {
   try {
-    const Genre = await TypeMusic.findAll({ attributes: ['Name','id']});
+    const Genre = await TypeMusic.findAll({ attributes: ["Name", "id"] });
 
     res.status(200).json(Genre);
   } catch (e) {
@@ -82,12 +83,11 @@ router.get("/genre", async (req, res) => {
   }
 });
 
-
 router.get("/user/all", async (req, res) => {
   try {
     const musics = await Music.findAll({
       where: { idUser: req.cookies.user_session[1] },
-      attributes: ["id","Name"],
+      attributes: ["id", "Name"],
     });
 
     res.status(200).json(musics);
@@ -100,8 +100,8 @@ router.get("/user/all", async (req, res) => {
 async function getRandomIndices(excludedIds) {
   const indices = new Set();
 
-  const allIds = await Music.findAll({ attributes: ['id'], raw: true });
-  while (indices.size < 10 && indices.size < allIds.length-excludedIds.length) {
+  const allIds = await Music.findAll({ attributes: ["id"], raw: true });
+  while (indices.size < 10 && indices.size < allIds.length - excludedIds.length) {
     const randomIndex = Math.floor(Math.random() * allIds.length);
     const randomId = allIds[randomIndex].id;
 
@@ -116,7 +116,7 @@ async function getRandomIndices(excludedIds) {
 // Function to fetch random music documents based on indices
 async function getRandomMusic(indices) {
   const musicDocuments = await Music.findAll({
-    attributes: ['id', 'Name', 'FilePath','idUser', 'Description'],
+    attributes: ["id", "Name", "FilePath", "idUser", "Description"],
     where: {
       id: {
         [Op.in]: indices,
@@ -125,7 +125,7 @@ async function getRandomMusic(indices) {
     include: [
       {
         model: User,
-        attributes: ['Nickname'],
+        attributes: ["Nickname"],
       },
     ],
   });
@@ -139,8 +139,18 @@ async function getRandomMusic(indices) {
     Nickname: music.User.Nickname,
   }));
 }
+router.get("/random/test", async (req, res) => {
+  try {
+    throw new MyError("test", 401);
 
-router.get('/random/music', async (req, res) => {
+    res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.get("/random/music", async (req, res) => {
   try {
     const excludedIds = req.query.list;
     const randomIndices = await getRandomIndices(excludedIds);
@@ -195,12 +205,12 @@ router.get("/all/:startLetter", async (req, res) => {
   }
 });
 
-router.post('/instrumentTemp/new', async (req, res) => {
+router.post("/instrumentTemp/new", async (req, res) => {
   try {
     await TempNewInstrument.create({
       Name: req.body.name,
-      Reference: req.body.reference
-    })
+      Reference: req.body.reference,
+    });
 
     res.status(200).send();
   } catch (e) {
@@ -209,9 +219,9 @@ router.post('/instrumentTemp/new', async (req, res) => {
   }
 });
 
-router.get('/instrumentTemp', async (req, res) => {
+router.get("/instrumentTemp", async (req, res) => {
   try {
-    const TempInstru = await TempNewInstrument.findAll({attributes:['id','Name','Reference']})
+    const TempInstru = await TempNewInstrument.findAll({ attributes: ["id", "Name", "Reference"] });
 
     res.status(200).json(TempInstru);
   } catch (e) {
@@ -220,11 +230,11 @@ router.get('/instrumentTemp', async (req, res) => {
   }
 });
 
-router.post('/instrumentTemp/accepted', async (req, res) => {
+router.post("/instrumentTemp/accepted", async (req, res) => {
   try {
     await Instrument.create({
-      Name: req.body.name
-    })
+      Name: req.body.name,
+    });
 
     await TempNewInstrument.destroy({
       where: { id: req.body.id },
@@ -237,9 +247,9 @@ router.post('/instrumentTemp/accepted', async (req, res) => {
   }
 });
 
-router.delete('/instrumentTemp/:idNewInstru', async (req, res) => {
+router.delete("/instrumentTemp/:idNewInstru", async (req, res) => {
   try {
-    await TempNewInstrument.destroy({ where: { id: req.params.idNewInstru },})
+    await TempNewInstrument.destroy({ where: { id: req.params.idNewInstru } });
 
     res.status(200).send();
   } catch (e) {
@@ -257,11 +267,10 @@ router.get("/instrument/all/:startLetter", async (req, res) => {
       attributes: ["id", "Name"],
     });
 
-    let instrumentData = {};
+    const userInstrumentData = [];
 
     for (const instrument of instruments) {
       const instrumentId = instrument.id;
-
       const usersWithInstrument = await InstrumentToUser.findAll({
         where: { InstrumentId: instrumentId },
         attributes: ["UserId"],
@@ -274,15 +283,46 @@ router.get("/instrument/all/:startLetter", async (req, res) => {
         attributes: ["id", "Nickname", "PictureUrl"],
       });
 
-      instrumentData = {user :users, instrument:instrument.Name};
+      // Use Promise.all to wait for all async operations inside the loop
+      await Promise.all(users.map(async (user) => {
+        try {
+          const allInstrumentOfUser = await InstrumentToUser.findAll({
+            where: { UserId: user.id },
+            attributes: ["InstrumentId"],
+          });
+      
+          const instruments = await Instrument.findAll({
+            where: { id: allInstrumentOfUser.map((item) => item.InstrumentId) },
+            attributes: ["Name"],
+          });
+      
+          // Find existing entry for the user or create a new one
+          let userEntry = userInstrumentData.find((entry) => entry.User.Nickname === user.Nickname);
+      
+          if (!userEntry) {
+            userEntry = { User: { Nickname: user.Nickname, id: user.id, PictureUrl: user.PictureUrl }, Instruments: [] };
+            userInstrumentData.push(userEntry);
+          }
+      
+          // Add the instruments to the user's instruments
+          instruments.forEach((instrument) => {
+            if (!userEntry.Instruments.includes(instrument.Name)) {
+              userEntry.Instruments.push(instrument.Name);
+            }
+          });
+        } catch (e) {
+          console.error(`Error processing user ${user.id}: ${e.message}`);
+        }
+      }));
     }
 
-    res.status(200).json(instrumentData);
+    res.status(200).json(userInstrumentData);
   } catch (e) {
     const status = e.status || 401;
     res.status(status).json({ error: e.message });
   }
 });
+
 
 router.get("/:userId", async (req, res) => {
   try {

@@ -32,11 +32,11 @@
  </div>
 
  <div *ngIf="buttonFocus == 'instrument'">
-  <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.id)">
-    <img alt="photo de profile" [src]="user.PictureUrl" />
+  <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.User.id)">
+    <img alt="photo de profile" [src]="user.User.PictureUrl" />
     <ion-card-header>
-      <ion-card-title>{{user.Nickname}}</ion-card-title>
-      <ion-card-subtitle>{{instrument}}</ion-card-subtitle>
+      <ion-card-title>{{user.User.Nickname}}</ion-card-title>
+      <ion-card-subtitle>{{user.Instruments}}</ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>
