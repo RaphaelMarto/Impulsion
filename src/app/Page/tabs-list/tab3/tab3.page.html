@@ -1,63 +1,79 @@
 <ion-content [fullscreen]="true">
-    <div class="music-container">
-      <form *ngIf="condition" [formGroup]="musicForm" id="music-form" (submit)="uploadFiles()">
-        <ion-button class="right-button" (click)="cancel()">
-          <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+  <div class="music-container">
+    <form *ngIf="condition" [formGroup]="musicForm" id="music-form" (submit)="uploadFiles()">
+      <ion-button class="right-button" (click)="cancel()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <div class="form-group">
+        <ion-input
+          label="Name"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="name"
+          class="form-control"
+          [clearInput]="true"
+        ></ion-input>
+      </div>
+      <div
+        *ngIf="musicForm.get('name')!.invalid && (musicForm.get('name')!.dirty || musicForm.get('name')!.touched) || sending && musicForm.get('name')!.invalid"
+      >
+        <div *ngIf="musicForm.get('name')!.errors!['required']" class="error" data-testid="name-required">
+          Name is required.
+        </div>
+        <div *ngIf="musicForm.get('name')!.errors?.['maxlength']" class="error">Max 20 caracter for the name.</div>
+      </div>
+      <div class="form-group-2">
+        <ion-select
+          label="Type of music"
+          label-placement="stacked"
+          formControlName="genre"
+          class="form-control-2"
+          fill="solid"
+        >
+          <ion-select-option *ngFor="let option of genre" [value]="option.id">{{ option.Name }}</ion-select-option>
+        </ion-select>
+      </div>
+      <div
+        *ngIf="musicForm.get('genre')!.invalid && (musicForm.get('genre')!.dirty || musicForm.get('genre')!.touched) || sending && musicForm.get('genre')!.invalid"
+      >
+        <div *ngIf="musicForm.get('genre')!.errors!['required']" class="error">Genre is required.</div>
+      </div>
+      <div class="form-group">
+        <ion-input
+          label="Description"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="desc"
+          class="form-control"
+          [clearInput]="true"
+        ></ion-input>
+      </div>
+      <div
+        *ngIf="musicForm.get('desc')!.invalid && (musicForm.get('desc')!.dirty || musicForm.get('desc')!.touched) || sending && musicForm.get('desc')!.invalid"
+      >
+        <div *ngIf="musicForm.get('desc')!.errors!['required']" class="error">Description is required.</div>
+      </div>
+      <div class="form-group">
+        <div id="waveform" #waveform></div>
+        <div id="timeline"></div>
+        <div class="div-button ion-button-justify">
+          <ion-button (click)="play()">Play</ion-button>
+          <ion-button (click)="pause()">Pause</ion-button>
+          <ion-button (click)="zoomIn()">Zoom +</ion-button>
+          <ion-button (click)="zoomOut()">Zoom -</ion-button>
+        </div>
+      </div>
+      <ion-fab-button>
+        <ion-button type="submit">
+          <ion-icon name="checkmark-outline"></ion-icon>
         </ion-button>
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" class="form-control" formControlName="name" />
-        </div>
-        <div
-          *ngIf="musicForm.get('name')!.invalid && (musicForm.get('name')!.dirty || musicForm.get('name')!.touched) || sending && musicForm.get('name')!.invalid"
-        >
-          <div *ngIf="musicForm.get('name')!.errors!['required']" class="error" data-testid="name-required">Name is required.</div>
-          <div *ngIf="musicForm.get('name')!.errors?.['maxlength']" class="error">Max 20 caracter for the name.</div>
-        </div>
-        <div class="form-group-2">
-          <label>Type</label>
-          <ion-select formControlName="genre" class="form-control-2">
-            <ion-select-option *ngFor="let option of genre" [value]="option.id"
-              >{{ option.Name }}</ion-select-option
-            >
-          </ion-select>
-          <input class="selectForm" />
-        </div>
-        <div
-          *ngIf="musicForm.get('genre')!.invalid && (musicForm.get('genre')!.dirty || musicForm.get('genre')!.touched) || sending && musicForm.get('genre')!.invalid"
-        >
-          <div *ngIf="musicForm.get('genre')!.errors!['required']" class="error">Genre is required.</div>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" class="form-control" formControlName="desc" />
-        </div>
-        <div
-          *ngIf="musicForm.get('desc')!.invalid && (musicForm.get('desc')!.dirty || musicForm.get('desc')!.touched) || sending && musicForm.get('desc')!.invalid"
-        >
-          <div *ngIf="musicForm.get('desc')!.errors!['required']" class="error">description is required.</div>
-        </div>
-        <div class="form-group">
-          <div id="waveform" #waveform></div>
-          <div id="timeline"></div>
-          <div class="div-button ion-button-justify">
-            <ion-button (click)="play()">Play</ion-button>
-            <ion-button (click)="pause()">Pause</ion-button>
-            <ion-button (click)="zoomIn()">Zoom +</ion-button>
-            <ion-button (click)="zoomOut()">Zoom -</ion-button>
-          </div>
-        </div>
-        <ion-fab-button>
-          <ion-button type="submit">
-            <ion-icon name="checkmark-outline"></ion-icon>
-          </ion-button>
-        </ion-fab-button>
-      </form>
-    </div>
-    <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="up">
-      <ion-fab-button *ngIf="!condition" (click)="fileInput.click()">
-        <ion-icon name="add-outline"></ion-icon>
       </ion-fab-button>
-      <input #fileInput type="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)" />
-    </ion-fab>
+    </form>
+  </div>
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="up">
+    <ion-fab-button *ngIf="!condition" (click)="fileInput.click()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+    <input #fileInput type="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)" />
+  </ion-fab>
 </ion-content>
