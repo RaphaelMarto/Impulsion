@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { LoadingController, Platform, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular';
 import { Tab3Service } from './service/tab3.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import WaveSurfer from 'wavesurfer.js';
@@ -35,6 +35,7 @@ export class Tab3Page implements OnInit {
     public toastController: ToastController,
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
+    public alertController: AlertController
   ) {}
 
   ngOnInit(): void {
@@ -155,14 +156,18 @@ export class Tab3Page implements OnInit {
     if (this.musicForm.valid) {
       const loading = await this.presentLoading();
       const newFile = await this.exportSelected();
-      const res = await this.tab3Service.uploadAudio(newFile, this.musicForm.value);
-      if (res) {
-        loading.dismiss();
-      }
-      this.name = '';
-      this.presentToast();
-      this.condition = false;
-      this.sending = false;
+      this.tab3Service.uploadAudio(newFile, this.musicForm.value).subscribe((res) =>{
+        if (res) {
+          loading.dismiss();
+          this.presentToast();
+        } else {
+          loading.dismiss();
+          this.FailedUplaod()
+        }
+        this.name = '';
+        this.condition = false;
+        this.sending = false;
+      });
     }
   }
 
@@ -184,5 +189,20 @@ export class Tab3Page implements OnInit {
 
   cancel() {
     this.condition = false;
+  }
+
+  async FailedUplaod() {
+    const alert = await this.alertController.create({
+      header: 'Error !',
+      message: 'The Upload of the file has failed :/',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'confirm',
+        },
+      ]
+    });
+
+    await alert.present();
   }
 }

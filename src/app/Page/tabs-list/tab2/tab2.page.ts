@@ -13,7 +13,6 @@ export class Tab2Page implements OnInit {
   public buttonFocus: string = 'artiste';
   private options = { withCredentials: true };
   public dataObserv!: Observable<any[]>;
-  public instrument: string='';
   @ViewChild('searchBar') searchBar: any;
 
   constructor(private http: HttpClient, private router: Router) {
@@ -49,16 +48,13 @@ export class Tab2Page implements OnInit {
 
   InputMusique(query: any) {
     this.http.get(config.API_URL + '/music/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
-      console.log(res)
       this.dataObserv = of(res);
     });
   }
 
   InputInstrument(query: any) {
     this.http.get(config.API_URL + '/music/instrument/all/' + query, this.options).pipe(take(1)).subscribe((res:any) => {
-      console.log(res)
-      this.instrument = res.instrument;
-      this.dataObserv = of(res.user);
+      this.dataObserv = of(res);
     });
   }
 
