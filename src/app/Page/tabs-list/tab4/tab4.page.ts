@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
+import { AlertController, ModalController, Platform } from '@ionic/angular';
 import { config } from 'src/app/config/configuration';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -45,6 +45,7 @@ export class Tab4Page implements OnInit {
     private formBuilder: FormBuilder,
     private dataSharingService: DataSharingService,
     private modalController: ModalController,
+    public alertController: AlertController
   ) {
     this.isIOS = this.platform.is('ios');
   }
@@ -184,5 +185,29 @@ export class Tab4Page implements OnInit {
 
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
+  }
+
+  async AccountDelete() {
+    const alert = await this.alertController.create({
+      header: 'Confirm deletion?',
+      message: 'Are you sure you want to delete your account ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'medium',
+        },
+        {
+          text: 'Delete',
+          role: 'confirm',
+          cssClass: 'alert-button-delete',
+          handler: () => {
+            this.Delete()
+          },
+        },
+      ]
+    });
+
+    await alert.present();
   }
 }

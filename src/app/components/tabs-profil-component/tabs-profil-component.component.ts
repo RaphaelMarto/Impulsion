@@ -1,10 +1,8 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TabsProfilService } from './service/tabs-profil.service';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from 'src/main';
-import { AuthService } from 'src/app/Authentication/auth.service';
 import { DataSharingService } from 'src/app/service/data-sharing.service';
 import { Observable, of } from 'rxjs';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tabs-profil-component',
@@ -16,7 +14,7 @@ export class TabsProfilComponentComponent implements OnInit {
   public musicObserv!: Observable<any[]>;
   public followObserv!: Observable<any[]>;
 
-  constructor(private dataSharingService: DataSharingService,private tabsProfilService: TabsProfilService, private authService: AuthService) {}
+  constructor(private dataSharingService: DataSharingService,private tabsProfilService: TabsProfilService, public alertController: AlertController) {}
 
   ngOnInit() {
     this.refresh();
@@ -44,7 +42,7 @@ export class TabsProfilComponentComponent implements OnInit {
     });
   }
 
-  deleteMusic(id: any): void {
+  deleteMusic(id: number): void {
     this.tabsProfilService.deleteMusic(id).subscribe(() => {
       this.loadInitialMusicData();
     });
@@ -54,5 +52,53 @@ export class TabsProfilComponentComponent implements OnInit {
     this.tabsProfilService.deleteFollow(id).subscribe(() => {
       this.loadInitialFollowData();
     });
+  }
+
+  async MusicDeleteConfirm(id:number) {
+    const alert = await this.alertController.create({
+      header: 'Confirm deletion?',
+      message: 'Are you sure you want to delete your music ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'medium',
+        },
+        {
+          text: 'Delete',
+          role: 'confirm',
+          cssClass: 'alert-button-delete',
+          handler: () => {
+            this.deleteMusic(id)
+          },
+        },
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async FollowDeleteConfirm(id:number) {
+    const alert = await this.alertController.create({
+      header: 'Confirm unfollow?',
+      message: 'Are you sure you want to unfollow ?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'medium',
+        },
+        {
+          text: 'Delete',
+          role: 'confirm',
+          cssClass: 'alert-button-delete',
+          handler: () => {
+            this.deleteFollow(id)
+          },
+        },
+      ]
+    });
+
+    await alert.present();
   }
 }

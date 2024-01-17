@@ -9,7 +9,7 @@
       [src]="APIurl + '/user/proxy-image?url='+(user?.PictureUrl)"
       alt="Profile Picture"
     />
-    <ion-button *ngIf="login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? unfollow() : follow()" [disabled]="isMe">
+    <ion-button *ngIf="login" [class]="followed ? 'unfollow-button' : 'follow-button'" (click)="followed ? FollowDeleteConfirm() : follow()" [disabled]="isMe">
       <ion-icon [name]="followed ? 'heart' : 'heart-outline'" slot="icon-only"></ion-icon>
       <p>{{ followed ? "Unfollow" : "Follow" }}</p>
     </ion-button>
@@ -39,7 +39,7 @@
               <p class="Text-center">{{ item.Name }}</p>
             </ion-col>
             <ion-col size="2">
-              <ion-button *ngIf="login" [color]="itemLikes[item.id] ? 'danger' : 'tertiary'" (click)="itemLikes[item.id] ? deleteLike(item.id) : like(item.id)"
+              <ion-button *ngIf="login" [color]="itemLikes[item.id] ? 'danger' : 'tertiary'" (click)="itemLikes[item.id] ? LikeDeleteConfirm(item.id) : like(item.id)"
                 ><ion-icon [name]="itemLikes[item.id] ? 'heart-dislike' : 'heart-outline'"></ion-icon>
               </ion-button>
               <ion-button *ngIf="!login" [color]="itemLikes[item.id] ? 'danger' : 'tertiary'" (click)="connexion()"
