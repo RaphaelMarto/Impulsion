@@ -80,7 +80,7 @@
       <h1>{{user.nickname}}</h1>
       <p>Email: {{user.email}}</p>
       <p>Phone: {{user.phone}}</p>
-      <p>Instrument: {{instrumentShow}}</p>
+      <p>Instrument: {{instrumentShow.length < 3 ? instrumentShow : instrumentShow.slice(0, 2) + '...'}} <b *ngIf="instrumentShow.length > 2" (click)="setOpen(true)">See</b></p>
       <p>Country: {{user.country}}</p>
       <p>City: {{user.city}}</p>
       <ion-button shape="round" color="dark" class="edit" (click)="Edit()">Edit Profile</ion-button>
@@ -89,4 +89,23 @@
   <div *ngIf="!edit">
     <app-tabs-profil-component></app-tabs-profil-component>
   </div>
+  <ion-modal [isOpen]="isModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Instrument</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item *ngFor="let instrument of instrumentShow">
+            {{ instrument }}
+          </ion-item>
+        </ion-list>        
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

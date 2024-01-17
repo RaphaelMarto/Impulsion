@@ -116,7 +116,7 @@ async function getRandomIndices(excludedIds) {
 // Function to fetch random music documents based on indices
 async function getRandomMusic(indices) {
   const musicDocuments = await Music.findAll({
-    attributes: ['id', 'Name', 'FilePath','idUser'],
+    attributes: ['id', 'Name', 'FilePath','idUser', 'Description'],
     where: {
       id: {
         [Op.in]: indices,
@@ -133,6 +133,7 @@ async function getRandomMusic(indices) {
   return musicDocuments.map((music) => ({
     id: music.id,
     Name: music.Name,
+    Description: music.Description,
     FilePath: music.FilePath,
     idUser: music.idUser,
     Nickname: music.User.Nickname,

@@ -36,6 +36,7 @@ export class Tab4Page implements OnInit {
   isDeployed:any;
   selectedInstruments:any;
   ApiUrl:string = config.API_URL;
+  isModalOpen:boolean = false;
 
   constructor(
     private platform: Platform,
@@ -179,5 +180,9 @@ export class Tab4Page implements OnInit {
 
   handleCancel() {
     this.viewAddInstrument = false;
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isModalOpen = isOpen;
   }
 }

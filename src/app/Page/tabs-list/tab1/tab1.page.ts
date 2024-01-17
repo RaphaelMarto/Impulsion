@@ -35,6 +35,7 @@ export class Tab1Page implements OnInit {
   public titleShown: any = [];
   private stopLoad: boolean = false;
   public musicsObserv!: Observable<any[]>;
+  public showLess:boolean = false;
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
 
@@ -348,5 +349,9 @@ export class Tab1Page implements OnInit {
       .subscribe((res: any) => {
         this.numCom[idMusic] = res.nbCom;
       });
+  }
+
+  toggleDescription() {
+    this.showLess = !this.showLess;
   }
 }
