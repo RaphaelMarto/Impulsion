@@ -41,6 +41,9 @@ jobs:
       run: npm install
       working-directory: Backend/
 
+    - name: Create security folder
+      run: mkdir -p Backend/security
+
     - name: Load environment variables
       run: |
         echo "NODE_ENV=development" >> Backend/.env
