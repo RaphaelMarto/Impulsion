@@ -48,7 +48,7 @@ jobs:
       run: |
         echo "NODE_ENV=development" >> Backend/.env
         echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> Backend/.env
-        echo "${{ secrets.FIREBASE }}" | tr -d \" >> Backend/security/impulsion-6bca6-firebase-adminsdk-w7go6-f24f59f4a0.json
+        echo '${{ secrets.FIREBASE }}' >> Backend/security/impulsion-6bca6-firebase-adminsdk-w7go6-f24f59f4a0.json
 
     - name: Run tests
       run: npm test
