@@ -73,7 +73,23 @@
         <label>City</label>
         <input type="text" class="form-control" formControlName="city" />
       </div>
-      <ion-button type="submit" shape="round">Save Changes</ion-button>
+      <div class="form-group">
+        <label>Spotify</label>
+        <input type="text" class="form-control" formControlName="Spotify" />
+      </div>
+      <div class="form-group">
+        <label>Youtube</label>
+        <input type="text" class="form-control" formControlName="Youtube" />
+      </div>
+      <div class="form-group">
+        <label>Facebook</label>
+        <input type="text" class="form-control" formControlName="Facebook" />
+      </div>
+      <div class="form-group">
+        <label>Soundcloud</label>
+        <input type="text" class="form-control" formControlName="Soundcloud" />
+      </div>
+      <ion-button type="submit" [disabled]="!profileForm.valid" shape="round">Save Changes</ion-button>
       <ion-button shape="round" color="medium" class="btn btn-medium btntest" (click)="cancelEdit()">Cancel</ion-button>
     </form>
     <div class="profile-info" *ngIf="!edit" id="main-content">
