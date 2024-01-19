@@ -43,6 +43,10 @@ router.get("/info", async (req, res) => {
             },
           ],
         },
+        {
+          model: Social,
+          attributes: ["Spotify", "Youtube", "Facebook", "Soundcloud"],
+        },
       ],
     });
     const InstrumentUser = await InstrumentToUser.findAll({
@@ -284,6 +288,10 @@ router.get("/:UserId", async (req, res) => {
             },
           ],
         },
+        {
+          model: Social,
+          attributes: ["Spotify", "Youtube", "Facebook", "Soundcloud"],
+        },
       ],
     });
     if (!UserInfo) throw new MyError("User Not Found", 401);
@@ -310,6 +318,21 @@ router.put("", authenticate, async (req, res) => {
     User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
       if (user) {
         return user.Address.update({ CityId: req.body.city }).then(function (result) {
+          return result;
+        });
+      } else {
+        throw new MyError("No User Found", 404);
+      }
+    });
+
+    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Social }] }).then(function (user) {
+      if (user) {
+        return user.Social.update({
+          Spotify: req.body.Spotify,
+          Youtube: req.body.Youtube,
+          Facebook: req.body.Facebook,
+          Soundcloud: req.body.Soundcloud,
+        }).then(function (result) {
           return result;
         });
       } else {

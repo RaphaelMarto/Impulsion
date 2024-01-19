@@ -57,7 +57,6 @@ export class ProfileOtherUsersComponent implements OnInit {
         .subscribe((s: any) => {
           this.followed = s.isFollowed;
           this.isMe = s.isMe;
-          console.log(this.isMe)
         });
     }
   }
@@ -181,5 +180,11 @@ export class ProfileOtherUsersComponent implements OnInit {
     });
 
     await alert.present();
+  }
+
+  openLink(link: string) {
+    if (link) {
+      window.open(link, '_system');
+    }
   }
 }

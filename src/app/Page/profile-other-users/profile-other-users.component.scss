@@ -12,20 +12,17 @@
     object-fit: cover;
 }
 
-.edit {
-    margin-top: 5%;
-    margin-bottom: 5%;
-}
-
 .profile-info {
-    margin-top: 20px;
+    margin-top: 10px;
     text-align: center;
+    width: 100%;
 }
 
 .profile-info h1 {
     font-size: 28px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 3%;
+    margin-top: 3%;
 }
 
 .profile-info p {
@@ -45,14 +42,14 @@
 .follow-button {
     --background:rgb(41, 45, 47);
     padding: 3px 3px 0px 0px;
-    margin-top: 3%;
+    margin-top: 5%;
     --box-shadow: none;
 }
 
 .unfollow-button {
     --background: rgb(230, 80, 80);
     padding: 3px 3px 0px 0px;
-    margin-top: 3%;
+    margin-top: 5%;
     --box-shadow: none;
 }
 
@@ -80,4 +77,33 @@ ion-list{
     align-items: center;
     justify-content: center;
     flex-direction: row;
+}
+
+.socials{
+    margin-top: 5%;
+    margin-bottom: 5%;
+    display: flex;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.socials ion-button {
+    flex: 1;
+    margin: 3px;
+  }
+
+.spotify{
+    --background: #1DB954;
+}
+
+.youtube{
+    --background: #FF0000;
+}
+
+.soundcloud{
+    --background: #ff5500;
+}
+
+.facebook{
+    --background: #0866FF;
 }
