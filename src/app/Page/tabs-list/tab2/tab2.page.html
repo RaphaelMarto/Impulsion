@@ -1,11 +1,39 @@
 <ion-content [fullscreen]="true">
- <ion-searchbar animated="true" #searchBar  color="light" [debounce]="500" (ionInput)="handleInput($event)"></ion-searchbar>
- <ion-button [color]="buttonFocus == 'artiste' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('artiste')">Artist</ion-button>
- <ion-button [color]="buttonFocus == 'musique' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('musique')">Music</ion-button>
- <ion-button [color]="buttonFocus == 'instrument' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('instrument')">Instrument</ion-button>
- <div *ngIf="buttonFocus == 'artiste'">
+  <ion-searchbar animated="true" #searchBar  color="light" [debounce]="500" (ionInput)="handleInput($event)" [disabled]="buttonFocus == 'Localiter'"></ion-searchbar>
+  <ion-button [color]="buttonFocus == 'artiste' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('artiste')">Artist</ion-button>
+  <ion-button [color]="buttonFocus == 'musique' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('musique')">Music</ion-button>
+  <ion-button [color]="buttonFocus == 'instrument' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('instrument')">Instrument</ion-button>
+  <ion-button [color]="buttonFocus == 'Localiter' ? 'dark' : 'light'" size="small" shape="round" (click)="onButtonClick('Localiter')">Location</ion-button>
+
+  <form [formGroup]="locationForm">
+    <div *ngIf="buttonFocus == 'Localiter'">
+      <ion-select
+        label="Country"
+        label-placement="stacked"
+        formControlName="country"
+        fill="solid"
+        (ionChange)="onCountryChange($event)"
+      >
+        <ion-select-option *ngFor="let option of country" [value]="option.id">{{ option.Name }}</ion-select-option>
+      </ion-select>
+      
+      <ion-select
+        label="City"
+        label-placement="stacked"
+        formControlName="city"
+        fill="solid"
+      >
+        <ion-select-option *ngFor="let option of city" [value]="option.id">{{ option.Name }}</ion-select-option>
+      </ion-select>
+      <div class="center-btn-container">
+        <ion-button (click)="InputLocation()" color="dark" class="locationBouton">Search</ion-button>
+      </div>
+    </div>
+  </form>
+
+  <div *ngIf="buttonFocus == 'artiste'">
   <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.id)" >
-    <img alt="photo de profile" [src]="user.PictureUrl" />
+    <img alt="photo de profile" [src]="url+user.PictureUrl" />
     <ion-card-header>
       <ion-card-title>{{user.Nickname}}</ion-card-title>
       <ion-card-subtitle>{{user.Address.City.Country.Name+', '+user.Address.City.Name}}</ion-card-subtitle>
@@ -33,10 +61,24 @@
 
  <div *ngIf="buttonFocus == 'instrument'">
   <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.User.id)">
-    <img alt="photo de profile" [src]="user.User.PictureUrl" />
+    <img alt="photo de profile" [src]="url+user.User.PictureUrl" />
     <ion-card-header>
       <ion-card-title>{{user.User.Nickname}}</ion-card-title>
       <ion-card-subtitle>{{user.Instruments}}</ion-card-subtitle>
+    </ion-card-header>
+  
+    <ion-card-content>
+     
+    </ion-card-content>
+  </ion-card>
+ </div>
+
+ <div *ngIf="buttonFocus == 'Localiter'">
+  <ion-card *ngFor="let user of (dataObserv | async)" (click)="getProfile(user.id)" >
+    <img alt="photo de profile" [src]="url+user.PictureUrl" />
+    <ion-card-header>
+      <ion-card-title>{{user.Nickname}}</ion-card-title>
+      <ion-card-subtitle>{{user.Address.City.Country.Name+', '+user.Address.City.Name}}</ion-card-subtitle>
     </ion-card-header>
   
     <ion-card-content>

@@ -66,6 +66,33 @@ router.get("/info", async (req, res) => {
   }
 });
 
+router.get("/country", authenticate, async (req, res) => {
+  try {
+    const country = await Country.findAll({ attributes: ['id','Name']})
+    res.status(200).json(country);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.get("/city/:idCountry", authenticate, async (req, res) => {
+  try {
+    const CountryId = req.params.idCountry;
+
+    const CityId = await City.findAll({
+      where: {
+        CountryId: CountryId,
+      },
+      attributes: ['id','Name']
+    });
+    res.status(200).json(CityId);
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
 router.get("/instrument/all", async (req, res) => {
   try {
     const newInstrument = await Instrument.findAll({
@@ -106,6 +133,45 @@ router.delete("/instrument/:idInstrument", authenticate, async (req, res) => {
     });
     if (deletedRows < 0) throw new MyError("No instrument", 401);
     res.status(200).send();
+  } catch (e) {
+    const status = e.status || 401;
+    res.status(status).json({ error: e.message });
+  }
+});
+
+router.get("/location/:city", async (req, res) => {
+  const cityId = req.params.city;
+
+  try {
+    const address = await Address.findAll({ where : {CityId: cityId}, attributes: ['id']})
+    const addressIds = address.map((addres) => addres.id)
+
+    const users = await User.findAll({
+      where: {
+        idSocials: addressIds,
+      },
+      attributes: ["Nickname", "PictureUrl", "id"],
+      include: [
+        {
+          model: Address,
+          attributes: ["id"],
+          include: [
+            {
+              model: City,
+              attributes: ["Name"],
+              include: [
+                {
+                  model: Country,
+                  attributes: ["Name"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    if (!users || users.length === 0) throw new MyError("No Users found", 401);
+    res.status(200).json(users);
   } catch (e) {
     const status = e.status || 401;
     res.status(status).json({ error: e.message });
