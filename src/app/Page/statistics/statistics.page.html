@@ -9,21 +9,51 @@
       <ion-title size="large">Statistics</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="stats-container">
-    <h2>This Month Stats:</h2>
-    <div class="stat-item">
-      <p>Your videos got 625 views</p>
-    </div>
-    <div class="stat-item">
-      <p>Your most listened-to music is Koala</p>
-    </div>
-    <div class="stat-item">
-      <p>You got a total of 2123 Likes</p>
-    </div>
-    <div class="stat-item">
-      <p>Your most liked video is Koala</p>
-    </div>
-  </div>
+  <ion-grid *ngIf="(dataObserv | async) as data">
+    <ion-row>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">Total View</p>
+          <p class="cell-number">{{data.totView}}</p>
+        </div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">Total Like</p>
+          <p class="cell-number">{{data.totLike}}</p>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">Most Viewed</p>
+          <p class="cell-number">{{data.mostView.musicName}} with {{data.mostView.nbView}} views</p>
+        </div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">Most Liked</p>
+          <p class="cell-number">{{data.mostLike.musicName}} with {{data.mostLike.nbLike}} Likes</p>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">View Average</p>
+          <p class="cell-number">{{data.avgView}}</p>
+        </div>
+      </ion-col>
+      <ion-col size="6">
+        <div class="grid-cell">
+          <p class="cell-text">Like Average</p>
+          <p class="cell-number">{{data.avgLike | number:'1.1-1'}}</p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  
 
   <canvas #myChart id="myChart"></canvas>
 </ion-content>

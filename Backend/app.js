@@ -13,6 +13,7 @@ let followRouter = require("./routes/follow");
 let likeRouter = require("./routes/like");
 let commentRouter = require("./routes/Comment");
 let chatRouter = require("./routes/chat");
+let statRouter = require("./routes/statistic");
 
 const firebaseAdmin = require("firebase-admin");
 
@@ -50,6 +51,7 @@ app.use("/follow", followRouter);
 app.use("/like", likeRouter);
 app.use("/chat", chatRouter);
 app.use("/comment", commentRouter);
+app.use("/statistic", statRouter)
 
 // require('dotenv').config()
 

@@ -35,7 +35,8 @@ export class Tab1Page implements OnInit {
   public titleShown: any = [];
   private stopLoad: boolean = false;
   public musicsObserv!: Observable<any[]>;
-  public showLess:boolean = false;
+  public showLess: boolean = false;
+  public nbView: number[] = [];
   itemLikes: { [name: string]: boolean } = {};
   options = { withCredentials: true };
 
@@ -140,6 +141,15 @@ export class Tab1Page implements OnInit {
             // Start playing the audio when the row comes into view
             audio.play();
             this.visulize(canva, this.musics[index], true, true);
+            if(typeof this.nbView[this.MusicIds[index]] === 'number'){
+              this.http
+              .post(config.API_URL + '/statistic/newStat', {
+                idMusic: this.MusicIds[index],
+                nbView: this.nbView[this.MusicIds[index]],
+              })
+              .pipe(take(1))
+              .subscribe();
+            }
           } else {
             // Pause audio when row goes out of view
             audio.pause();
@@ -269,6 +279,15 @@ export class Tab1Page implements OnInit {
     }
   }
 
+  getViews(idMusic:any){
+    this.http
+        .get(config.API_URL + '/statistic/view/'+idMusic)
+        .pipe(take(1))
+        .subscribe((res: any) => {
+          this.nbView[idMusic] = res && res.nbView !== undefined ? res.nbView : 0;
+        })
+  }
+
   async loadItems() {
     if (!this.stopLoad) {
       this.swiperRef?.nativeElement.swiper.update();
@@ -283,6 +302,7 @@ export class Tab1Page implements OnInit {
               this.MusicIds.push(obj.id);
               this.getlike(obj.id);
               this.getComment(obj.id);
+              this.getViews(obj.id)
             });
           } else {
             this.stopLoad = true;
