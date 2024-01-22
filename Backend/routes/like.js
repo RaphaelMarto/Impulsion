@@ -1,7 +1,8 @@
 var express = require("express");
 const { authenticate } = require("../middleware/auth");
 var router = express.Router();
-const { Liked } = require("../models");
+const { Liked,Statistic } = require("../models");
+const { Op } = require("sequelize");
 const MyError = require("../middleware/Error");
 
 router.get("/add/:idMusic", authenticate, async (req, res) => {
@@ -11,6 +12,27 @@ router.get("/add/:idMusic", authenticate, async (req, res) => {
       idMusic: idMusic,
       idUser: req.cookies.user_session[1],
     });
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const stat = await Statistic.findOne({
+      where: { idMusic: idMusic },
+      createdAt: {
+        [Op.gte]: startOfDay,
+      },
+      attribute: ['nbLike']
+    });
+
+    if(stat){
+      await Statistic.update(
+        {
+          nbLike: ++stat.nbLike,
+          updatedAt: new Date(),
+        },
+        { where: { idMusic: idMusic } }
+      );
+    }
     res.status(200).send();
   } catch (e) {
     const status = e.status || 401;
@@ -27,6 +49,26 @@ router.delete("/del/:idMusic", authenticate, async (req, res) => {
         idUser: req.cookies.user_session[1],
       },
     });
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const stat = await Statistic.findOne({
+      where: { idMusic: idMusic },
+      createdAt: {
+        [Op.gte]: startOfDay,
+      },
+      attribute: ['nbLike']
+    });
+
+    if(stat){
+      await Statistic.update(
+        {
+          nbLike: --stat.nbLike,
+          updatedAt: new Date(),
+        },
+        { where: { idMusic: idMusic } }
+      );
+    }
     if (deletedRows < 0) throw new MyError("No like", 401);
     res.status(200).send();
   } catch (e) {

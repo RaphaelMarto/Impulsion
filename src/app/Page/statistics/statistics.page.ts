@@ -1,6 +1,10 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Observable, take } from 'rxjs';
+import { config } from '../../config/configuration';
+import { StatisticData } from './statistic.model'
 
 @Component({
   selector: 'app-statistics',
@@ -9,10 +13,15 @@ import { Location } from '@angular/common';
 })
 export class StatisticsPage implements OnInit, AfterViewInit {
   @ViewChild('myChart') myChart!: ElementRef;
+  options = { withCredentials: true };
+  
+  public dataObserv!:Observable<StatisticData>;
 
-  constructor(private location: Location) {}
+  constructor(private location: Location,private http: HttpClient) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.init()
+  }
 
   ngAfterViewInit() {
     const ctx = this.myChart.nativeElement.getContext('2d');
@@ -62,5 +71,9 @@ export class StatisticsPage implements OnInit, AfterViewInit {
 
   goBack() {
     this.location.back();
+  }
+
+  init(){
+    this.dataObserv = this.http.get<StatisticData>(config.API_URL + '/statistic/user', this.options);
   }
 }

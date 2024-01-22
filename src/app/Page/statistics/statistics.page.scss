@@ -1,16 +1,20 @@
-.stats-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    // height: 50vh;
-    padding: 20px; 
-  }
+.grid-cell {
+  border: 1px solid #ccc; 
+  background-color: #aaaaaa; 
+  padding: 15px;
+  text-align: center;
+  border-radius: 10px; 
+}
   
-  .stat-item {
-    background-color: #afafaf; 
-    padding: 15px; 
-    margin-bottom: 10px; 
-    border-radius: 8px;
-    text-align: center;
-  }
+.cell-text {
+  font-weight: bold;
+  color: #333;
+}
+  
+.cell-number {
+  font-size: 1em;
+  margin-top: 8px;
+  color: #ffffff;
+}
+  
   
