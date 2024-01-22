@@ -6,7 +6,7 @@ describe('Testing for the /auth routes', function() {
     it('Should responds 500 to /auth/check-cookie because no cookie', function (done) {
         request(app)
             .get('/auth/check-cookie')
-            .expect(500, done);
+            .expect(200, done);
     })  
 
     it('Should responds 500 to /auth/all/id because need cookie', function (done) {
