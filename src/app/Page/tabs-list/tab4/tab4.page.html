@@ -31,12 +31,24 @@
     <form *ngIf="edit" [formGroup]="profileForm" (submit)="onSubmit()">
       <div class="form-group">
         <input hidden formControlName="avatar" />
-        <label>Nickname</label>
-        <input type="text" class="form-control" formControlName="nickname" />
+        <ion-input
+          label="Nickname"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="nickname"
+          class="form-control"
+          [clearInput]="true"
+        ></ion-input>
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" class="form-control" formControlName="email" />
+        <ion-input
+          label="Email"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="email"
+          class="form-control"
+          [clearInput]="true"
+        ></ion-input>
       </div>
       <div class="form-group">
         <label>Instrument</label>
@@ -48,46 +60,81 @@
             </ion-button>
           </ion-item>
           <ion-item class="centered-button">
-            <!-- <ion-select class="select"  label="Instrument" label-placement="floating" fill="solid" *ngIf="viewAddInstrument"
-            (ionChange)="handleChange($event)" (ionCancel)="handleCancel()">
-              <ion-select-option *ngFor="let option of instruments" [value]="option.id"
-                >{{ option.Name }}</ion-select-option
-              >
-            </ion-select> -->
             <ion-button class="add-instrument" (click)="viewInstrument()">
               <ion-icon name="add-outline"></ion-icon>
             </ion-button>
           </ion-item>
         </ion-list>
-       
       </div>
       <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" class="form-control" formControlName="phone" />
+        <ion-input
+        label="Phone"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="phone"
+        class="form-control"
+        [clearInput]="true"
+      ></ion-input>
       </div>
       <div class="form-group">
-        <label>Country</label>
-        <input type="text" class="form-control" formControlName="country" />
+        <ion-input
+          label="Country"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="country"
+          class="form-control"
+          (click)="viewCountryOrCity('Country',0)"
+        ></ion-input>
       </div>
       <div class="form-group">
-        <label>City</label>
-        <input type="text" class="form-control" formControlName="city" />
+        <ion-input
+        label="City"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="city"
+        class="form-control"
+        (click)="viewCountryOrCity('City',CountryId)"
+      ></ion-input>
       </div>
       <div class="form-group">
-        <label>Spotify</label>
-        <input type="text" class="form-control" formControlName="Spotify" />
+        <ion-input
+        label="Spotify"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="Spotify"
+        class="form-control"
+        [clearInput]="true"
+      ></ion-input>
       </div>
       <div class="form-group">
-        <label>Youtube</label>
-        <input type="text" class="form-control" formControlName="Youtube" />
+        <ion-input
+        label="Youtube"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="Youtube"
+        class="form-control"
+        [clearInput]="true"
+      ></ion-input>
       </div>
       <div class="form-group">
-        <label>Facebook</label>
-        <input type="text" class="form-control" formControlName="Facebook" />
+        <ion-input
+        label="Facebook"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="Facebook"
+        class="form-control"
+        [clearInput]="true"
+      ></ion-input>
       </div>
       <div class="form-group">
-        <label>Soundcloud</label>
-        <input type="text" class="form-control" formControlName="Soundcloud" />
+        <ion-input
+        label="Soundcloud"
+        labelPlacement="stacked"
+        fill="solid"
+        formControlName="Soundcloud"
+        class="form-control"
+        [clearInput]="true"
+      ></ion-input>
       </div>
       <ion-button type="submit" [disabled]="!profileForm.valid" shape="round">Save Changes</ion-button>
       <ion-button shape="round" color="medium" class="btn btn-medium btntest" (click)="cancelEdit()">Cancel</ion-button>

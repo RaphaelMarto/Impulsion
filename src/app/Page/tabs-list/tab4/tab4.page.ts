@@ -8,6 +8,7 @@ import { DataSharingService } from 'src/app/service/data-sharing.service';
 import { take } from 'rxjs';
 import { InstrumentModalComponent } from 'src/app/components/instrument-modal/instrument-modal.component';
 import { socialLinkValidator } from './Validator'
+import { AddressPopupComponent } from 'src/app/components/address-popup/address-popup.component';
 
 @Component({
   selector: 'app-tab4',
@@ -23,6 +24,7 @@ export class Tab4Page implements OnInit {
     phone: '',
     country: '',
     city: '',
+    cityId: 0,
   };
   public edit: boolean = false;
   instrumentShow: any[] = [];
@@ -38,6 +40,8 @@ export class Tab4Page implements OnInit {
   selectedInstruments: any;
   ApiUrl: string = config.API_URL;
   isModalOpen: boolean = false;
+  CountryId!:number
+  CityId!:number
 
   constructor(
     private platform: Platform,
@@ -67,7 +71,7 @@ export class Tab4Page implements OnInit {
         this.instrumentShow = s.InstrumentUser.map((instrument: any) => instrument.Name);
         this.instrument = s.InstrumentUser;
         this.user.phone = s.UserInfo.Phone;
-        this.user.country = s.UserInfo.Address.City.Country.Name; // s.UserInfo.Address.City.Street s.UserInfo.Address.City.HouseNum s.UserInfo.Address.City.PostCode
+        this.user.country = s.UserInfo.Address.City.Country.Name;
         this.user.city = s.UserInfo.Address.City.Name;
         this.user.Spotify = s.UserInfo.Social.Spotify;
         this.user.Youtube = s.UserInfo.Social.Youtube;
@@ -78,7 +82,8 @@ export class Tab4Page implements OnInit {
           email: [s.UserInfo.Email, [Validators.required, Validators.email]],
           phone: [s.UserInfo.Phone],
           country: [s.UserInfo.Address.City.Country.Name],
-          city: [s.UserInfo.Address.City.Name],
+          city: [{ value: s.UserInfo.Address.City.Name, disabled: true }],
+          cityId: [null],
           avatar: [s.UserInfo.PictureUrl],
           Spotify: [s.UserInfo.Social.Spotify, socialLinkValidator('Spotify')],
           Youtube: [s.UserInfo.Social.Youtube, socialLinkValidator('Youtube')],
@@ -112,6 +117,7 @@ export class Tab4Page implements OnInit {
   cancelEdit(): void {
     this.profileForm.setValue(this.userCopy);
     this.edit = false;
+    this.profileForm.get('city')?.disable();
     this.emitEvent(true);
   }
 
@@ -128,11 +134,12 @@ export class Tab4Page implements OnInit {
       this.user.email = this.profileForm.controls['email'].value;
       this.user.phone = this.profileForm.controls['phone'].value;
       this.user.country = this.profileForm.controls['country'].value;
-      this.user.city = 1; //this.profileForm.controls['city'].value;
+      this.user.city = this.profileForm.controls['city'].value;
       this.user.Spotify = this.profileForm.controls['Spotify'].value;
       this.user.Youtube = this.profileForm.controls['Youtube'].value;
       this.user.Facebook = this.profileForm.controls['Facebook'].value;
       this.user.Soundcloud = this.profileForm.controls['Soundcloud'].value;
+      this.user.cityId = this.CityId;
       this.emitEvent(true);
       this.http
         .put(config.API_URL + '/user', this.user, this.options)
@@ -202,6 +209,29 @@ export class Tab4Page implements OnInit {
 
     if (role === 'confirm') {
       this.addInstrument(data);
+    }
+  }
+
+  async viewCountryOrCity(CountryOrCity:string, CountryId:number) {
+    const modal = await this.modalController.create({
+      component: AddressPopupComponent,
+      componentProps: {
+        CountryOrCity: CountryOrCity,
+        CountryId: CountryId
+      },
+    });
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm' && CountryOrCity === "Country") {
+      this.CountryId = data[0];
+      this.profileForm.get('country')?.setValue(data[1])
+      this.profileForm.get('city')?.setValue(null)
+      this.profileForm.get('city')?.enable();
+    } else if (role === 'confirm'){
+      this.CityId = data[0];
+      this.profileForm.get('city')?.setValue(data[1])
     }
   }
 

@@ -7,24 +7,22 @@
 
   <form [formGroup]="locationForm">
     <div *ngIf="buttonFocus == 'Localiter'">
-      <ion-select
-        label="Country"
-        label-placement="stacked"
-        formControlName="country"
-        fill="solid"
-        (ionChange)="onCountryChange($event)"
-      >
-        <ion-select-option *ngFor="let option of country" [value]="option.id">{{ option.Name }}</ion-select-option>
-      </ion-select>
-      
-      <ion-select
+      <ion-input
+          label="Country"
+          labelPlacement="stacked"
+          fill="solid"
+          formControlName="country"
+          class="form-control"
+          (click)="viewCountryOrCity('Country',0)"
+        ></ion-input>
+        <ion-input
         label="City"
-        label-placement="stacked"
-        formControlName="city"
+        labelPlacement="stacked"
         fill="solid"
-      >
-        <ion-select-option *ngFor="let option of city" [value]="option.id">{{ option.Name }}</ion-select-option>
-      </ion-select>
+        formControlName="city"
+        class="form-control"
+        (click)="viewCountryOrCity('City',CountryId)"
+      ></ion-input>
       <div class="center-btn-container">
         <ion-button (click)="InputLocation()" color="dark" class="locationBouton">Search</ion-button>
       </div>

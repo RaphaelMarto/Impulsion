@@ -18,6 +18,7 @@ export class Tab5Page implements OnInit,OnDestroy {
   public user!: Array<any>;
   public loading: boolean = false;
   public chatRooms!: Observable<any[]>;
+  public userFiltered!: Array<any>;
   unsub1: any;
   model = {
     icon: 'chatbubbles-outline',
@@ -59,6 +60,7 @@ export class Tab5Page implements OnInit,OnDestroy {
       .pipe(take(1))
       .subscribe((res: any) => {
         this.user = res;
+        this.userFiltered =res;
       });
   }
 
@@ -108,5 +110,11 @@ export class Tab5Page implements OnInit,OnDestroy {
       },
     };
     this.router.navigate(['/tabs/chat/private', item?.roomsId], navData);
+  }
+
+  onSearch(event: any) {
+    this.userFiltered = this.user.filter((obj: any) =>
+      obj.Nickname.toLowerCase().includes(event.target.value.toLowerCase())
+    );
   }
 }

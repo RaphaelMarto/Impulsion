@@ -317,7 +317,7 @@ router.put("", authenticate, async (req, res) => {
 
     User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
       if (user) {
-        return user.Address.update({ CityId: req.body.city }).then(function (result) {
+        return user.Address.update({ CityId: req.body.cityId }).then(function (result) {
           return result;
         });
       } else {

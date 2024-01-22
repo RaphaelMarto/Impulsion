@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Tab2Page } from './tab2.page';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
+import { AddressModalModule } from 'src/app/components/address-popup/address-popup.module';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { Tab2PageRoutingModule } from './tab2-routing.module';
     HeaderModule,
     HttpClientModule,
     ReactiveFormsModule,
+    AddressModalModule,
   ],
   declarations: [Tab2Page],
 })
