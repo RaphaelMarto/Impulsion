@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { Observable, of, take } from 'rxjs';
+import { AddressPopupComponent } from 'src/app/components/address-popup/address-popup.component';
 import { config } from 'src/app/config/configuration';
 
 @Component({
@@ -14,13 +16,13 @@ export class Tab2Page implements OnInit {
   public buttonFocus: string = 'artiste';
   private options = { withCredentials: true };
   public dataObserv!: Observable<any[]>;
-  public country: any = [];
-  public city: any = [];
+  public selectedCity!: number;
+  public CountryId!: number;
   locationForm!: FormGroup;
   @ViewChild('searchBar') searchBar: any;
   public url = config.API_URL + '/user/proxy-image?url=';
 
-  constructor(private http: HttpClient, private router: Router, private fb: FormBuilder) {
+  constructor(private http: HttpClient, private router: Router, private fb: FormBuilder,private modalController: ModalController,) {
     this.locationForm = this.fb.group({
       country: [null, Validators.required],
       city: [{ value: null, disabled: true }, Validators.required],
@@ -77,9 +79,8 @@ export class Tab2Page implements OnInit {
 
   InputLocation() {
     if (this.locationForm.valid) {
-      const selectedCity = this.locationForm.get('city')?.value;
       this.http
-        .get(config.API_URL + '/user/location/' + selectedCity, this.options)
+        .get(config.API_URL + '/user/location/' + this.selectedCity, this.options)
         .pipe(take(1))
         .subscribe((res: any) => {
           this.dataObserv = of(res);
@@ -87,24 +88,26 @@ export class Tab2Page implements OnInit {
     }
   }
 
-  getCountry() {
-    this.http
-      .get(config.API_URL + '/user/country/', this.options)
-      .pipe(take(1))
-      .subscribe((res: any) => {
-        this.country = res;
-      });
-  }
+  async viewCountryOrCity(CountryOrCity:string, CountryId:number) {
+    const modal = await this.modalController.create({
+      component: AddressPopupComponent,
+      componentProps: {
+        CountryOrCity: CountryOrCity,
+        CountryId: CountryId
+      },
+    });
+    await modal.present();
 
-  onCountryChange(event: any) {
-    if (!!this.locationForm.get('country')?.value) {
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm' && CountryOrCity === "Country") {
+      this.CountryId = data[0];
+      this.locationForm.get('country')?.setValue(data[1])
+      this.locationForm.get('city')?.setValue(null)
       this.locationForm.get('city')?.enable();
-      this.http
-        .get(config.API_URL + '/user/city/' + event.target.value, this.options)
-        .pipe(take(1))
-        .subscribe((res: any) => {
-          this.city = res;
-        });
+    } else if (role === 'confirm'){
+      this.selectedCity = data[0];
+      this.locationForm.get('city')?.setValue(data[1])
     }
   }
 
@@ -118,11 +121,8 @@ export class Tab2Page implements OnInit {
     this.dataObserv = of([]);
     if(name == 'Localiter'){
       this.locationForm.get('city')?.setValue(null);
-      this.locationForm.get('city')?.disable();
       this.locationForm.get('country')?.setValue(null);
-      this.city = null;
-      this.country = null;
-      this.getCountry();
+      this.locationForm.get('city')?.disable();
     }
   }
 }

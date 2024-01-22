@@ -16,7 +16,6 @@ export class InstrumentModalComponent  implements OnInit {
 
   ngOnInit() {
     this.instrumentsFiltered = this.instrumentList;
-    console.log(this.instrumentList)
   }
 
   cancel() {
@@ -29,7 +28,6 @@ export class InstrumentModalComponent  implements OnInit {
 
   onRadioChange(instrumentId: any) {
     this.selectedInstrument= instrumentId.target.value;
-    console.log('Selected instruments:', instrumentId.target.value);
   }
 
   async viewNewInstrument() {

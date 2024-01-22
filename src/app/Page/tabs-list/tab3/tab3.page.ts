@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController, Platform, ToastController } from '@ionic/angular';
 import { Tab3Service } from './service/tab3.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import WaveSurfer from 'wavesurfer.js';
 import * as WaveSurferTimeline from 'wavesurfer.js/src/plugin/timeline';
 import * as WaveSurferRegion from 'wavesurfer.js/src/plugin/regions';
 import * as Minimap from 'wavesurfer.js/src/plugin/minimap';
+import { AddressPopupComponent } from 'src/app/components/address-popup/address-popup.component';
 
 @Component({
   selector: 'app-tab3',
@@ -19,6 +20,7 @@ export class Tab3Page implements OnInit {
   public file: any;
   public genre: any[] = [];
   musicForm!: FormGroup<any>;
+  type:any;
   audioFile: any;
   audioDuration: any;
   wave: any;
@@ -35,14 +37,11 @@ export class Tab3Page implements OnInit {
     public toastController: ToastController,
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
-    public alertController: AlertController
+    public alertController: AlertController,
+    private modalController: ModalController,
   ) {}
 
-  ngOnInit(): void {
-    this.tab3Service.getGenre().subscribe((data) => {
-      this.genre = data;
-    });
-  }
+  ngOnInit(): void {}
 
   async presentLoading(): Promise<HTMLIonLoadingElement> {
     const loading = await this.loadingController.create({
@@ -154,6 +153,7 @@ export class Tab3Page implements OnInit {
   async uploadFiles(): Promise<void> {
     this.sending = true;
     if (this.musicForm.valid) {
+      this.musicForm.get('genre')?.setValue(this.type)
       const loading = await this.presentLoading();
       const newFile = await this.exportSelected();
       this.tab3Service.uploadAudio(newFile, this.musicForm.value).subscribe((res) =>{
@@ -204,5 +204,23 @@ export class Tab3Page implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async viewTypeOfMusic(Type:string) {
+    const modal = await this.modalController.create({
+      component: AddressPopupComponent,
+      componentProps: {
+        Type: Type,
+        CountryId: null
+      },
+    });
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      this.type = data[0];
+      this.musicForm.get('genre')?.setValue(data[1])
+    }
   }
 }

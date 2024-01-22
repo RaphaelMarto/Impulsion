@@ -8,6 +8,7 @@ import { Tab3Page } from './tab3.page';
 import { Tab3PageRoutingModule } from './tab3-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { Tab3Service } from './service/tab3.service';
+import { AddressModalModule } from 'src/app/components/address-popup/address-popup.module';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { Tab3Service } from './service/tab3.service';
     HeaderModule,
     HttpClientModule,
     ReactiveFormsModule,
+    AddressModalModule,
   ],
   declarations: [Tab3Page],
   providers: [Tab3Service],

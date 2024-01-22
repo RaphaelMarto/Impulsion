@@ -69,11 +69,14 @@
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
+        <ion-toolbar class="toolbar">
+          <ion-searchbar placeholder="Search for instrument" (ionInput)="onSearch($event)"></ion-searchbar>
+        </ion-toolbar>
       </ion-header>
       <ion-content>
         <ion-list class="ion-margin-top" [style.background]="'transparent'" lines="none">
           <app-user-list
-          *ngFor="let item of user"
+          *ngFor="let item of userFiltered"
           [item]="item"
           (onClick)="startChat($event)"></app-user-list>
         </ion-list>
