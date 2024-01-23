@@ -14,7 +14,7 @@ export class CommentComponent implements OnInit {
   @Input() comments: any;
   @Input() idMusic: number = 0;
   @Input() numberReply: number = 0;
-  @Output() cancelAction = new EventEmitter<boolean>();
+  @Output() commentDeleted = new EventEmitter<void>();
   comments2: any;
   public name: any = '';
   public replyCommentVisible: boolean = false;
@@ -60,7 +60,6 @@ export class CommentComponent implements OnInit {
       .get(config.API_URL + '/comment/comment/' + this.idMusic + '/' + CommentId, this.options)
       .pipe(take(1))
       .subscribe((res: any) => {
-        console.log(res);
         this.comments2 = of(res);
         this.showMoreCom = true;
         this.numberReply++;
@@ -73,9 +72,8 @@ export class CommentComponent implements OnInit {
       .delete(config.API_URL + '/comment/del/' + CommentId, this.options)
       .pipe(take(1))
       .subscribe(() => {
-        this.cancelAction.emit(true);
+        this.commentDeleted.emit();
       });
-  this.cancelAction.emit(false);
   }
 
   addComment(text: string, CommentId: number) {
