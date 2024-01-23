@@ -27,5 +27,5 @@
     <a (click)="showMoreComment(comments.id)" *ngIf="!showMoreCom">Show reply</a>
   </div>
 </div>
-<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async)" [comments]="comment2" [idMusic]="idMusic" [numberReply]="numberReply">
+<div [style.margin-left.px]="marginValue" *ngIf="showMoreCom"><app-comment *ngFor="let comment2 of (comments2 | async)" [comments]="comment2" [idMusic]="idMusic" [numberReply]="numberReply" (commentDeleted)="refresh(comments.id)">
 </app-comment></div>

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
 import { config } from '../../config/configuration';
+import { insturmentValidator } from './Validator';
 
 @Component({
   selector: 'app-instrument-form',
@@ -10,13 +11,23 @@ import { config } from '../../config/configuration';
   styleUrls: ['./instrument-form.component.scss'],
 })
 export class InstrumentFormComponent  implements OnInit {
-  InsturmentForm:any;
+  InstrumentForm!:FormGroup;
+  options = { withCredentials: true };
+  InstrumentList:Array<any> = [];
 
   constructor(private modalCtrl: ModalController,private formBuilder: FormBuilder,private http: HttpClient,public alertController: AlertController) { }
 
   ngOnInit() {
-    this.InsturmentForm = this.formBuilder.group({
-      name: ['', Validators.required],
+    this.http.get(config.API_URL + '/user/instrument/all',this.options).subscribe((res:any) => {
+      this.InstrumentList = res.map((item:any) => item.Name);
+      this.InstrumentForm = this.formBuilder.group({
+        name: ['', [Validators.required, insturmentValidator(this.InstrumentList)]],
+        reference: [''],
+      });
+    })
+
+    this.InstrumentForm ??= this.formBuilder.group({
+      name: ['', []],
       reference: [''],
     });
   }
@@ -26,10 +37,11 @@ export class InstrumentFormComponent  implements OnInit {
   }
 
   SendInstrument(){
-    const options = { withCredentials: true };
-    this.http.post(config.API_URL + '/music/instrumentTemp/new', this.InsturmentForm.value ,options).subscribe(() => {
-      this.ConfirmSent()
-    })
+    if(this.InstrumentForm.valid){
+      this.http.post(config.API_URL + '/music/instrumentTemp/new', this.InstrumentForm.value ,this.options).subscribe(() => {
+        this.ConfirmSent()
+      })
+    }
   }
 
   async ConfirmSent() {
