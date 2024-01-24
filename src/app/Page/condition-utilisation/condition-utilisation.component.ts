@@ -16,7 +16,6 @@ export class ConditionUtilisationComponent  implements OnInit {
   ngOnInit() {}
 
   acceptConditions() {
-    console.log('here')
     const options = { withCredentials: true };
     this.http.put(config.API_URL + '/user/condition',{}, options).subscribe();
     this.router.navigate(['/tabs/home']);

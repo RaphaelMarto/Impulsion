@@ -4,11 +4,11 @@ export interface StatisticData {
     totLike:number;
     totView:number;
     mostLike: {
-      nbLike: number;
-      musicName: string;
+      nbLike: number | null;
+      musicName: string | null;
     };
     mostView: {
-      nbView: number;
-      musicName: string;
+      nbView: number | null;
+      musicName: string | null;
     };
   }

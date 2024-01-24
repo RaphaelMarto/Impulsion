@@ -130,6 +130,11 @@ async function getRandomMusic(indices) {
     ],
   });
 
+  const indexMap = new Map();
+  indices.forEach((index, order) => indexMap.set(index, order));
+
+  musicDocuments.sort((a, b) => indexMap.get(a.id) - indexMap.get(b.id));
+
   return musicDocuments.map((music) => ({
     id: music.id,
     Name: music.Name,
