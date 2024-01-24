@@ -33,7 +33,7 @@ router.get("/info", async (req, res) => {
           include: [
             {
               model: City,
-              attributes: ["Name"],
+              attributes: ["Name",'id'],
               include: [
                 {
                   model: Country,

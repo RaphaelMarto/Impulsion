@@ -73,6 +73,8 @@ export class Tab4Page implements OnInit {
         this.user.phone = s.UserInfo.Phone;
         this.user.country = s.UserInfo.Address.City?.Country?.Name;
         this.user.city = s.UserInfo.Address.City?.Name;
+        this.user.cityId = s.UserInfo.Address.City?.id;
+        console.log(s.UserInfo.Address)
         this.user.Spotify = s.UserInfo.Social.Spotify;
         this.user.Youtube = s.UserInfo.Social.Youtube;
         this.user.Facebook = s.UserInfo.Social.Facebook;
@@ -83,7 +85,7 @@ export class Tab4Page implements OnInit {
           phone: [s.UserInfo.Phone],
           country: [s.UserInfo.Address.City?.Country?.Name],
           city: [{ value: s.UserInfo.Address.City?.Name, disabled: true }],
-          cityId: [null],
+          cityId: [s.UserInfo.Address.City?.id],
           avatar: [s.UserInfo.PictureUrl],
           Spotify: [s.UserInfo.Social.Spotify, socialLinkValidator('Spotify')],
           Youtube: [s.UserInfo.Social.Youtube, socialLinkValidator('Youtube')],
