@@ -71,8 +71,8 @@ export class Tab4Page implements OnInit {
         this.instrumentShow = s.InstrumentUser.map((instrument: any) => instrument.Name);
         this.instrument = s.InstrumentUser;
         this.user.phone = s.UserInfo.Phone;
-        this.user.country = s.UserInfo.Address.City.Country.Name;
-        this.user.city = s.UserInfo.Address.City.Name;
+        this.user.country = s.UserInfo.Address.City?.Country?.Name;
+        this.user.city = s.UserInfo.Address.City?.Name;
         this.user.Spotify = s.UserInfo.Social.Spotify;
         this.user.Youtube = s.UserInfo.Social.Youtube;
         this.user.Facebook = s.UserInfo.Social.Facebook;
@@ -81,8 +81,8 @@ export class Tab4Page implements OnInit {
           nickname: [s.UserInfo.Nickname, Validators.required],
           email: [s.UserInfo.Email, [Validators.required, Validators.email]],
           phone: [s.UserInfo.Phone],
-          country: [s.UserInfo.Address.City.Country.Name],
-          city: [{ value: s.UserInfo.Address.City.Name, disabled: true }],
+          country: [s.UserInfo.Address.City?.Country?.Name],
+          city: [{ value: s.UserInfo.Address.City?.Name, disabled: true }],
           cityId: [null],
           avatar: [s.UserInfo.PictureUrl],
           Spotify: [s.UserInfo.Social.Spotify, socialLinkValidator('Spotify')],

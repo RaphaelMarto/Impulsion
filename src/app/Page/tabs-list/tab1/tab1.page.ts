@@ -58,8 +58,8 @@ export class Tab1Page implements OnInit {
     this.authService.isLoggedIn.subscribe(async (logedIn) => {
       this.login = logedIn;
       if (this.login) {
-        this.authService.checkCondition().subscribe(async (condition) => {
-          if (!condition) {
+        this.authService.checkCondition().subscribe(async (condition:any) => {
+          if (!condition.PolicyCheck) {
             this.router.navigate(['/condition']);
           }
         });

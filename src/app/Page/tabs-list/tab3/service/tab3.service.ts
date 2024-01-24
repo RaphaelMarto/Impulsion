@@ -26,18 +26,4 @@ export class Tab3Service {
       })
     );
   }
-
-  getGenre() {
-    return this.http
-      .get(config.API_URL + '/music/genre')
-      .pipe(take(1))
-      .pipe(
-        map((response: any) => {
-          return response.map((genre: any) => ({
-            Name: genre.Name,
-            id: genre.id,
-          }));
-        })
-      );
-  }
 }

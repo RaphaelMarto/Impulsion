@@ -1,9 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { take } from 'rxjs';
+import { map, take } from 'rxjs';
 import { config } from '../../config/configuration';
 import { HttpClient } from '@angular/common/http';
-import { Tab3Service } from 'src/app/Page/tabs-list/tab3/service/tab3.service';
 
 @Component({
   selector: 'app-address-popup',
@@ -19,7 +18,7 @@ export class AddressPopupComponent implements OnInit {
   public selectedata: any;
   private options = { withCredentials: true };
 
-  constructor(private modalCtrl: ModalController, private http: HttpClient,private tab3Service: Tab3Service) {}
+  constructor(private modalCtrl: ModalController, private http: HttpClient) {}
 
   ngOnInit() {
     if (this.CountryOrCity === 'Country') {
@@ -70,8 +69,22 @@ export class AddressPopupComponent implements OnInit {
       });
   }
 
+  getGenre() {
+    return this.http
+      .get(config.API_URL + '/music/genre')
+      .pipe(take(1))
+      .pipe(
+        map((response: any) => {
+          return response.map((genre: any) => ({
+            Name: genre.Name,
+            id: genre.id,
+          }));
+        })
+      );
+  }
+
   getType(){
-    this.tab3Service.getGenre().subscribe((data) => {
+    this.getGenre().subscribe((data) => {
       this.data = data;
       this.dataFiltered = data;
     });

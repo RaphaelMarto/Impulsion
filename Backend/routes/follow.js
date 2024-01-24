@@ -20,7 +20,6 @@ router.get("/all", async (req, res) => {
         attributes: ["id", "Nickname"],
       });
     });
-    if (followInfo.length == 0 || !Array.isArray(followInfo)) throw new MyError("You don't follow anyone", 401);
     res.status(200).json(followInfo);
   } catch (e){
     const status = e.status || 401;

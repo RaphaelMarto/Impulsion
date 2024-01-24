@@ -39,7 +39,6 @@ export class InstrumentModalComponent  implements OnInit {
   }
 
   onSearch(event:any) {
-    console.log(event.target.value.toLowerCase())
     this.instrumentsFiltered = this.instrumentList.filter((instrument:any) =>
       instrument.Name.toLowerCase().includes(event.target.value.toLowerCase())
     );

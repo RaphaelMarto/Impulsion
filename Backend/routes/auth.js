@@ -32,7 +32,7 @@ router.post("/login", async (req, res) => {
             Phone: null,
             PictureUrl: user.photoURL,
             PolicyCheck: false,
-            IsActive: true,
+            isActive: true,
             Role: 1,
             idSocials: SocialId,
             AdressId: AddressId,

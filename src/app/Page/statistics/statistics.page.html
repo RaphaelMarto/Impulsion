@@ -28,13 +28,23 @@
       <ion-col size="6">
         <div class="grid-cell">
           <p class="cell-text">Most Viewed</p>
-          <p class="cell-number">{{data.mostView.musicName}} with {{data.mostView.nbView}} views</p>
+          <ng-container *ngIf="data.mostView">
+            <p class="cell-number">{{data.mostView.musicName}} with {{data.mostView.nbView}} views</p>
+          </ng-container>
+          <ng-container *ngIf="!data.mostView">
+            <p class="cell-number">0</p>
+          </ng-container>
         </div>
       </ion-col>
       <ion-col size="6">
         <div class="grid-cell">
           <p class="cell-text">Most Liked</p>
-          <p class="cell-number">{{data.mostLike.musicName}} with {{data.mostLike.nbLike}} Likes</p>
+          <ng-container *ngIf="data.mostLike">
+            <p class="cell-number">{{data.mostLike.musicName}} with {{data.mostLike.nbLike}} Likes</p>
+          </ng-container>
+          <ng-container *ngIf="!data.mostLike">
+            <p class="cell-number">0</p>
+          </ng-container>
         </div>
       </ion-col>
     </ion-row>
@@ -42,13 +52,23 @@
       <ion-col size="6">
         <div class="grid-cell">
           <p class="cell-text">View Average</p>
-          <p class="cell-number">{{data.avgView}}</p>
+          <ng-container *ngIf="data.avgView">
+            <p class="cell-number">{{data.avgView}}</p>
+          </ng-container>
+          <ng-container *ngIf="!data.avgView">
+            <p class="cell-number">0</p>
+          </ng-container>
         </div>
       </ion-col>
       <ion-col size="6">
         <div class="grid-cell">
           <p class="cell-text">Like Average</p>
-          <p class="cell-number">{{data.avgLike | number:'1.1-1'}}</p>
+          <ng-container *ngIf="data.avgLike">
+            <p class="cell-number">{{data.avgLike | number:'1.1-1'}}</p>
+          </ng-container>
+          <ng-container *ngIf="!data.avgLike">
+            <p class="cell-number">0</p>
+          </ng-container>
         </div>
       </ion-col>
     </ion-row>
