@@ -13,7 +13,7 @@ router.post("/add/:idMusic", authenticate, async (req, res) => {
   try {
     const NewComment = await Comment.create({
       idMusic: MusicId,
-      idUser: req.cookies.user_session[1],
+      idUser: JSON.parse(req.cookies.user_session).ID,
       RepliedToComId: ReplyId,
       Message: comment,
     });

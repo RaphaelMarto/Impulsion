@@ -38,7 +38,7 @@ router.post("/upload", authenticate, upload.single("file"), async (req, res) => 
       Name: name,
       Description: desc,
       TypeMusicId: genre,
-      idUser: req.cookies.user_session[1],
+      idUser: JSON.parse(req.cookies.user_session).ID,
     });
 
     fs.unlink(file.path, (err) => {
@@ -86,7 +86,7 @@ router.get("/genre", async (req, res) => {
 router.get("/user/all", async (req, res) => {
   try {
     const musics = await Music.findAll({
-      where: { idUser: req.cookies.user_session[1] },
+      where: { idUser: JSON.parse(req.cookies.user_session).ID },
       attributes: ["id", "Name"],
     });
 

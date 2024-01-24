@@ -53,7 +53,7 @@
         <div class="grid-cell">
           <p class="cell-text">View Average</p>
           <ng-container *ngIf="data.avgView">
-            <p class="cell-number">{{data.avgView}}</p>
+            <p class="cell-number">{{data.avgView | number:'1.1-1'}}</p>
           </ng-container>
           <ng-container *ngIf="!data.avgView">
             <p class="cell-number">0</p>

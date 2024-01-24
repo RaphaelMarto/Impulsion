@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
     // Set session cookie in response
-    res.cookie("user_session", [sessionCookie, UserId, uid], {
+    res.cookie("user_session", JSON.stringify({CookieSes :sessionCookie, ID:UserId, UID:uid}), {
       maxAge: expiresIn,
       expires: new Date(Date.now() + expiresIn),
       httpOnly: true,
@@ -65,7 +65,7 @@ router.post("/login", async (req, res) => {
     // res.setHeader(
     //   "Set-Cookie",
     //   "user_session=" +
-    //     [sessionCookie, UserId] +
+    //     JSON.stringify({CookieSes :sessionCookie, ID:UserId, UID:uid}) +
     //     "; expires=" +
     //     new Date(Date.now() + expiresIn) +
     //     "; Secure; httpOnly; SameSite=None; Path=/"
@@ -87,7 +87,7 @@ router.get("/logout", function (req, res) {
 });
 
 router.get("/userId", authenticate, async (req, res) => {
-  res.status(200).json(req.cookies.user_session[2]);
+  res.status(200).json(JSON.parse(req.cookies.user_session).UID);
 });
 
 router.get("/check-cookie", (req, res) => {
@@ -101,7 +101,7 @@ router.get("/check-cookie", (req, res) => {
 router.get("/all/id", async (req, res) => {
   try {
     const UserIds = await Follow.findAll({
-      where: { idUserFollowing: req.cookies.user_session[1] },
+      where: { idUserFollowing: JSON.parse(req.cookies.user_session).ID },
       attributes: ["idUserFollowed"],
       raw: true,
     }).then((followeds) => {
@@ -124,7 +124,7 @@ router.get("/all/id", async (req, res) => {
 
 router.get("/get-name", async (req, res) => {
   try {
-    const user = await User.findOne({ where: { id: req.cookies.user_session[1] }, attributes: ["Nickname"] });
+    const user = await User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, attributes: ["Nickname"] });
     if (!user) throw new MyError("No User", 404);
     res.status(200).json(user);
   } catch (e) {

@@ -1,7 +1,7 @@
 const firebaseAdmin = require("firebase-admin");
 
 const authenticate = async (req, res, next) => {
-  const sessionCookie = req.cookies.user_session[0];
+  const sessionCookie = JSON.parse(req.cookies.user_session).CookieSes;
   
   try {
     if (!sessionCookie) {

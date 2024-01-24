@@ -23,7 +23,7 @@ router.get("/info", async (req, res) => {
   try {
     const UserInfo = await User.findOne({
       where: {
-        id: req.cookies.user_session[1],
+        id: JSON.parse(req.cookies.user_session).ID,
       },
       attributes: ["Nickname", "Email", "Phone", "PictureUrl"],
       include: [
@@ -50,7 +50,7 @@ router.get("/info", async (req, res) => {
       ],
     });
     const InstrumentUser = await InstrumentToUser.findAll({
-      where: { UserId: req.cookies.user_session[1] },
+      where: { UserId: JSON.parse(req.cookies.user_session).ID },
       attributes: ["InstrumentId"],
       raw: true,
     }).then((Instruments) => {
@@ -116,7 +116,7 @@ router.get("/instrument/:idInstrument", authenticate, async (req, res) => {
 
     const newInstrument = await InstrumentToUser.create({
       InstrumentId: instrumentId,
-      UserId: req.cookies.user_session[1],
+      UserId: JSON.parse(req.cookies.user_session).ID,
     });
     res.status(200).send();
   } catch (e) {
@@ -132,7 +132,7 @@ router.delete("/instrument/:idInstrument", authenticate, async (req, res) => {
     const deletedRows = await InstrumentToUser.destroy({
       where: {
         InstrumentId: instrumentId,
-        UserId: req.cookies.user_session[1],
+        UserId: JSON.parse(req.cookies.user_session).ID,
       },
     });
     if (deletedRows < 0) throw new MyError("No instrument", 401);
@@ -224,7 +224,7 @@ router.get("/all/:startLetter", async (req, res) => {
 
 router.get("/condition", async (req, res) => {
   try {
-    const PolicyCheck = await User.findOne({ where: { id: req.cookies.user_session[1] }, attributes: ["PolicyCheck"] });
+    const PolicyCheck = await User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, attributes: ["PolicyCheck"] });
     res.status(200).json(PolicyCheck);
   } catch (e) {
     const status = e.status || 401;
@@ -236,7 +236,7 @@ router.put("/condition", authenticate, async (req, res) => {
   try {
     const numOfUpdatedRows = await User.update(
       { PolicyCheck: true }, // Set the new value for PolicyCheck
-      { where: { id: req.cookies.user_session[1] } } // Include returning option to get the updated user
+      { where: { id: JSON.parse(req.cookies.user_session).ID } } // Include returning option to get the updated user
     );
     if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
     res.status(200).send();
@@ -311,11 +311,11 @@ router.put("", authenticate, async (req, res) => {
         Phone: req.body.phone,
         PictureUrl: req.body.avatar,
       },
-      { where: { id: req.cookies.user_session[1] } }
+      { where: { id: JSON.parse(req.cookies.user_session).ID } }
     );
     if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
 
-    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
+    User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, include: [{ model: Address }] }).then(function (user) {
       if (user) {
         return user.Address.update({ CityId: req.body.cityId }).then(function (result) {
           return result;
@@ -325,7 +325,7 @@ router.put("", authenticate, async (req, res) => {
       }
     });
 
-    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Social }] }).then(function (user) {
+    User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, include: [{ model: Social }] }).then(function (user) {
       if (user) {
         return user.Social.update({
           Spotify: req.body.Spotify,
@@ -359,11 +359,11 @@ router.delete("", authenticate, async (req, res) => {
         Password: null,
         UID: null,
       },
-      { where: { id: req.cookies.user_session[1] } }
+      { where: { id: JSON.parse(req.cookies.user_session).ID } }
     );
     if (numOfUpdatedRows < 0) throw new MyError("Update failed", 401);
 
-    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Address }] }).then(function (user) {
+    User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, include: [{ model: Address }] }).then(function (user) {
       if (user) {
         return user.Address.update({ CityId: 1, PostCode: null, HouseNum: null, Street: null }).then(function (result) {
           return result;
@@ -373,7 +373,7 @@ router.delete("", authenticate, async (req, res) => {
       }
     });
 
-    User.findOne({ where: { id: req.cookies.user_session[1] }, include: [{ model: Social }] }).then(function (user) {
+    User.findOne({ where: { id: JSON.parse(req.cookies.user_session).ID }, include: [{ model: Social }] }).then(function (user) {
       if (user) {
         return user.Social.update({ Spotify: null, Youtube: null, Facebook: null, Soundcloud: null }).then(function (
           result
@@ -390,19 +390,19 @@ router.delete("", authenticate, async (req, res) => {
         RoleId: 1,
       },
       {
-        where: { UserId: req.cookies.user_session[1] },
+        where: { UserId: JSON.parse(req.cookies.user_session).ID },
       }
     );
 
     const userMusic = await Music.findAll({
-      where: { idUser: req.cookies.user_session[1] },
+      where: { idUser: JSON.parse(req.cookies.user_session).ID },
       attributes: ["id"],
     });
 
     // Extract music IDs
     const musicIds = userMusic.map((music) => music.id);
     await Music.destroy({
-      where: { idUser: req.cookies.user_session[1] },
+      where: { idUser: JSON.parse(req.cookies.user_session).ID },
     });
 
     await Comment.destroy({
@@ -415,7 +415,7 @@ router.delete("", authenticate, async (req, res) => {
 
     const userFollow = await Follow.findAll({
       where: {
-        [Op.or]: [{ idUserFollowing: req.cookies.user_session[1] }, { idUserFollowed: req.cookies.user_session[1] }],
+        [Op.or]: [{ idUserFollowing: JSON.parse(req.cookies.user_session).ID }, { idUserFollowed: JSON.parse(req.cookies.user_session).ID }],
       },
       attributes: ["id"],
     });
@@ -427,7 +427,7 @@ router.delete("", authenticate, async (req, res) => {
     });
 
     await InstrumentToUsers.destroy({
-      where: { UserId: req.cookies.user_session[1] },
+      where: { UserId: JSON.parse(req.cookies.user_session).ID },
     });
 
     res.status(200).send();
