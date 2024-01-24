@@ -20,7 +20,7 @@ router.post("/chatRoom", authenticate, async (req, res) => {
       .doc(uuid)
       .set({
         type: "private",
-        members: [req.cookies.user_session[2], idOther],
+        members: [JSON.parse(req.cookies.user_session).UID, idOther],
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -29,7 +29,7 @@ router.post("/chatRoom", authenticate, async (req, res) => {
 
   for (const doc of room.docs) {
     const roomData = doc.data();
-    roomExist = roomData.members.includes(req.cookies.user_session[2]) && roomData.members.includes(idOther);
+    roomExist = roomData.members.includes(JSON.parse(req.cookies.user_session).UID) && roomData.members.includes(idOther);
     if (roomExist) {
       res.send({ id: doc.id });
       break;
@@ -43,7 +43,7 @@ router.post("/chatRoom", authenticate, async (req, res) => {
       .doc(uuid)
       .set({
         type: "private",
-        members: [req.cookies.user_session[2], idOther],
+        members: [JSON.parse(req.cookies.user_session).UID, idOther],
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -58,8 +58,8 @@ router.get("/chatRoom", authenticate, async (req, res) => {
     for (const doc of room.docs) {
       const roomData = doc.data();
 
-      if (roomData.members.includes(req.cookies.user_session[2])) {
-        const user_data = roomData.members.filter((x) => x != req.cookies.user_session[2]);
+      if (roomData.members.includes(JSON.parse(req.cookies.user_session).UID)) {
+        const user_data = roomData.members.filter((x) => x != JSON.parse(req.cookies.user_session).UID);
         const userId = user_data[0];
         const roomsId = doc.id;
 
@@ -105,7 +105,7 @@ router.post("/message", authenticate, async (req, res) => {
 
   const new_msg = {
     message: msg,
-    sender: req.cookies.user_session[2],
+    sender: JSON.parse(req.cookies.user_session).UID,
     createdAt: new Date(),
   };
 

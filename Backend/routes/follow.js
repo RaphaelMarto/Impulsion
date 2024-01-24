@@ -7,7 +7,7 @@ const MyError = require("../middleware/Error");
 router.get("/all", async (req, res) => {
   try{
     const followInfo = await Follow.findAll({
-      where: { idUserFollowing: req.cookies.user_session[1] },
+      where: { idUserFollowing: JSON.parse(req.cookies.user_session).ID },
       attributes: ["idUserFollowed"],
       raw: true,
     }).then((followeds) => {
@@ -30,7 +30,7 @@ router.get("/all", async (req, res) => {
 router.get("/new/:followedId", authenticate, async (req, res) => {
   try {
     const newFollow = await Follow.create({
-      idUserFollowing: req.cookies.user_session[1],
+      idUserFollowing: JSON.parse(req.cookies.user_session).ID,
       idUserFollowed: req.params.followedId,
     });
 
@@ -47,7 +47,7 @@ router.get("/following/:followID", async (req, res) => {
 
     const followInfo = await Follow.findOne({
       where: {
-        idUserFollowing: req.cookies.user_session[1],
+        idUserFollowing: JSON.parse(req.cookies.user_session).ID,
         idUserFollowed: followedId,
       },
       attributes: ["idUserFollowed"],
@@ -55,7 +55,7 @@ router.get("/following/:followID", async (req, res) => {
 
     const isFollowed = !!followInfo;
     let isMe  = false;
-    if(followedId === req.cookies.user_session[1]){
+    if(followedId === JSON.parse(req.cookies.user_session).ID){
       isMe = true
     }
     res.status(200).send({isFollowed:isFollowed, isMe:isMe});
@@ -71,7 +71,7 @@ router.delete("/:followedId", authenticate, async (req, res) => {
   try {
     const deletedRows = await Follow.destroy({
       where: {
-        idUserFollowing: req.cookies.user_session[1],
+        idUserFollowing: JSON.parse(req.cookies.user_session).ID,
         idUserFollowed: followedId,
       },
     });

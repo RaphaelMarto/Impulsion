@@ -6,7 +6,7 @@ const { Statistic, Music } = require("../models");
 router.get("/user", async (req, res) => {
   try {
     const musicData = await Music.findAll({
-      where: { idUser: req.cookies.user_session[1] },
+      where: { idUser: JSON.parse(req.cookies.user_session).ID },
       attributes: ["id", "Name"],
     });
 

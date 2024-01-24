@@ -10,7 +10,7 @@ router.get("/add/:idMusic", authenticate, async (req, res) => {
     const idMusic = req.params.idMusic;
     const like = await Liked.create({
       idMusic: idMusic,
-      idUser: req.cookies.user_session[1],
+      idUser: JSON.parse(req.cookies.user_session).ID,
     });
 
     const startOfDay = new Date();
@@ -46,7 +46,7 @@ router.delete("/del/:idMusic", authenticate, async (req, res) => {
     const deletedRows = await Liked.destroy({
       where: {
         idMusic: idMusic,
-        idUser: req.cookies.user_session[1],
+        idUser: JSON.parse(req.cookies.user_session).ID,
       },
     });
     const startOfDay = new Date();
@@ -88,7 +88,7 @@ router.get("/liked/:idMusic", async (req, res) => {
     let likedEntry = null;
 
     if (req.cookies.user_session) {
-      likedEntry = await Liked.findOne({ where: { idUser: req.cookies.user_session[1], idMusic: idMusic } });
+      likedEntry = await Liked.findOne({ where: { idUser: JSON.parse(req.cookies.user_session).ID, idMusic: idMusic } });
     }
 
     const isLiked = !!likedEntry;
