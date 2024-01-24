@@ -6,7 +6,7 @@ const fs = require("fs");
 const nanoid = require("nanoid");
 var router = express.Router();
 const axios = require("axios");
-const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, TempNewInstrument,sequelize } = require("../models");
+const { Music, Comment, Liked, Instrument, InstrumentToUser, User, TypeMusic, TempNewInstrument,sequelize, Statistic } = require("../models");
 const { Op } = require("sequelize");
 const MyError = require("../middleware/Error");
 
@@ -345,6 +345,10 @@ router.delete("/:musicId", authenticate, async (req, res) => {
   const musicId = req.params.musicId;
 
   try {
+    await Statistic.destroy({
+      where: { idMusic: musicId },
+    });
+
     await Music.destroy({
       where: { id: musicId },
     });

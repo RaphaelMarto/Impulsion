@@ -70,9 +70,9 @@
     </form>
   </div>
   <ion-fab vertical="bottom" horizontal="center" slot="fixed" class="up">
-    <ion-fab-button *ngIf="!condition" (click)="fileInput.click()">
+    <ion-fab-button *ngIf="!condition" (click)="file.click()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-    <input #fileInput type="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)" />
+    <input #file type="file" name="file" accept="audio/*" style="display: none" (change)="onFileSelected($event)" />
   </ion-fab>
 </ion-content>
